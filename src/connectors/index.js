@@ -75,5 +75,11 @@ module.exports = {
   },
   getLiftById: (request) => {
     return handleRequest(request, odhConnector.fetchLiftById, validator.validateLift, serializer.serializeLift)
+  },
+  getTrails: (request) => {
+    return handleRequest(request, odhConnector.fetchTrails, validator.validateTrailArray, serializer.serializeTrails)
+  },
+  getTrailById: (request) => {
+    return handleRequest(request, odhConnector.fetchTrailById, validator.validateTrail, serializer.serializeTrail)
   }
 }

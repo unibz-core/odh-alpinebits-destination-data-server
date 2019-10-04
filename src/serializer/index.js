@@ -76,5 +76,11 @@ module.exports = {
   },
   serializeLift: (data, request, meta) => {
     return data;
+  },
+  serializeTrails: (data, request, meta) => {
+    return data;
+  },
+  serializeTrail: (data, request, meta) => {
+    return data;
   }
 }
