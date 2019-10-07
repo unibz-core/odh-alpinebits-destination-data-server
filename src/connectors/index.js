@@ -81,5 +81,8 @@ module.exports = {
   },
   getTrailById: (request) => {
     return handleRequest(request, odhConnector.fetchTrailById, validator.validateTrail, serializer.serializeTrail)
+  },
+  getTrailMedia: (request) => {
+    return handleRequest(request, odhConnector.fetchTrailMediaObjects, validator.validateMediaObjectArray, serializer.serializeMediaObjects)
   }
 }

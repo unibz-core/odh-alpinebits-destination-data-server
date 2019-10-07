@@ -110,7 +110,20 @@ const templates = {
     address: {},
     geometries: [],
     howToArrive: {}
-  }
+  },
+  Trail: {
+      "@type": "Trail",
+      "id": "",
+      "name": {},
+      "category": "",
+      "length": null,
+      "minHeight": null,
+      "maxHeight": null,
+      "difficulty": {},
+      "connections": [],
+      "geometries": [],
+      "openingHours": []
+    }
 }
 
 // Function to create empty objects. It is better to have fields with null values than to have missing fields.

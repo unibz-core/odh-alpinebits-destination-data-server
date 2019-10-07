@@ -163,5 +163,6 @@ module.exports = {
   fetchLifts: fetchLifts,
   fetchLiftById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformLift),
   fetchTrails: fetchTrails,
-  fetchTrailById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformTrail)
+  fetchTrailById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformTrail),
+  fetchTrailMediaObjects: fetchSubResource(ACTIVITY_PATH, odh2ab.transformTrail, 'multimediaDescriptions')
 }

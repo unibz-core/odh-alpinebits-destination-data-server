@@ -2,9 +2,9 @@ const shajs = require('sha.js')
 const utils = require('./utils');
 const templates = require('./templates');
 
-module.exports.transform = (object) => {
+module.exports = (object) => {
   const source = JSON.parse(JSON.stringify(object));
-  let target = templates.createObject('Lift');
+  let target = templates.createObject('Trail');
 
   Object.assign(target, utils.transformMetadata(source));
   Object.assign(target, utils.transformBasicProperties(source));
@@ -26,17 +26,17 @@ module.exports.transform = (object) => {
   // { "_id" : "Unterirdische Bahn", "count" : 1 }
   // { "_id" : "Skilift", "count" : 112 }
 
-  const geometry = transformGeometry(source.GpsInfo);
-  target.geometries.push(geometry);
+  // const geometry = transformGeometry(source.GpsInfo);
+  // target.geometries.push(geometry);
 
   return target;
 }
 
-function transformGeometry(points){
-  let geometry = templates.createObject('LineString');
-  points.forEach(point => {
-    console.log(point);
-    //COntinue here...
-  })
-  return geometry;
-}
+// function transformGeometry(points){
+//   let geometry = templates.createObject('LineString');
+//   points.forEach(point => {
+//     console.log(point);
+//     //COntinue here...
+//   })
+//   return geometry;
+// }

@@ -24,4 +24,21 @@ module.exports = function(app) {
       .then(data => res.json(data))
       .catch(error => handleError(error, req, res));
   });
+
+  app.get('/api/v1/trails/:id/multimediaDescriptions', function(req, res) {
+    connector.getTrailMedia(parseResourceRequest(req))
+      .then(data => res.json(data))
+      .catch(error => handleError(error, req, res));
+  });
+
+  app.get('/api/v1/trails/:id/relationships/multimediaDescriptions', function(req, res) {
+    handleNotImplemented(req,res);
+  });
+
+  // TODO: Check fields that are not subroutes:
+  //    "@type", "id", "name", "description",
+  //    "url", "address", "geometries", "howToArrive",
+  //    "connections", "category", "length", "minAltitude",
+  //    "maxAltitude", "openingHours"
+
 }
