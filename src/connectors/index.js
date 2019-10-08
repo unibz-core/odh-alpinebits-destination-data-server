@@ -80,6 +80,6 @@ module.exports = {
     return handleRequest(request, odhConnector.fetchSnowparks, validator.validateSnowparkArray, serializer.serializeSnowparks)
   },
   getSnowparkById: (request) => {
-    return handleRequest(request, odhConnector.fetcSnowparkById, validator.validatSnowpark, serializer.serializSnowpark)
+    return handleRequest(request, odhConnector.fetchSnowparkById, validator.validateSnowpark, serializer.serializeSnowpark)
   }
 }
