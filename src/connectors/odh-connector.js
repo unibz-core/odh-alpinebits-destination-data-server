@@ -34,6 +34,16 @@ function fetchTrails (request) {
   return fetch(path, request, odh2ab.transformTrailArray)
 }
 
+function fetchSnowparks (request) {
+  let queryArray = getPaginationQuery(request);
+  queryArray.push('activitytype=256')
+  queryArray.push('subtype=16')
+
+  let path = ACTIVITY_PATH+"?"+queryArray.join("&");
+
+  return fetch(path, request, odh2ab.transformSnowparkArray)
+}
+
 function getPaginationQuery(request) {
   const { page } = request.query;
   let pageArray = []
@@ -166,4 +176,6 @@ module.exports = {
   fetchTrails: fetchTrails,
   fetchTrailById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformTrail),
   fetchTrailMediaObjects: fetchSubResource(ACTIVITY_PATH, odh2ab.transformTrail, 'multimediaDescriptions')
+  fetchSnowparks: fetchSnowparks,
+  fetchSnowparkById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformSnowpark),
 }

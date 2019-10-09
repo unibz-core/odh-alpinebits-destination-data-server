@@ -84,5 +84,11 @@ module.exports = {
   },
   getTrailMedia: (request) => {
     return handleRequest(request, odhConnector.fetchTrailMediaObjects, validator.validateMediaObjectArray, serializer.serializeMediaObjects)
+  },
+  getSnowparks: (request) => {
+    return handleRequest(request, odhConnector.fetchSnowparks, validator.validateSnowparkArray, serializer.serializeSnowparks)
+  },
+  getSnowparkById: (request) => {
+    return handleRequest(request, odhConnector.fetchSnowparkById, validator.validateSnowpark, serializer.serializeSnowpark)
   }
 }

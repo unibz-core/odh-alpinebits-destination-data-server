@@ -12,6 +12,11 @@ The current version of the server accepts HTTP GET requests on the following rou
 * /events/:id/venues
 * /events/:id/publisher
 * /events/:id/organizers
+* /lifts
+* /lifts/:id
+* /snowparks
+* /snowparks/:id
+
 
 
 ### Install
@@ -55,6 +60,6 @@ docker-compose start
 
 * *Please set the environment variables as you need within the '.env' file.*
 
-* *The whole test suite takes ~13s to be executed, as it makes multiple HTTP requests to the OpenDataHub API.*
+* *The whole test suite may take between 15 and 25 seconds to be executed, as it makes multiple HTTP requests to the OpenDataHub API.*
 
 For the tests, we are using the [Jest](https://jestjs.io/) framework.

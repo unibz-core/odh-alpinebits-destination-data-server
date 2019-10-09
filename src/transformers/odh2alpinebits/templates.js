@@ -101,6 +101,7 @@ const templates = {
     shortName: {},
     description: {},
     abstract: {},
+    url: {},
     multimediaDescriptions: [],
     category: null,
     length: null,
@@ -127,6 +128,28 @@ const templates = {
       "geometries": [],
       "openingHours": []
     }
+  },
+  Snowpark: {
+    "@type": "Snowpark",
+    id: "",
+    name: {},
+    shortName: {},
+    description: {},
+    abstract: {},
+    url: {},
+    multimediaDescriptions: [],
+    address: {},
+    geometries: [],
+    howToArrive: {},
+    connections: [],
+    category: null,
+    area: null,
+    minAltitude: null,
+    maxAltitude: null,
+    difficulty: null,
+    features: [],
+    openingHours: []
+  }
 }
 
 // Function to create empty objects. It is better to have fields with null values than to have missing fields.
