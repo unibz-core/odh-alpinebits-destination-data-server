@@ -2,9 +2,6 @@
 CHECK:
   * Difficulty and PoiType: we need to discuss the difficulty scale
 
-TODO:
-  * LocationInfo
-
 USED:
   * AltitudeLowestPoint: always 0
   * AltitudeHighestPoint: always 0
@@ -55,6 +52,7 @@ IGNORED:
   * SmgId
   * SmgTags
   * TourismorganizationId
+  * LocationInfo
 
 > Redundant
   * AdditionalPoiInfos: we this data from 'PoiType' and 'SubType'
