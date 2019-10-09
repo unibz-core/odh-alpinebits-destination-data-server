@@ -1,4 +1,4 @@
-
+const { basicResourceRouteTests } = require('./route_id.test');
 const { basicRouteTests } = require('./route.test');
 
 let opts = {
@@ -9,3 +9,4 @@ let opts = {
 }
 
 basicRouteTests(opts);
+basicResourceRouteTests(opts);

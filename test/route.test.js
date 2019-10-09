@@ -72,10 +72,10 @@ module.exports.basicRouteTests = (opts) => {
     })
 
     test(`/${opts.route}: single attribute selection`, () => {
-      return utils.axiosInstance.get(`/api/v1/${opts.route}?fields[${opts.resourceType}]=name`)
+      return utils.axiosInstance.get(`/api/v1/${opts.route}?fields[${opts.resourceType}]=${opts.sampleAttributes[0]}`)
         .then( (res) => {
           res.data.data.forEach( object => {
-            expect(Object.keys(object.attributes)).toEqual(['name'])
+            expect(Object.keys(object.attributes)).toEqual([opts.sampleAttributes[0]])
           })
         })
     })
