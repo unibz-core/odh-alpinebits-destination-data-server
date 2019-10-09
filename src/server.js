@@ -15,7 +15,7 @@ app.use(express.json());
 app.use( (req, res, next) => {
   //TODO: Add security layer
   //TODO: Add header validation layer
-  console.log('> Request received: '+req.protocol+'://'+req.get('host')+req.originalUrl);
+  console.log('> Request received: ' + process.env.REF_SERVER_URL + req.originalUrl);
   next();
 });
 
@@ -42,5 +42,5 @@ app.get('*', (req, res) => {
 });
 
 app.listen(process.env.REF_SERVER_PORT, function () {
-  console.log('App listening at %s:%s', process.env.REF_SERVER_URL, this.address().port);
+  console.log('DestinationData API listening at %s', process.env.REF_SERVER_URL);
 })
