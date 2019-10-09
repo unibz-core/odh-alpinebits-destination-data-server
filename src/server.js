@@ -42,5 +42,5 @@ app.get('*', (req, res) => {
 });
 
 app.listen(process.env.REF_SERVER_PORT, function () {
-  console.log('App listening at http://localhost:%s', this.address().port);
+  console.log('App listening at %s:%s', process.env.REF_SERVER_URL, this.address().port);
 })
