@@ -81,5 +81,11 @@ module.exports = {
   },
   getSnowparkById: (request) => {
     return handleRequest(request, odhConnector.fetchSnowparkById, validator.validateSnowpark, serializer.serializeSnowpark)
+  },
+  getMountainAreas: (request) => {
+    return handleRequest(request, odhConnector.fetchMountainAreas, validator.validateMountainAreaArray, serializer.serializeMountainAreas)
+  },
+  getMountainAreaById: (request) => {
+    return handleRequest(request, odhConnector.fetchMountainAreaById, validator.validateMountainArea, serializer.serializeMountainArea)
   }
 }

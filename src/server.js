@@ -29,6 +29,7 @@ require('./routes/home.route.js')(app);
 require('./routes/events.route.js')(app);
 require('./routes/lifts.route.js')(app);
 require('./routes/snowparks.route.js')(app);
+require('./routes/mountain-areas.route.js')(app);
 
 require('./routes/places.route.js')(app);
 require('./routes/agents.route.js')(app);

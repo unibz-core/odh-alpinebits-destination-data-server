@@ -114,7 +114,7 @@ const EVENT = {
   name: 'events',
   opts: {
     ..._EVENT,
-    attributes: [..._EVENT_ATTR],
+    attributes: [..._EVENT_ATTR, ...META_ATTR],
     subEvents: SUB_EVENT.opts
   },
   relationships: [..._EVENT_REL]
@@ -139,7 +139,7 @@ const SNOWPARK = {
   name: 'snowparks',
   opts: {
     ...DEFAULT_OPTS,
-    attributes: [...BASIC_ATTR, 'category','difficulty','area','minAltitude','maxAltitude','capacityPerHour','personsPerChair',
+    attributes: [...BASIC_ATTR,'category','difficulty','area','minAltitude','maxAltitude','capacityPerHour','personsPerChair',
     'howToArrive','address','geometries','openingHours','features','connections','multimediaDescriptions'],
     multimediaDescriptions: MEDIA_OBJECT.opts,
     address: ADDRESS.opts,
@@ -149,6 +149,24 @@ const SNOWPARK = {
     features: {}
   },
   relationships: ['multimediaDescriptions', 'connections']
+}
+
+const MOUNTAIN_AREA = {
+  name: 'mountainAreas',
+  opts: {
+    ...DEFAULT_OPTS,
+    attributes: [...BASIC_ATTR, ...META_ATTR,
+      'address','geometries','howToArrive','openingHours','area','minAltitude','maxAltitude','totalTrailLength','totalParkArea',
+      'multimediaDescriptions','areaOwner','connections','lifts','snowparks','trails','subAreas'],
+    areaOwner: AGENT.opts,
+    multimediaDescriptions: MEDIA_OBJECT.opts,
+    lifts: LIFT.opts,
+    snowparks: SNOWPARK.opts,
+    trails: {},
+    connections: {},
+    subAreas: {}
+  },
+  relationships: ['multimediaDescriptions','areaOwner','connections','lifts','snowparks','trails','subAreas']
 }
 
 function typeForAttribute (attribute, data) {
@@ -175,6 +193,8 @@ function typeForAttribute (attribute, data) {
       return LIFT.name;
     case 'Snowpark':
       return SNOWPARK.name;
+    case 'MountainArea':
+      return MOUNTAIN_AREA.name;
 
     return data['@type'];
   }
@@ -200,6 +220,12 @@ function getTypeFromRelationship(relationship) {
     case 'geometries':
     case 'venues.geometries':
       return GEOMETRY.name;
+    case 'areaOwner':
+      return AGENT.name;
+    case 'lifts':
+      return LIFT.name;
+    case 'snowparks':
+      return SNOWPARK.name;
   }
 }
 
@@ -209,7 +235,8 @@ const resources = {
   'mediaObjects': MEDIA_OBJECT,
   'places': PLACE,
   'lifts': LIFT,
-  'snowparks': SNOWPARK
+  'snowparks': SNOWPARK,
+  'mountainAreas': MOUNTAIN_AREA
 }
 
 module.exports = {
