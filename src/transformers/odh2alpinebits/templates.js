@@ -116,18 +116,24 @@ const templates = {
     howToArrive: {}
   },
   Trail: {
-      "@type": "Trail",
-      "id": "",
-      "name": {},
-      "category": "",
-      "length": null,
-      "minHeight": null,
-      "maxHeight": null,
-      "difficulty": {},
-      "connections": [],
-      "geometries": [],
-      "openingHours": []
-    }
+    "@type": "Trail",
+    id: "",
+    name: {},
+    description: {},
+    shortName: {},
+    abstract: {},
+    url: {},
+    multimediaDescriptions: [],
+    category: null,
+    length: null,
+    minAltitude: null,
+    maxAltitude: null,
+    difficulty: null,
+    connections: [],
+    geometries: [],
+    openingHours: [],
+    address: {},
+    howToArrive: {}
   },
   Snowpark: {
     "@type": "Snowpark",

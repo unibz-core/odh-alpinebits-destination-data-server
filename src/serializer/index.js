@@ -102,6 +102,12 @@ module.exports = {
 
     return serialize(resource, data);
   },
+  serializeTrails: (data, request, meta) => {
+    return data;
+  },
+  serializeTrail: (data, request, meta) => {
+    return data;
+  },
   serializeSnowpark: (data, request, meta) => {
     let resource = resources.getOptions('snowparks');
 
@@ -110,11 +116,5 @@ module.exports = {
     fields.add(resource, request);
 
     return serialize(resource, data);
-  },
-  serializeTrails: (data, request, meta) => {
-    return data;
-  },
-  serializeTrail: (data, request, meta) => {
-    return data;
   }
 }

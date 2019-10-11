@@ -30,7 +30,7 @@ module.exports = {
   validateLift: (object) => validateObject(liftAjv, object),
   validateLiftArray: (object) => validateArray(liftAjv, object),
   validateTrail: (object) => validateObject(trailAjv, object),
-  validateTrailArray: (object) => validateArray(trailAjv, object)
+  validateTrailArray: (object) => validateArray(trailAjv, object),
   validateSnowpark: (object) => validateObject(snowparkAjv, object),
   validateSnowparkArray: (object) => validateArray(snowparkAjv, object)
 }

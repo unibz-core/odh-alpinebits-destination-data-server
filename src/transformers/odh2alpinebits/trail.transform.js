@@ -1,3 +1,61 @@
+/*
+USED:
+  * Id
+  * SmgTags
+  * Difficulty
+  * OperationSchedule
+  * GpsInfo
+  * GpsPoints
+  * GpsTrack
+  * DistanceLength
+  * LastChange
+
+PARTIALLY USED:
+  * Detail: Title, BaseText, GetThereText
+  * ContactInfos: City, Country, ZipCode, Street
+
+IGNORED:
+  * Type
+  * SubType
+  * PoiType
+  * Active
+  * AdditionalPoiInfos
+  * AltitudeDifference
+  * AltitudeSumDown
+  * AltitudeSumUp
+  * AreaId
+  * BikeTransport
+  * ChildPoiIds
+  * CopyrightChecked
+  * DistanceDuration
+  * Exposition
+  * FeetClimb
+  * FirstImport
+  * HasFreeEntrance
+  * HasLanguage
+  * HasRentals
+  * Highlight
+  * Id
+  * ImageGallery
+  * IsOpen
+  * IsPrepared
+  * IsWithLigth
+  * LiftAvailable
+  * LocationInfo
+  * LTSTags
+  * MasterPoiIds
+  * OutdooractiveID
+  * OwnerRid
+  * RunToValley
+  * SmgActive
+  * SmgId
+  * TourismorganizationId
+
+OUT OF SCOPE:
+  * Active : 'true' valued boolean for every object
+
+*/
+
 const shajs = require('sha.js')
 const utils = require('./utils');
 const templates = require('./templates');
@@ -9,34 +67,41 @@ module.exports = (object) => {
   Object.assign(target, utils.transformMetadata(source));
   Object.assign(target, utils.transformBasicProperties(source));
 
-  // GetThereText exists.
+  const categoryMapping = {
+    'ski alpin': 'alpinebits/ski-slope',
+    'ski alpin (rundkurs)': 'alpinebits/ski-slope',
+    'rodelbahnen': 'alpinebits/sledge-slope',
+    'loipen': 'alpinebits/cross-country',
+  };
 
-  // Lift subtypes
-  // { "_id" : "Sessellift", "count" : 174 }
-  // { "_id" : "Seilbahn", "count" : 32 }
-  // { "_id" : "Skibus", "count" : 4 }
-  // { "_id" : "Förderband", "count" : 10 }
-  // { "_id" : "Telemix", "count" : 4 }
-  // { "_id" : "Standseilbahn/Zahnradbahn", "count" : 4 }
-  // { "_id" : "no Subtype", "count" : 1 }
-  // { "_id" : "Zug", "count" : 2 }
-  // { "_id" : "Kabinenbahn", "count" : 12 }
-  // { "_id" : "Schrägaufzug", "count" : 2 }
-  // { "_id" : "Umlaufbahn", "count" : 72 }
-  // { "_id" : "Unterirdische Bahn", "count" : 1 }
-  // { "_id" : "Skilift", "count" : 112 }
+  source.SmgTags.find(tag => {
+    if(categoryMapping[tag]) {
+      target.category = categoryMapping[tag];
+      return true;
+    }
+    return false;
+  })
 
-  // const geometry = transformGeometry(source.GpsInfo);
-  // target.geometries.push(geometry);
+  target.length = source.DistanceLength > 0 ? source.DistanceLength : null;
+
+  target.minAltitude = source.AltitudeLowestPoint;
+  target.maxAltitude = source.AltitudeHighestPoint;
+
+  const difficultyMapping = {
+    '2': 'alpinebits/easy',
+    '4': 'alpinebits/medium',
+    '6': 'alpinebits/hard'
+  }
+  target.difficulty = difficultyMapping[source.Difficulty];
+
+  const geometry = utils.transformGeometry(source.GpsInfo, ['Startpunkt', 'Endpunkt'], source.GpsPoints, source.GpsTrack);
+  if(geometry) target.geometries.push(geometry);
+
+  target.openingHours = utils.transformOperationSchedule(source.OperationSchedule);
+
+  target.address = utils.transformAddress(source.ContactInfos, ['city','country','zipcode','street']);
+
+  target.howToArrive = utils.transformHowToArrive(source.Detail);
 
   return target;
 }
-
-// function transformGeometry(points){
-//   let geometry = templates.createObject('LineString');
-//   points.forEach(point => {
-//     console.log(point);
-//     //COntinue here...
-//   })
-//   return geometry;
-// }

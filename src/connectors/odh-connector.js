@@ -27,7 +27,7 @@ function fetchLifts (request) {
 
 function fetchTrails (request) {
   let queryArray = getPaginationQuery(request);
-  queryArray.push('activitytype=448')
+  queryArray.push('odhtagfilter=ski alpin,ski alpin (rundkurs),rodelbahnen,loipen')
 
   let path = ACTIVITY_PATH+"?"+queryArray.join("&");
 
@@ -175,7 +175,7 @@ module.exports = {
   fetchLiftById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformLift),
   fetchTrails: fetchTrails,
   fetchTrailById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformTrail),
-  fetchTrailMediaObjects: fetchSubResource(ACTIVITY_PATH, odh2ab.transformTrail, 'multimediaDescriptions')
+  fetchTrailMediaObjects: fetchSubResource(ACTIVITY_PATH, odh2ab.transformTrail, 'multimediaDescriptions'),
   fetchSnowparks: fetchSnowparks,
   fetchSnowparkById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformSnowpark),
 }

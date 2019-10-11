@@ -145,6 +145,13 @@ function transformAddress(contactInfo, fields){
     address.zipcode = safeGet(['de','ZipCode'], contactInfo) ||
       safeGet(['it','ZipCode'], contactInfo) || safeGet(['en','ZipCode'], contactInfo);
 
+  if(fields.includes('street'))
+    address.street = {
+      deu: safeGet(['de','Address'], contactInfo),
+      ita: safeGet(['it','Address'], contactInfo),
+      eng: safeGet(['en','Address'], contactInfo)
+    };
+
   address.region = {}
 
   return address;
