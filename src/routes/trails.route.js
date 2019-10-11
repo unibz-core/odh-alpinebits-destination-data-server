@@ -1,5 +1,5 @@
 const connector = require ('../connectors');
-const errors = require('../messages/errors');
+const errors = require('../errors');
 const { parseCollectionRequest, parseResourceRequest } = require('./request-parser');
 
 function handleNotImplemented(req, res){
