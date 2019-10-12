@@ -26,6 +26,17 @@ module.exports = {
   transformLift: function(data) {
     return transformLift(data);
   },
+  transformTrailArray: function(data) {
+    let result = [];
+
+    for (object of data.Items)
+    result.push(transformTrail(object));
+
+    return result;
+  },
+  transformTrail: function(data) {
+    return transformTrail(data);
+  },
   transformSnowparkArray: function(data) {
     let result = [];
 
@@ -37,15 +48,4 @@ module.exports = {
   transformSnowpark: function(data) {
     return transformSnowpark(data);
   },
-  transformTrailArray: function(data) {
-    let result = [];
-
-    for (object of data.Items)
-      result.push(transformTrail(object));
-
-    return result;
-  },
-  transformTrail: function(data) {
-    return transformTrail(data);
-  }
 }

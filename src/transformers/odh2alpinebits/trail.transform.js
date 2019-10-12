@@ -15,49 +15,50 @@ PARTIALLY USED:
   * ContactInfos: City, Country, ZipCode, Street
 
 IGNORED:
-  * Type
-  * SubType
-  * PoiType
-  * Active
-  * AdditionalPoiInfos
+> Potentially useful:
   * AltitudeDifference
   * AltitudeSumDown
   * AltitudeSumUp
-  * AreaId
-  * BikeTransport
-  * ChildPoiIds
-  * CopyrightChecked
   * DistanceDuration
   * Exposition
   * FeetClimb
-  * FirstImport
-  * HasFreeEntrance
-  * HasLanguage
-  * HasRentals
-  * Highlight
-  * Id
   * ImageGallery
-  * IsOpen
-  * IsPrepared
-  * IsWithLigth
   * LiftAvailable
-  * LocationInfo
-  * LTSTags
-  * MasterPoiIds
-  * OutdooractiveID
-  * OwnerRid
   * RunToValley
-  * SmgActive
-  * SmgId
-  * TourismorganizationId
+  * LocationInfo
 
-OUT OF SCOPE:
-  * Active : 'true' valued boolean for every object
 
+> Out of scope or "useless" field (e.g. always null, [], false...)
+  * Active (always true)
+  * AreaId (unkown IDs)
+  * BikeTransport (potentially uselles for this endpoint)
+  * ChildPoiIds (always null)
+  * CopyrightChecked (always null)
+  * FirstImport (unclear semantics)
+  * HasFreeEntrance (always false)
+  * HasLanguage (unclear semantics)
+  * HasRentals (unclear semantics)
+  * Highlight (unclear semantics)
+  * IsOpen (unclear semantics, mostly false)
+  * IsPrepared (unclear semantics)
+  * IsWithLigth (unclear semantics)
+  * LTSTags (always [])
+  * MasterPoiIds (always null)
+  * OutdooractiveID (unkown IDs)
+  * OwnerRid (always null)
+  * SmgActive (always true)
+  * SmgId (always null)
+  * TourismorganizationId (unkown IDs)
+
+> Redundant
+  * AdditionalPoiInfos: potentially useful information is redundant (i.e. PoiType and SubType)
+  * Shortname
+  * Type: only querying for SmgTags
+  * SubType: only querying for SmgTags
+  * PoiType: redudant with difficulty [[blau, 2], [rot, 4], [schwarz, 6]]
 
 */
 
-const shajs = require('sha.js')
 const utils = require('./utils');
 const templates = require('./templates');
 
@@ -67,6 +68,11 @@ module.exports = (object) => {
 
   Object.assign(target, utils.transformMetadata(source));
   Object.assign(target, utils.transformBasicProperties(source));
+
+  // Media Objects
+  target.multimediaDescriptions = []
+  for (image of source.ImageGallery)
+    target.multimediaDescriptions.push(utils.transformMediaObject(image));
 
   const categoryMapping = {
     'ski alpin': 'alpinebits/ski-slope',
@@ -89,18 +95,20 @@ module.exports = (object) => {
   target.maxAltitude = source.AltitudeHighestPoint;
 
   const difficultyMapping = {
-    '2': 'alpinebits/easy',
-    '4': 'alpinebits/medium',
-    '6': 'alpinebits/hard'
+    '2': 'beginner',
+    '4': 'intermediate',
+    '6': 'expert'
   }
-  target.difficulty = difficultyMapping[source.Difficulty];
+  target.difficulty = {
+    'eu': difficultyMapping[source.Difficulty]
+  };
 
   const geometry = utils.transformGeometry(source.GpsInfo, ['Startpunkt', 'Endpunkt'], source.GpsPoints, source.GpsTrack);
   if(geometry) target.geometries.push(geometry);
 
   target.openingHours = utils.transformOperationSchedule(source.OperationSchedule);
 
-  target.address = utils.transformAddress(source.ContactInfos, ['city','country','zipcode','street']);
+  target.address = utils.transformAddress(source.ContactInfos, ['city','country','zipcode']);
 
   target.howToArrive = utils.transformHowToArrive(source.Detail);
 
