@@ -135,6 +135,31 @@ const templates = {
     difficulty: null,
     features: [],
     openingHours: []
+  },
+  MountainArea: {
+    '@type': 'MountainArea',
+    id: '',
+    name: {},
+    shortName: {},
+    description: {},
+    abstract: {},
+    url: {},
+    address: {},
+    geometries: {},
+    howToArrive: {},
+    openingHours: {},
+    area: {},
+    minAltitude: {},
+    maxAltitude: {},
+    totalTrailLength: {},
+    totalParkArea: {},
+    multimediaDescriptions: [],
+    areaOwner: {},
+    connections: [],
+    lifts: [],
+    snowparks: [],
+    trails: [],
+    subAreas: [],
   }
 }
 

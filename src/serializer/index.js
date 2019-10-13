@@ -112,25 +112,24 @@ module.exports = {
     return serialize(resource, data);
   },
   serializeMountainAreas: (data, request, meta) => {
-    // let resource = resources.getOptions('mountainAreas');
-    //
-    // links.addPagination(resource, request, meta);
-    // links.addSelf(resource, request);
-    // links.addDataLinks(resource, request);
-    // includes.add(resource, request);
-    // fields.add(resource, request);
-    //
-    // return serialize(resource, data);
+    let resource = resources.getOptions('mountainAreas');
+
+    links.addPagination(resource, request, meta);
+    links.addSelf(resource, request);
+    links.addDataLinks(resource, request);
+    includes.add(resource, request);
+    fields.add(resource, request);
+
+    return serialize(resource, data);
     return data;
   },
   serializeMountainArea: (data, request, meta) => {
-    // let resource = resources.getOptions('mountainAreas');
-    //
-    // links.addSelf(resource, request);
-    // includes.add(resource, request);
-    // fields.add(resource, request);
-    //
-    // return serialize(resource, data);
-    return data;
+    let resource = resources.getOptions('mountainAreas');
+
+    links.addSelf(resource, request);
+    includes.add(resource, request);
+    fields.add(resource, request);
+
+    return serialize(resource, data);
   }
 }

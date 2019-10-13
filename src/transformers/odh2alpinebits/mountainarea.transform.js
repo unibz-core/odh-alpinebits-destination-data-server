@@ -25,10 +25,10 @@ const templates = require('./templates');
 
 module.exports = (object) => {
   const source = JSON.parse(JSON.stringify(object));
-  // let target = templates.createObject('MountainArea');
-  //
-  // Object.assign(target, utils.transformMetadata(source));
-  // Object.assign(target, utils.transformBasicProperties(source));
+  let target = templates.createObject('MountainArea');
+
+  Object.assign(target, utils.transformMetadata(source));
+  Object.assign(target, utils.transformBasicProperties(source));
   //
   // target.minAltitude = source.AltitudeLowestPoint;
   // target.maxAltitude = source.AltitudeHighestPoint;
@@ -51,6 +51,5 @@ module.exports = (object) => {
   // const geometry = utils.transformGeometry(source.GpsInfo, ['Startpunkt', 'Endpunkt'], source.GpsPoints, source.GpsTrack);
   // if(geometry) target.geometries.push(geometry);
   //
-  // return target;
-  return source;
+  return target;
 }
