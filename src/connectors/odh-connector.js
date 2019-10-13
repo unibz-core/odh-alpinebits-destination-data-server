@@ -33,6 +33,15 @@ function fetchLifts (request) {
   return fetch(path, request, odh2ab.transformLiftArray)
 }
 
+function fetchTrails (request) {
+  let queryArray = getPaginationQuery(request);
+  queryArray.push('odhtagfilter=ski alpin,ski alpin (rundkurs),rodelbahnen,loipen')
+
+  let path = ACTIVITY_PATH+"?"+queryArray.join("&");
+
+  return fetch(path, request, odh2ab.transformTrailArray)
+}
+
 function fetchSnowparks (request) {
   let queryArray = getPaginationQuery(request);
   queryArray.push('odhtagfilter=snowpark')
@@ -260,7 +269,10 @@ module.exports = {
   fetchEventVenues: fetchSubResource(EVENT_PATH, odh2ab.transformEvent, 'venues'),
   fetchLifts,
   fetchLiftById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformLift),
-  fetchSnowparks,
+  fetchTrails: fetchTrails,
+  fetchTrailById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformTrail),
+  fetchTrailMediaObjects: fetchSubResource(ACTIVITY_PATH, odh2ab.transformTrail, 'multimediaDescriptions'),
+  fetchSnowparks: fetchSnowparks,
   fetchSnowparkById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformSnowpark),
   fetchMountainAreas: fetchMountainArea,
   fetchMountainAreaById: fetchMountainArea,

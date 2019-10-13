@@ -1,5 +1,6 @@
 const transformEvent = require('./event.transform');
 const transformLift = require('./lift.transform');
+const transformTrail = require('./trail.transform');
 const transformSnowpark = require('./snowpark.transform');
 const transformMountainArea = require('./mountainarea.transform');
 
@@ -18,6 +19,8 @@ module.exports = {
   transformEvent: data => transformEvent(data),
   transformLiftArray: data => transformArray(data, transformLift),
   transformLift: data => transformLift(data),
+  transformTrailArray: data => transformArray(data, transformTrail),
+  transformTrail: data => transformTrail(data),
   transformSnowparkArray: data => transformArray(data, transformSnowpark),
   transformSnowpark: data => transformSnowpark(data),
   transformMountainAreaArray: data => transformArray(data, transformMountainArea),

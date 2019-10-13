@@ -7,6 +7,7 @@ const venueSchema = require('./schemas/venue.schema');
 const agentSchema = require('./schemas/agent.schema');
 const mediaObjectSchema = require('./schemas/mediaobject.schema');
 const liftSchema = require('./schemas/lift.schema');
+const trailSchema = require('./schemas/trail.schema');
 const snowparkSchema = require('./schemas/snowpark.schema');
 const mountainAreaSchema = require('./schemas/mountainarea.schema');
 
@@ -17,6 +18,7 @@ let venueAjv = ajv.compile(venueSchema);
 let mediaObjectAjv = ajv.compile(mediaObjectSchema);
 let agentAjv = ajv.compile(agentSchema);
 let liftAjv = ajv.compile(liftSchema);
+let trailAjv = ajv.compile(trailSchema);
 let snowparkAjv = ajv.compile(snowparkSchema);
 let mountainAreaAjv = ajv.compile(mountainAreaSchema);
 
@@ -28,7 +30,9 @@ module.exports = {
   validateAgent: (object) => validateObject(agentAjv, object),
   validateAgentArray: (array) => validateArray(agentAjv, array),
   validateLift: (object) => validateObject(liftAjv, object),
-  validateLiftArray: (array) => validateArray(liftAjv, array),
+  validateLiftArray: (object) => validateArray(liftAjv, object),
+  validateTrail: (object) => validateObject(trailAjv, object),
+  validateTrailArray: (object) => validateArray(trailAjv, object),
   validateSnowpark: (object) => validateObject(snowparkAjv, object),
   validateSnowparkArray: (array) => validateArray(snowparkAjv, array),
   validateMountainArea: (object) => validateObject(mountainAreaAjv, object),
