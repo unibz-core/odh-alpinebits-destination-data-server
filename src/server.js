@@ -14,7 +14,7 @@ app.use(express.json());
 
 app.use( (req, res, next) => {
   //TODO: Add security layer
-  //TODO: Add header validation layer
+  //TODO: Add header/url/query validation layer
   console.log('> Request received: ' + process.env.REF_SERVER_URL + req.originalUrl);
   next();
 });

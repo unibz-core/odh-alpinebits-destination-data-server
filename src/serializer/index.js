@@ -141,7 +141,6 @@ module.exports = {
     fields.add(resource, request);
 
     return serialize(resource, data);
-    return data;
   },
   serializeMountainArea: (data, request, meta) => {
     let resource = resources.getOptions('mountainAreas');

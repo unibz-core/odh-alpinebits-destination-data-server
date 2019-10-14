@@ -18,28 +18,27 @@ const HOURS = {
   }
 }
 
-const AGENT = {
-  name: 'agents',
-  opts: {
-    ...DEFAULT_OPTS,
-    attributes: [...BASIC_ATTR,'category','contacts'],
-    contacts: {
-      attributes: [...BASIC_ATTR, 'email', 'telephone', 'address', 'availableHours'],
-      address: ADDRESS.opts,
-      availableHours: HOURS.opts
-    }
-  },
-  relationships: []
-}
-
 const MEDIA_OBJECT = {
   name: 'mediaObjects',
   opts: {
     ...DEFAULT_OPTS,
     attributes: [...BASIC_ATTR,'contentType','height','width','duration','license','copyrightOwner'],
-    copyrightOwner: AGENT.opts
+  }
+}
+
+const AGENT = {
+  name: 'agents',
+  opts: {
+    ...DEFAULT_OPTS,
+    attributes: [...BASIC_ATTR,'category','multimediaDescriptions','contacts'],
+    contacts: {
+      attributes: [...BASIC_ATTR, 'email', 'telephone', 'address', 'availableHours'],
+      address: ADDRESS.opts,
+      availableHours: HOURS.opts
+    },
+    multimediaDescriptions: MEDIA_OBJECT.opts
   },
-  relationships: ['copyrightOwner']
+  relationships: ['multimediaDescriptions']
 }
 
 const GEOMETRY = {
@@ -48,7 +47,6 @@ const GEOMETRY = {
     ...DEFAULT_OPTS,
     attributes: ['coordinates', 'category'],
     transform: function (data) {
-      console.log("HERE!!!");
        data.category = data['@type'];
        return data;
     }
@@ -124,7 +122,7 @@ const LIFT = {
   name: 'lifts',
   opts: {
     ...DEFAULT_OPTS,
-    attributes: [...BASIC_ATTR,'category','length','minAltitude','maxAltitude','capacityPerHour','personsPerChair',
+    attributes: [...BASIC_ATTR, ...META_ATTR, 'category','length','minAltitude','maxAltitude','capacityPerHour','personsPerChair',
     'howToArrive','address','geometries','openingHours','connections','multimediaDescriptions'],
     multimediaDescriptions: MEDIA_OBJECT.opts,
     address: ADDRESS.opts,
@@ -139,7 +137,7 @@ const TRAIL = {
   name: 'trails',
   opts: {
     ...DEFAULT_OPTS,
-    attributes: [...BASIC_ATTR,'category','length','minAltitude','maxAltitude','difficulty','connections','geometries','openingHours','address','howToArrive','multimediaDescriptions'],
+    attributes: [...BASIC_ATTR,...META_ATTR, 'category','length','minAltitude','maxAltitude','difficulty','connections','geometries','openingHours','address','howToArrive','multimediaDescriptions'],
     multimediaDescriptions: MEDIA_OBJECT.opts,
     address: ADDRESS.opts,
     openingHours: HOURS.opts,
@@ -153,7 +151,7 @@ const SNOWPARK = {
   name: 'snowparks',
   opts: {
     ...DEFAULT_OPTS,
-    attributes: [...BASIC_ATTR,'category','difficulty','area','minAltitude','maxAltitude','capacityPerHour','personsPerChair',
+    attributes: [...BASIC_ATTR,...META_ATTR, 'category','difficulty','area','minAltitude','maxAltitude','capacityPerHour','personsPerChair',
     'howToArrive','address','geometries','openingHours','features','connections','multimediaDescriptions'],
     multimediaDescriptions: MEDIA_OBJECT.opts,
     address: ADDRESS.opts,
@@ -180,7 +178,8 @@ const MOUNTAIN_AREA = {
     connections: {},
     subAreas: {}
   },
-  relationships: ['multimediaDescriptions','areaOwner','connections','lifts','snowparks','trails','subAreas']
+  relationships: ['multimediaDescriptions','areaOwner','areaOwner.multimediaDescriptions','connections','lifts','snowparks',
+    'trails','subAreas']
 }
 
 function typeForAttribute (attribute, data) {

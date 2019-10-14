@@ -10,7 +10,9 @@ function getHomeResponse(request, response) {
       resources: {
         events: getBaseUrl(request)+'/events',
         lifts: getBaseUrl(request)+'/lifts',
-        snowparks: getBaseUrl(request)+'/snowparks'
+        lifts: getBaseUrl(request)+'/trails',
+        snowparks: getBaseUrl(request)+'/snowparks',
+        mountainAreas: getBaseUrl(request)+'/mountainAreas'
       }
     },
     data: []
