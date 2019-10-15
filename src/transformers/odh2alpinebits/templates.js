@@ -1,30 +1,30 @@
 const templates = {
   Event: {
-    "@type": "Event",
-    dataProvider: "",
-    lastUpdate: "",
-    id: "",
+    '@type': 'Event',
+    dataProvider: '',
+    lastUpdate: '',
+    id: '',
     name: {
-      deu: "",
-      eng: "",
-      ita: ""
+      deu: '',
+      eng: '',
+      ita: ''
     },
     shortName: {
-      deu: "",
-      eng: "",
-      ita: ""
+      deu: '',
+      eng: '',
+      ita: ''
     },
     description: {
-      deu: "",
-      eng: "",
-      ita: ""
+      deu: '',
+      eng: '',
+      ita: ''
     },
     abstract: {
-      deu: "",
-      eng: "",
-      ita: ""
+      deu: '',
+      eng: '',
+      ita: ''
     },
-    structure: "simple",
+    structure: 'simple',
     startDate: null,
     endDate: null,
     venues: [],
@@ -36,51 +36,51 @@ const templates = {
     // subEvents: [],
   },
   Agent: {
-    "@type": "Agent",
-    id: "123456",
+    '@type': 'Agent',
+    id: '123456',
     name: {}
   },
   MediaObject: {
-    "@type": "MediaObject",
+    '@type': 'MediaObject',
     // name: {},
     description: {},
-    url: "",
-    contentType: "",
+    url: '',
+    contentType: '',
     // height: 0,
     // width: 0,
-    license: "",
+    license: '',
     copyrightOwner: {}
   },
   Address: {
-    "@type": "Address",
+    '@type': 'Address',
     street: {},
     city: {},
     region: {
-      deu: "BZ",
-      eng: "BZ",
-      ita: "BZ",
+      deu: 'BZ',
+      eng: 'BZ',
+      ita: 'BZ',
     },
-    country: "IT",
+    country: 'IT',
     zipcode: null,
     complement: {},
   },
   Point:  {
-    "@type": "Geometry",
-    category: "Point",
+    '@type': 'Geometry',
+    category: 'Point',
     coordinates: []
   },
   LineString:  {
-    "@type": "Geometry",
-    category: "LineString",
+    '@type': 'Geometry',
+    category: 'LineString',
     coordinates: []
   },
   Polygon: {
-    "@type": "Polygon",
+    '@type': 'Polygon',
     coordinates: [ [] ]
   },
   Venue: {
-    "@type": "Venue",
-    id: "",
+    '@type': 'Venue',
+    id: '',
     name: {},
     description: {},
     address: {},
@@ -89,18 +89,18 @@ const templates = {
     multimediaDescriptions: []
   },
   ContactPoint: {
-    "@type": "ContactPoint",
+    '@type': 'ContactPoint',
     address: {}
   },
   HoursSpecification: {
-    "@type": "HoursSpecification",
+    '@type': 'HoursSpecification',
     hours: [],
     validFrom: null,
     validTo: null
   },
   Lift: {
-    "@type": "Lift",
-    id: "",
+    '@type': 'Lift',
+    id: '',
     name: {},
     shortName: {},
     description: {},
@@ -120,8 +120,8 @@ const templates = {
     howToArrive: {}
   },
   Trail: {
-    "@type": "Trail",
-    id: "",
+    '@type': 'Trail',
+    id: '',
     name: {},
     description: {},
     shortName: {},
@@ -140,8 +140,8 @@ const templates = {
     howToArrive: {}
   },
   Snowpark: {
-    "@type": "Snowpark",
-    id: "",
+    '@type': 'Snowpark',
+    id: '',
     name: {},
     shortName: {},
     description: {},
@@ -184,6 +184,16 @@ const templates = {
     snowparks: [],
     trails: [],
     subAreas: [],
+  },
+  EventSeries: {
+    '@type':  'EventSeries',
+    id: '',
+    name: {},
+    abstract: {},
+    description: {},
+    url: {},
+    multimediaDescriptions: [],
+    frequency: '',
   }
 }
 

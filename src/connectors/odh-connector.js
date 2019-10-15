@@ -51,6 +51,97 @@ function fetchSnowparks (request) {
   return fetch(path, request, odh2ab.transformSnowparkArray)
 }
 
+function fetchEventSeries (request) {
+  const { page } = request.query;
+  let pageSize = page && page.size ? page.size : 10;
+  let pageNumber = page && page.number ? page.number : 1;
+
+  res = getEventSeriesData({ pageSize, pageNumber });
+
+  if(!res.data || res.status!==200){
+    console.log('ERROR: Resource not found!');
+    throw errors.notFound;
+  }
+
+  console.log('OK: Data found on \'Event Series - Mock Data\'.\n');
+
+  try {
+    console.log('> Transforming data to the AlpineBits format...');
+    const data = odh2ab.transformEventSeriesArray(res.data);
+    console.log('OK: Sucessfully transformed data.\n');
+    const meta = getResponseMeta(res.data);
+
+    // TODO: Support fetchSubResource()
+    return { data, meta };
+  }
+  catch(error) {
+    handleTransformationError(error);
+  }
+}
+
+function fetchEventSeriesById (request) {
+  console.log(`\n> Fetching data from 'Event Series - Mock Data' ...`);
+  res = getEventSeriesData({ id: request.params.id });
+
+  if(!res.data || res.status!==200){
+    console.log('ERROR: Resource not found!');
+    throw errors.notFound;
+  }
+
+  console.log('OK: Data found on \'Event Series - Mock Data\'.\n');
+
+  try {
+    console.log('> Transforming data to the AlpineBits format...');
+    const data = odh2ab.transformEventSeries(res.data);
+    console.log('OK: Sucessfully transformed data.\n');
+    const meta = getResponseMeta(res.data);
+
+    // TODO: Support fetchSubResource()
+    return { data, meta };
+  }
+  catch(error) {
+    handleTransformationError(error);
+  }
+}
+
+function getEventSeriesData(params) {
+  let id = params.id;
+  let eventSeriesData = require('../../data/event-series.data');
+  let res = {}
+
+  if(id) {
+    data = eventSeriesData.find(eventSeries => eventSeries.id === id);
+    if(data) {
+      res.data = data;
+      res.status = 200;
+    }
+    else {
+      res.status = 404;
+    }
+
+    return res;
+  }
+
+  let pageSize = params.pageSize;
+  let pageNumber = params.pageNumber;
+
+  if(pageNumber > Math.ceil(eventSeriesData.length/pageSize)) {
+    res.status = 404;
+    return res;
+  }
+
+  res.data = {
+    TotalResults :  eventSeriesData.length,
+    TotalPages: Math.ceil(eventSeriesData.length/pageSize),
+    CurrentPage: pageNumber,
+    Seed: "null",
+    Items: eventSeriesData.slice((pageNumber-1)*pageSize,pageNumber*pageSize)
+  };
+  res.status = 200;
+
+  return res;
+}
+
 function fetchResourceById(resource, transform) {
   return (
     function(request) {
@@ -276,4 +367,6 @@ module.exports = {
   fetchSnowparkById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformSnowpark),
   fetchMountainAreas: fetchMountainArea,
   fetchMountainAreaById: fetchMountainArea,
+  fetchEventSeries: fetchEventSeries,
+  fetchEventSeriesById: fetchEventSeriesById,
 }

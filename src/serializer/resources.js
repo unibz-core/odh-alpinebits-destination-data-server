@@ -72,7 +72,8 @@ const EVENT_SERIES = {
     ...DEFAULT_OPTS,
     attributes: [...BASIC_ATTR, 'multimediaDescriptions', 'frequency'],
     multimediaDescriptions: MEDIA_OBJECT.opts
-  }
+  },
+  relationships: ['multimediaDescriptions']
 }
 
 const CONTRIBUTION = {
@@ -252,7 +253,8 @@ const resources = {
   'lifts': LIFT,
   'trails': TRAIL,
   'snowparks': SNOWPARK,
-  'mountainAreas': MOUNTAIN_AREA
+  'mountainAreas': MOUNTAIN_AREA,
+  'eventSeries': EVENT_SERIES,
 }
 
 module.exports = {

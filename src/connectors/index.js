@@ -96,5 +96,11 @@ module.exports = {
   },
   getMountainAreaById: (request) => {
     return handleRequest(request, odhConnector.fetchMountainAreaById, validator.validateMountainArea, serializer.serializeMountainArea)
-  }
+  },
+  getEventSeries: (request) => {
+    return handleRequest(request, odhConnector.fetchEventSeries, validator.validateEventSeriesArray, serializer.serializeEventSeries)
+  },
+  getEventSeriesById: (request) => {
+    return handleRequest(request, odhConnector.fetchEventSeriesById, validator.validateEventSeries, serializer.serializeEventSeries)
+  },
 }

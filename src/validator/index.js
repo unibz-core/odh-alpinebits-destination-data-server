@@ -10,6 +10,7 @@ const liftSchema = require('./schemas/lift.schema');
 const trailSchema = require('./schemas/trail.schema');
 const snowparkSchema = require('./schemas/snowpark.schema');
 const mountainAreaSchema = require('./schemas/mountainarea.schema');
+const eventSeriesSchema = require('./schemas/eventseries.schema');
 
 let ajv = new Ajv({ verbose: false });
 
@@ -21,6 +22,7 @@ let liftAjv = ajv.compile(liftSchema);
 let trailAjv = ajv.compile(trailSchema);
 let snowparkAjv = ajv.compile(snowparkSchema);
 let mountainAreaAjv = ajv.compile(mountainAreaSchema);
+let eventSeriesAjv = ajv.compile(eventSeriesSchema);
 
 module.exports = {
   validateEvent: (object) => validateObject(eventAjv, object),
@@ -36,7 +38,9 @@ module.exports = {
   validateSnowpark: (object) => validateObject(snowparkAjv, object),
   validateSnowparkArray: (array) => validateArray(snowparkAjv, array),
   validateMountainArea: (object) => validateObject(mountainAreaAjv, object),
-  validateMountainAreaArray: (array) => validateArray(mountainAreaAjv, array)
+  validateMountainAreaArray: (array) => validateArray(mountainAreaAjv, array),
+  validateEventSeries: (object) => validateObject(eventSeriesAjv, object),
+  validateEventSeriesArray: (array) => validateArray(eventSeriesAjv, array),
 }
 
 function validateObject(validation, object){
@@ -62,6 +66,7 @@ function validate(validation, object, result) {
   else {
     let message = object && object.id ? 'Object <'+object.id+'>' : 'Data';
     console.log('ERROR: '+message+' is INVALID!');
+    // console.log('ERROR: '+message+' is INVALID! ' + JSON.stringify(validation.errors,null,1));
     result.invalid.push(object);
     // console.log(validation.errors);
   }
