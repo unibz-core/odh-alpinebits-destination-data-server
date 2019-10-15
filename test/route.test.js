@@ -50,7 +50,7 @@ module.exports.basicRouteTests = (opts) => {
     });
 
     test(`/${opts.route}: page size works`, () => {
-      const pageSize = 7;
+      const pageSize = 2;
       return utils.axiosInstance.get(`/api/v1/${opts.route}?page[size]=${pageSize}`)
         .then( (res) => {
           let {pages, count} = res.data.meta;
@@ -112,15 +112,22 @@ module.exports.basicRouteTests = (opts) => {
         .then( (resArray) => {
           resArray.forEach( (res) => expect(res.data.data).toBeDefined() )
         });
-    });
+    }, 60000);
 
     test(`/${opts.route}: data links work`, () => {
-      let promises = data.map( object => axios.get(object.links.self) );
+      let promises = [];
+      let i = 0;
+
+      while(i<=3 && i<data.length-1){
+        promises.push(axios.get(data[i].links.self));
+        i++;
+      }
+
       return Promise.all(promises)
         .then( (resArray) => {
           resArray.forEach( (res) => expect(res.data.data).toBeDefined() )
         });
-    });
+    }, 15000);
 
     test(`/${opts.route}: single include`, () => {
       if(!opts.include)

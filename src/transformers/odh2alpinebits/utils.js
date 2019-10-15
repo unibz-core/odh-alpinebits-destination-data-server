@@ -195,12 +195,12 @@ function transformGeometry(gpsInfo, infoKeys, gpsPoints, gpsTrack){
     }
   }
   else if(gpsPoints && Object.keys(gpsPoints)) {
-    console.log('Has GpsPoints:', Object.keys(gpsPoints).length);
-    return geometry;
+    // console.log('Has GpsPoints:', Object.keys(gpsPoints).length);
+    return null;
   }
   else if(gpsTrack && gpsTrack.length>=1) {
-    console.log('Has GpsTrack:', gpsTrack.length);
-    return geometry;
+    // console.log('Has GpsTrack:', gpsTrack.length);
+    return null;
   }
 
   return geometry;

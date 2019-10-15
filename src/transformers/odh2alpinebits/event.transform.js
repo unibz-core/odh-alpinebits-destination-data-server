@@ -33,7 +33,7 @@ module.exports = (object) => {
   // Media Objects
   target.multimediaDescriptions = []
   for (image of source.ImageGallery)
-    target.multimediaDescriptions.push(util.transformMediaObject(image));
+    target.multimediaDescriptions.push(utils.transformMediaObject(image));
 
   return target;
 }

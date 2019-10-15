@@ -110,7 +110,7 @@ async function fetch(path, request, transform, field) {
   }
 }
 
-async function fetchMountainArea(request) {
+async function fetchMountainArea(request, field, transform) {
   const instance = axios.create(axiosOpts);
   let areaId = request.params.id;
   let areaRes, regionRes;
@@ -153,8 +153,22 @@ async function fetchMountainArea(request) {
 
   try {
     let subRequests = [];
-    items.forEach( area => subRequests=subRequests.concat(fetchMountainSubResources(request, area)) );
-    await Promise.all(subRequests);
+    let opts = [];
+    let odhTagMap = {
+      lifts: 'aufstiegsanlagen',
+      snowparks: 'snowpark',
+      trails: 'ski alpin,ski alpin (rundkurs),rodelbahnen,loipen'
+    }
+
+    if(field && odhTagMap[field])
+      opts = [ [field, odhTagMap[field]] ];
+    else
+      opts = Object.keys(odhTagMap).map(key => [key, odhTagMap[key]]);
+
+    if(opts.length>0){
+      items.forEach( area => subRequests=subRequests.concat(fetchMountainSubResources(request, area, opts)) );
+      await Promise.all(subRequests);
+    }
   }
   catch(error){
     handleConnectionError(error);
@@ -165,6 +179,10 @@ async function fetchMountainArea(request) {
     const data = areaId ? odh2ab.transformMountainArea(res) : odh2ab.transformMountainAreaArray(res);
     console.log('OK: Sucessfully transformed data.\n');
     const meta =  areaId ? {} : getResponseMeta(res);
+
+    if(field)
+      return { data: data[field], meta };
+
     return { data, meta };
   }
   catch(error) {
@@ -172,22 +190,20 @@ async function fetchMountainArea(request) {
   }
 }
 
-function fetchMountainSubResources(request, area) {
-  let opts = [['lifts','aufstiegsanlagen'],['snowparks','snowpark'],['trails','ski alpin,ski alpin (rundkurs),rodelbahnen,loipen']]
-
+function fetchMountainSubResources(request, area, opts) {
   return opts.map( entry => {
     let [ relationship, odhTag ] = entry;
-    console.log(`> Fetching ${relationship} from ${process.env.ODH_BASE_URL}...`);
 
     const instance = axios.create(axiosOpts);
     const id = 'SkiRegionId' in area ? 'ska'+area.Id : 'skr'+area.Id;
     let path;
 
-    if(relationship in request.query.include)
+    if(opts.length===1 || relationship in request.query.include)
       path = `${ACTIVITY_PATH}?odhtagfilter=${odhTag}&areafilter=${id}&pagesize=1000`
     else
       path = `${ACTIVITY_REDUCED_PATH}?odhtagfilter=${odhTag}&areafilter=${id}`
 
+    console.log(`> Fetching ${relationship} from ${process.env.ODH_BASE_URL+path}...`);
     return instance.get(path)
       .then( res => {
         if(res.status!==200 || !res.data)
@@ -274,6 +290,11 @@ module.exports = {
   fetchTrailMediaObjects: fetchSubResource(ACTIVITY_PATH, odh2ab.transformTrail, 'multimediaDescriptions'),
   fetchSnowparks: fetchSnowparks,
   fetchSnowparkById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformSnowpark),
-  fetchMountainAreas: fetchMountainArea,
-  fetchMountainAreaById: fetchMountainArea,
+  fetchMountainAreas: request => fetchMountainArea(request, null),
+  fetchMountainAreaById: request => fetchMountainArea(request, null),
+  fetchMountainAreaMedia: request => fetchMountainArea(request, 'multimediaDescriptions'),
+  fetchMountainAreaOwner: request => fetchMountainArea(request, 'areaOwner'),
+  fetchMountainAreaLifts: request => fetchMountainArea(request, 'lifts'),
+  fetchMountainAreaTrails: request => fetchMountainArea(request, 'trails'),
+  fetchMountainAreaSnowparks: request => fetchMountainArea(request, 'snowparks')
 }
