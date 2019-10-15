@@ -106,6 +106,5 @@ module.exports = (object) => {
   for (image of source.ImageGallery)
     target.multimediaDescriptions.push(utils.transformMediaObject(image));
 
-  console.log(target);
   return target;
 }

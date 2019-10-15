@@ -26,7 +26,7 @@ let opts = {
       resourceType: 'lifts'
     },
     {
-      attributes: ['name','address'],
+      attributes: ['name'],
       relationship: 'areaOwner',
       resourceType: 'agents'
     }

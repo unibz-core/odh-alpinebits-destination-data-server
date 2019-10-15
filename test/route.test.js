@@ -101,18 +101,29 @@ module.exports.basicRouteTests = (opts) => {
         })
     })
 
-    test(`/${opts.route}: pagination links work`, () => {
-      let promises = [];
-      promises.push(axios.get(links.next));
-      promises.push(axios.get(links.prev));
-      promises.push(axios.get(links.first));
-      promises.push(axios.get(links.last));
-      promises.push(axios.get(links.self));
-      return Promise.all(promises)
-        .then( (resArray) => {
-          resArray.forEach( (res) => expect(res.data.data).toBeDefined() )
-        });
-    }, 60000);
+    test(`/${opts.route}: pagination 'next' link works`, () => {
+      return axios.get(links.next).then( res => expect(res.data.data).toBeDefined())
+    });
+
+    test(`/${opts.route}: pagination 'prev' link works`, () => {
+      return axios.get(links.prev).then( res => expect(res.data.data).toBeDefined())
+    });
+
+    test(`/${opts.route}: pagination 'first' link works`, () => {
+      return axios.get(links.first).then( res => expect(res.data.data).toBeDefined())
+    });
+
+    test(`/${opts.route}: pagination 'last' link works`, () => {
+      return axios.get(links.last).then( res => expect(res.data.data).toBeDefined())
+    });
+
+    test(`/${opts.route}: 'self' link works`, () => {
+      return axios.get(links.self).then( res => {
+        expect(res.data.data).toBeDefined()
+        expect(res.data.data).toEqual(data);
+        expect(res.data.links).toEqual(links);
+      })
+    });
 
     test(`/${opts.route}: data links work`, () => {
       let promises = [];
