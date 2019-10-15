@@ -92,7 +92,7 @@ module.exports = (object) => {
 
   target.multimediaDescriptions = []
   for (image of source.ImageGallery)
-    target.multimediaDescriptions.push(util.transformMediaObject(image));
+    target.multimediaDescriptions.push(utils.transformMediaObject(image));
 
   if(source.SkiAreaMapURL) {
     let map = templates.createObject('MediaObject');
@@ -185,9 +185,20 @@ module.exports = (object) => {
     owner.multimediaDescriptions = [ logo ];
   }
 
-  target.lifts = source.lifts.map(lift => conditionalTransform(lift, 'Lift', transformLift));
-  target.trails = source.trails.map(trail => conditionalTransform(trail, 'Trail', transformTrail));
-  target.snowparks = source.snowparks.map(park => conditionalTransform(park, 'Snowpark', transformSnowpark));
+  if(source.lifts)
+    target.lifts = source.lifts.map(lift => conditionalTransform(lift, 'Lift', transformLift));
+  else
+    target.lifts = [];
+
+  if(source.trails)
+    target.trails = source.trails.map(trail => conditionalTransform(trail, 'Trail', transformTrail));
+  else
+    target.trails = [];
+
+  if(source.snowparks)
+    target.snowparks = source.snowparks.map(park => conditionalTransform(park, 'Snowpark', transformSnowpark));
+  else
+    target.snowparks = [];
 
   return target;
 }

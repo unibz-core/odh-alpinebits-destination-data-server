@@ -23,7 +23,11 @@ const MEDIA_OBJECT = {
   opts: {
     ...DEFAULT_OPTS,
     attributes: [...BASIC_ATTR,'contentType','height','width','duration','license','copyrightOwner'],
-  }
+    copyrightOwner: {
+      attributes: [...BASIC_ATTR]
+    }
+  },
+  relationships: []
 }
 
 const AGENT = {

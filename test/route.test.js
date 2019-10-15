@@ -50,7 +50,7 @@ module.exports.basicRouteTests = (opts) => {
     });
 
     test(`/${opts.route}: page size works`, () => {
-      const pageSize = 7;
+      const pageSize = 2;
       return utils.axiosInstance.get(`/api/v1/${opts.route}?page[size]=${pageSize}`)
         .then( (res) => {
           let {pages, count} = res.data.meta;
@@ -101,26 +101,44 @@ module.exports.basicRouteTests = (opts) => {
         })
     })
 
-    test(`/${opts.route}: pagination links work`, () => {
-      let promises = [];
-      promises.push(axios.get(links.next));
-      promises.push(axios.get(links.prev));
-      promises.push(axios.get(links.first));
-      promises.push(axios.get(links.last));
-      promises.push(axios.get(links.self));
-      return Promise.all(promises)
-        .then( (resArray) => {
-          resArray.forEach( (res) => expect(res.data.data).toBeDefined() )
-        });
+    test(`/${opts.route}: pagination 'next' link works`, () => {
+      return axios.get(links.next).then( res => expect(res.data.data).toBeDefined())
+    });
+
+    test(`/${opts.route}: pagination 'prev' link works`, () => {
+      return axios.get(links.prev).then( res => expect(res.data.data).toBeDefined())
+    });
+
+    test(`/${opts.route}: pagination 'first' link works`, () => {
+      return axios.get(links.first).then( res => expect(res.data.data).toBeDefined())
+    });
+
+    test(`/${opts.route}: pagination 'last' link works`, () => {
+      return axios.get(links.last).then( res => expect(res.data.data).toBeDefined())
+    });
+
+    test(`/${opts.route}: 'self' link works`, () => {
+      return axios.get(links.self).then( res => {
+        expect(res.data.data).toBeDefined()
+        expect(res.data.data).toEqual(data);
+        expect(res.data.links).toEqual(links);
+      })
     });
 
     test(`/${opts.route}: data links work`, () => {
-      let promises = data.map( object => axios.get(object.links.self) );
+      let promises = [];
+      let i = 0;
+
+      while(i<=3 && i<data.length-1){
+        promises.push(axios.get(data[i].links.self));
+        i++;
+      }
+
       return Promise.all(promises)
         .then( (resArray) => {
           resArray.forEach( (res) => expect(res.data.data).toBeDefined() )
         });
-    });
+    }, 15000);
 
     test(`/${opts.route}: single include`, () => {
       if(!opts.include)
