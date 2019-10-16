@@ -9,8 +9,9 @@ function getHomeResponse(request, response) {
       self: getSelfUrl(request),
       resources: {
         events: getBaseUrl(request)+'/events',
+        eventSeries: getBaseUrl(request)+'/eventSeries',
         lifts: getBaseUrl(request)+'/lifts',
-        lifts: getBaseUrl(request)+'/trails',
+        trails: getBaseUrl(request)+'/trails',
         snowparks: getBaseUrl(request)+'/snowparks',
         mountainAreas: getBaseUrl(request)+'/mountainAreas'
       }
