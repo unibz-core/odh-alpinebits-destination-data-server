@@ -72,10 +72,8 @@ module.exports = {
   getMountainAreaLifts: req => handleRequest(req, odhCon.fetchMountainAreaLifts, val.validateLiftArray, ser.serializeLiftArray),
   getMountainAreaTrails: req => handleRequest(req, odhCon.fetchMountainAreaTrails, val.validateTrailArray, ser.serializeTrailArray),
   getMountainAreaSnowparks: req => handleRequest(req, odhCon.fetchMountainAreaSnowparks, val.validateSnowparkArray, ser.serializeSnowparkArray),
-  getEventSeries: (request) => {
-    return handleRequest(request, odhConnector.fetchEventSeries, validator.validateEventSeriesArray, serializer.serializeEventSeries)
-  },
-  getEventSeriesById: (request) => {
-    return handleRequest(request, odhConnector.fetchEventSeriesById, validator.validateEventSeries, serializer.serializeEventSeries)
-  },
+  getEventSeries: (req) => handleRequest(req, odhCon.fetchEventSeries, val.validateEventSeriesArray, ser.serializeEventSeriesArray),
+  getEventSeriesById: (req) => handleRequest(req, odhCon.fetchEventSeriesById, val.validateEventSeries, ser.serializeEventSeries),
+  getSnowReports: (req) => handleRequest(req, odhCon.fetchSnowReports, val.validateSnowReportArray, ser.serializeSnowReports),
+  getSnowReportById: (req) => handleRequest(req, odhCon.fetchSnowReportById, val.validateSnowReport, ser.serializeSnowReport),
 }

@@ -387,7 +387,7 @@ module.exports = {
   fetchMountainAreaOwner: request => fetchMountainArea(request, 'areaOwner'),
   fetchMountainAreaLifts: request => fetchMountainArea(request, 'lifts'),
   fetchMountainAreaTrails: request => fetchMountainArea(request, 'trails'),
-  fetchMountainAreaSnowparks: request => fetchMountainArea(request, 'snowparks')
+  fetchMountainAreaSnowparks: request => fetchMountainArea(request, 'snowparks'),
   fetchEventSeries: fetchEventSeries,
   fetchEventSeriesById: fetchEventSeriesById,
 }

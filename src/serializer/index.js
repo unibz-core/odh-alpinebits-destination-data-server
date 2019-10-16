@@ -46,26 +46,9 @@ module.exports = {
   serializeSnowpark: (data,request,meta) => serializeObject('snowparks', data, request, meta),
   serializeSnowparkArray: (data,request,meta) => serializeArray('snowparks', data, request, meta),
   serializeMountainArea: (data,request,meta) => serializeObject('mountainAreas', data, request, meta),
-  serializeMountainAreaArray: (data,request,meta) => serializeArray('mountainAreas', data, request, meta)
-  serializeEventSeries: (data, request, meta) => {
-    let resource = resources.getOptions('eventSeries');
-
-    links.addPagination(resource, request, meta);
-    links.addSelf(resource, request);
-    links.addDataLinks(resource, request);
-
-    includes.add(resource, request);
-    fields.add(resource, request);
-
-    return serialize(resource, data);
-  },
-  serializeEventSeriesArray: (data, request, meta) => {
-    let resource = resources.getOptions('eventSeries');
-
-    links.addSelf(resource, request);
-    includes.add(resource, request);
-    fields.add(resource, request);
-
-    return serialize(resource, data);
-  },
+  serializeMountainAreaArray: (data,request,meta) => serializeArray('mountainAreas', data, request, meta),
+  serializeEventSeries: (data,request,meta) => serializeObject('eventSeries', data, request, meta),
+  serializeEventSeriesArray: (data,request,meta) => serializeArray('eventSeries', data, request, meta),
+  serializeSnowReport: (data,request,meta) => serializeObject('snowReports', data, request, meta),
+  serializeSnowReportArray: (data,request,meta) => serializeArray('snowReports', data, request, meta),
 }

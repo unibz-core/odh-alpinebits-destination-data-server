@@ -1,58 +1,145 @@
-
 module.exports = {
   '$schema': 'http://json-schema.org/draft-07/schema#',
-  '$id': 'https://www.alpinebits.org/schemas/v1/general/EventSeries',
-  'title': 'Event Series',
+  '$id': 'https://www.alpinebits.org/schemas/v1/mountaindata/SnowReport',
+  'title': 'Snow Report',
   'type': 'object',
   'required': [
+    'lastUpdate',
+    'dataProvider',
     '@type',
-    'id',
-    'name'
+    'areaId',
+    'baseSnow',
+    'newSnow'
   ],
   'properties': {
     '@type': {
-      'const': 'EventSeries'
+      'const': 'SnowReport'
     },
-    'id': {
+    'dataProvider': {
+      'oneOf': [
+        {
+          '$ref': '#/definitions/agent'
+        },
+        {
+          'type': 'string',
+          'format': 'uri'
+        }
+      ]
+    },
+    'lastUpdate': {
+      'type': 'string',
+      'format': 'date-time'
+    },
+    'areaId': {
       'type': 'string',
       'minLength': 1
     },
-    'name': {
-      '$ref': '#/definitions/text'
+    'trails': {
+      '$ref': '#/definitions/conditionArray'
     },
-    'shortName': {
-      '$ref': '#/definitions/text'
+    'snowparks': {
+      '$ref': '#/definitions/conditionArray'
     },
-    'abstract': {
-      '$ref': '#/definitions/text'
-    },
-    'description': {
-      '$ref': '#/definitions/text'
-    },
-    'url': {
-      '$ref': '#/definitions/url'
-    },
-    'multimediaDescriptions': {
+    'subAreas': {
       'type': 'array',
       'items': {
-        '$ref': '#/definitions/mediaObject'
+        '$ref': '#'
       }
-    },
-    'frequency': {
-      'type': 'string',
-      'enum': [
-        'daily',
-        'weekly',
-        'monthly',
-        'bimonthly',
-        'quaterly',
-        'annual',
-        'biennial',
-        'triennial'
-      ]
     }
   },
+  'allOf': [
+    {
+      '$ref': '#/definitions/snow'
+    }
+  ],
   'definitions': {
+    'snow': {
+      'properties': {
+        'measuredBy': {
+          '$ref': '#/definitions/agent'
+        },
+        'measuredAt': {
+          'title': 'Point',
+          'type': 'object',
+          'properties': {
+            '@type': {
+              'const': 'Point'
+            },
+            'coordinates': {
+              'type': 'array',
+              'minItems': 2,
+              'items': {
+                'type': 'number'
+              }
+            }
+          },
+          'required': [
+            '@type',
+            'coordinates'
+          ]
+        },
+        'primarySurface': {
+          'type': 'string'
+        },
+        'secondarySurface': {
+          'type': 'string'
+        },
+        'baseSnow': {
+          'description': 'Amount of base snow in a mountain area, trail or snow park, in centimeters.',
+          'type': 'number'
+        },
+        'baseRange': {
+          'required': [
+            'lower',
+            'upper'
+          ],
+          'properties': {
+            'lower': {
+              'description': 'Lower amount of base snow in a mountain area, trail or snow park, in centimeters.',
+              'type': 'number'
+            },
+            'upper': {
+              'description': 'Upper amount of base snow in a mountain area, trail or snow park, in centimeters.',
+              'type': 'number'
+            }
+          }
+        },
+        'latestStorm': {
+          'description': 'Amount of snow from the latest storm cycle in a mountain area, trail or snow park, in centimeters.',
+          'type': 'string',
+          'format': 'date'
+        },
+        'newSnow': {
+          'type': 'number'
+        },
+        'groomed': {
+          'type': 'boolean'
+        },
+        'snowMaking': {
+          'type': 'boolean'
+        }
+      }
+    },
+    'conditionArray': {
+      'type': 'array',
+      'minItems': 1,
+      'items': {
+        'allOf': [
+          {
+            '$ref': '#/definitions/snow'
+          }
+        ],
+        'required': [
+          'id'
+        ],
+        'properties': {
+          'id': {
+            'type': 'string',
+            'minLength': 1
+          }
+        }
+      }
+    },
     'text': {
       'patternProperties': {
         '': {
@@ -208,102 +295,6 @@ module.exports = {
           'required': [
             'name'
           ]
-        }
-      ]
-    },
-    'mediaObject': {
-      'title': 'Media Object',
-      'type': 'object',
-      'required': [
-        '@type',
-        'url',
-        'contentType'
-      ],
-      'properties': {
-        '@type': {
-          'const': 'MediaObject'
-        },
-        'id': {
-          'type': 'string',
-          'minLength': 1
-        },
-        'name': {
-          '$ref': '#/definitions/text'
-        },
-        'shortName': {
-          '$ref': '#/definitions/text'
-        },
-        'abstract': {
-          '$ref': '#/definitions/text'
-        },
-        'description': {
-          '$ref': '#/definitions/text'
-        },
-        'url': {
-          '$ref': '#/definitions/url'
-        },
-        'contentType': {
-          'type': 'string',
-          'pattern': '^(application|audio|font|example|image|message|model|multipart|text|video)/[a-zA-Z0-9-.+]+$'
-        },
-        'height': {
-          'description': 'The height of an image or a video in pixels.',
-          'type': 'integer',
-          'minimum': 1
-        },
-        'width': {
-          'description': 'The width of an image or a video in pixels.',
-          'type': 'integer',
-          'minimum': 1
-        },
-        'duration': {
-          'description': 'The duration of an audio or a video in seconds.',
-          'type': 'number',
-          'minimum': 1
-        },
-        'license': {
-          'description': 'The license defined for a media object. The value of this field should be a valid license identifier as defined in https://spdx.org/licenses/ (e.g. CC-BY-4.0, FreeImage)',
-          'type': 'string'
-        },
-        'copyrightOwner': {
-          '$ref': '#/definitions/agent'
-        }
-      },
-      'allOf': [
-        {
-          'if': {
-            'properties': {
-              'contentType': {
-                'type': 'string',
-                'pattern': '^(application|font|example|image|message|model|multipart|text)'
-              }
-            }
-          },
-          'then': {
-            'not': {
-              'required': [
-                'duration'
-              ]
-            }
-          }
-        },
-        {
-          'if': {
-            'properties': {
-              'contentType': {
-                'type': 'string',
-                'pattern': '^(application|audio|font|example|message|model|multipart|text)'
-              }
-            }
-          },
-          'then': {
-            'not': {
-              'required': [
-                'width',
-                'height'
-              ]
-            }
-          }
         }
       ]
     },

@@ -187,6 +187,15 @@ const MOUNTAIN_AREA = {
     'trails','subAreas']
 }
 
+const SNOW_REPORT = {
+  name: 'snowReports',
+  opts: {
+    ...DEFAULT_OPTS,
+    attributes: [...BASIC_ATTR,...META_ATTR,],
+  },
+  relationships: []
+}
+
 function typeForAttribute (attribute, data) {
   switch(data['@type']) {
     case 'Event':
@@ -215,6 +224,8 @@ function typeForAttribute (attribute, data) {
       return SNOWPARK.name;
     case 'MountainArea':
       return MOUNTAIN_AREA.name;
+    case 'SnowReport':
+      return SNOW_REPORT.name;
 
     return data['@type'];
   }
@@ -259,6 +270,7 @@ const resources = {
   'snowparks': SNOWPARK,
   'mountainAreas': MOUNTAIN_AREA,
   'eventSeries': EVENT_SERIES,
+  'snowReports': SNOW_REPORT
 }
 
 module.exports = {

@@ -14,4 +14,12 @@ module.exports = function(app) {
       .then(data => res.json(data))
       .catch(error => errors.handleError(error, req, res));
   });
+
+  app.get('/api/v1/eventSeries/:id/multimediaDescriptions', function(req, res) {
+    errors.handleNotImplemented(req,res);
+  });
+
+  app.get('/api/v1/eventSeries/:id/relationships/multimediaDescriptions', function(req, res) {
+    errors.handleNotImplemented(req,res);
+  });
 }

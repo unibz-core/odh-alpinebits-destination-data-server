@@ -11,6 +11,7 @@ const trailSchema = require('./schemas/trail.schema');
 const snowparkSchema = require('./schemas/snowpark.schema');
 const mountainAreaSchema = require('./schemas/mountainarea.schema');
 const eventSeriesSchema = require('./schemas/eventseries.schema');
+const snowReportSchema = require('./schemas/snowreport.schema');
 
 let ajv = new Ajv({ verbose: false });
 
@@ -23,6 +24,7 @@ let trailAjv = ajv.compile(trailSchema);
 let snowparkAjv = ajv.compile(snowparkSchema);
 let mountainAreaAjv = ajv.compile(mountainAreaSchema);
 let eventSeriesAjv = ajv.compile(eventSeriesSchema);
+let snowReportAjv = ajv.compile(snowReportSchema);
 
 module.exports = {
   validateEvent: (object) => validateObject(eventAjv, object),
@@ -41,6 +43,8 @@ module.exports = {
   validateMountainAreaArray: (array) => validateArray(mountainAreaAjv, array),
   validateEventSeries: (object) => validateObject(eventSeriesAjv, object),
   validateEventSeriesArray: (array) => validateArray(eventSeriesAjv, array),
+  validateSnowReport: (object) => validateObject(snowReportAjv, object),
+  validateSnowReportArray: (array) => validateArray(snowReportAjv, array),
 }
 
 function validateObject(validation, object){

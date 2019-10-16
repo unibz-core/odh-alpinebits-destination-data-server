@@ -194,7 +194,16 @@ const templates = {
     url: {},
     multimediaDescriptions: [],
     frequency: '',
-  }
+  },
+  SnowReport: {
+    '@type':  'SnowReport',
+    dataProvider: {},
+    lastUpdate: '',
+    areaId: '',
+    trails: [],
+    snowparks: [],
+    subAreas: [],
+  },
 }
 
 // Function to create empty objects. It is better to have fields with null values than to have missing fields.
