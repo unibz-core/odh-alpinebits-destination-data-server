@@ -2,6 +2,7 @@ const { basicResourceRouteTests } = require('./route_id.test');
 const { basicRouteTests } = require('./route.test');
 
 let opts = {
+  pageSize: 2,
   route: 'mountainAreas',
   resourceType: 'mountainAreas',
   sampleAttributes: ['name','address','geometries','totalTrailLength'],

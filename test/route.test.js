@@ -4,8 +4,12 @@ module.exports.basicRouteTests = (opts) => {
 
   let headers, status, meta, data, links;
 
+  const pageParam = opts.pageSize ? 'page[size]='+opts.pageSize : '';
+  const pageSize = opts.pageSize || 10;
+
   beforeAll( () => {
-    return utils.axiosInstance.get(`/api/v1/${opts.route}`)
+
+    return utils.axiosInstance.get(`/api/v1/${opts.route}?${pageParam}`)
       .then( (response) => {
         ({headers, status} = response);
         ({meta, data, links} = response.data);
@@ -39,8 +43,8 @@ module.exports.basicRouteTests = (opts) => {
 
     test(`/${opts.route}: correct default pagination parameters`, () => {
       let {pages, count} = meta;
-      if(count >= 10)
-        expect(data.length).toBe(10);
+      if(count >= pageSize)
+        expect(data.length).toBe(pageSize);
       else
         expect(data.length).toBe(count);
 
@@ -50,17 +54,17 @@ module.exports.basicRouteTests = (opts) => {
     });
 
     test(`/${opts.route}: page size works`, () => {
-      const pageSize = 2;
-      return utils.axiosInstance.get(`/api/v1/${opts.route}?page[size]=${pageSize}`)
+      const customPageSize = 3;
+      return utils.axiosInstance.get(`/api/v1/${opts.route}?page[size]=${customPageSize}`)
         .then( (res) => {
           let {pages, count} = res.data.meta;
 
-          if(count >= pageSize)
-            expect(res.data.data.length).toEqual(pageSize)
+          if(count >= customPageSize)
+            expect(res.data.data.length).toEqual(customPageSize)
           else
             expect(res.data.data.length).toEqual(count)
 
-          expect(pages).toEqual(Math.ceil(count/pageSize));
+          expect(pages).toEqual(Math.ceil(count/customPageSize));
         })
     })
 
@@ -72,7 +76,7 @@ module.exports.basicRouteTests = (opts) => {
     })
 
     test(`/${opts.route}: single attribute selection`, () => {
-      return utils.axiosInstance.get(`/api/v1/${opts.route}?fields[${opts.resourceType}]=${opts.sampleAttributes[0]}`)
+      return utils.axiosInstance.get(`/api/v1/${opts.route}?${pageParam}&fields[${opts.resourceType}]=${opts.sampleAttributes[0]}`)
         .then( (res) => {
           res.data.data.forEach( object => {
             expect(Object.keys(object.attributes)).toEqual([opts.sampleAttributes[0]])
@@ -82,7 +86,7 @@ module.exports.basicRouteTests = (opts) => {
 
     test(`/${opts.route}: multi-attribute selection`, () => {
       const fields = opts.sampleAttributes;
-      return utils.axiosInstance.get(`/api/v1/${opts.route}?fields[${opts.resourceType}]=${fields.join(',')}`)
+      return utils.axiosInstance.get(`/api/v1/${opts.route}?${pageParam}&fields[${opts.resourceType}]=${fields.join(',')}`)
         .then( (res) => {
           res.data.data.forEach( object => {
             expect(Object.keys(object.attributes)).toEqual(fields)
@@ -92,7 +96,7 @@ module.exports.basicRouteTests = (opts) => {
 
     test(`/${opts.route}: attribute and relationship selection`, () => {
       const fields = [...opts.sampleAttributes, ...opts.sampleRelationships];
-      return utils.axiosInstance.get(`/api/v1/${opts.route}?fields[${opts.resourceType}]=`+fields.join(','))
+      return utils.axiosInstance.get(`/api/v1/${opts.route}?${pageParam}&fields[${opts.resourceType}]=`+fields.join(','))
         .then( (res) => {
           res.data.data.forEach( object => {
             expect(Object.keys(object.attributes)).toEqual(opts.sampleAttributes);
@@ -138,13 +142,13 @@ module.exports.basicRouteTests = (opts) => {
         .then( (resArray) => {
           resArray.forEach( (res) => expect(res.data.data).toBeDefined() )
         });
-    }, 15000);
+    });
 
     test(`/${opts.route}: single include`, () => {
       if(!opts.include)
         return;
 
-      return utils.axiosInstance.get(`/api/v1/${opts.route}?include=${opts.include.relationship}`)
+      return utils.axiosInstance.get(`/api/v1/${opts.route}?${pageParam}&include=${opts.include.relationship}`)
         .then( (res) => {
           expect(res.data.included).toBeDefined();
           res.data.included.forEach( object => expect(object.type).toEqual(opts.include.resourceType) )
@@ -155,7 +159,7 @@ module.exports.basicRouteTests = (opts) => {
       if(!opts.multiInclude)
         return;
 
-      return utils.axiosInstance.get(`/api/v1/${opts.route}?include=${opts.multiInclude.relationships.join(',')}`)
+      return utils.axiosInstance.get(`/api/v1/${opts.route}?${pageParam}&include=${opts.multiInclude.relationships.join(',')}`)
         .then( (res) => {
           expect(res.data.included).toBeDefined();
           res.data.included.forEach( object =>  expect(opts.multiInclude.resourceTypes).toContain(object.type) )
@@ -166,7 +170,7 @@ module.exports.basicRouteTests = (opts) => {
       if(!opts.selectInclude)
         return;
 
-      return utils.axiosInstance.get(`/api/v1/${opts.route}?include=${opts.selectInclude.relationship}&fields[${opts.selectInclude.resourceType}]=${opts.selectInclude.attribute}`)
+      return utils.axiosInstance.get(`/api/v1/${opts.route}?${pageParam}&include=${opts.selectInclude.relationship}&fields[${opts.selectInclude.resourceType}]=${opts.selectInclude.attribute}`)
         .then( (res) => {
           expect(res.data.included).toBeDefined();
           res.data.included.forEach( object => {
@@ -182,7 +186,7 @@ module.exports.basicRouteTests = (opts) => {
 
       let include = 'include='+opts.multiSelectInclude.map(entry => entry.relationship).join(',');
       let fields = opts.multiSelectInclude.map(entry => `fields[${entry.resourceType}]=${entry.attributes.join(',')}`)
-      let params = [include, ...fields].join('&');
+      let params = [pageParam, include, ...fields].join('&');
 
       let expectedAttributesPerType = {};
       opts.multiSelectInclude.forEach( entry => expectedAttributesPerType[entry.resourceType]=entry.attributes)
