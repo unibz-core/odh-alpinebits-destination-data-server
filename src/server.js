@@ -58,8 +58,8 @@ app.get('*', (req, res) => {
   errors.handleError(errors.notFound, req, res);
 });
 
-const privateKey  = fs.readFileSync(proccess.env.SSL_CERT_FILE, 'utf8');
-const certificate = fs.readFileSync(proccess.env.SSL_KEY_FILE, 'utf8');
+const privateKey  = fs.readFileSync(process.env.SSL_KEY_FILE, 'utf8');
+const certificate = fs.readFileSync(process.env.SSL_CERT_FILE, 'utf8');
 const options = {key: privateKey, cert: certificate};
 
 https.createServer(options,app).listen(process.env.REF_SERVER_PORT, function () {
