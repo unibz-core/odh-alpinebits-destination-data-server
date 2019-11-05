@@ -29,6 +29,7 @@ app.use(basicAuth({
       return userMatches & passwordMatches;
     },
     unauthorizedResponse: (req, res) => {
+      console.log('Unauthorized request ' + process.env.REF_SERVER_URL + req.originalUrl);
       return req.auth
         ? errors.createJSON(errors.credentialsRejected)
         : errors.createJSON(errors.noCredentials)
