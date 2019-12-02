@@ -50,6 +50,7 @@ require('./routes/snowparks.route.js')(app);
 require('./routes/mountain-areas.route.js')(app);
 require('./routes/event-series.route.js')(app);
 require('./routes/snow-reports.route.js')(app);
+require('./routes/webhooks.route.js')(app);
 
 require('./routes/places.route.js')(app);
 require('./routes/agents.route.js')(app);
