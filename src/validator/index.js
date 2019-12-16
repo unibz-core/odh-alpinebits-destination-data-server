@@ -12,6 +12,7 @@ const snowparkSchema = require('./schemas/snowpark.schema');
 const mountainAreaSchema = require('./schemas/mountainarea.schema');
 const eventSeriesSchema = require('./schemas/eventseries.schema');
 const snowReportSchema = require('./schemas/snowreport.schema');
+const webhookSchema = require('./schemas/webhook.schema');
 
 let ajv = new Ajv({ verbose: false });
 
@@ -25,6 +26,7 @@ let snowparkAjv = ajv.compile(snowparkSchema);
 let mountainAreaAjv = ajv.compile(mountainAreaSchema);
 let eventSeriesAjv = ajv.compile(eventSeriesSchema);
 let snowReportAjv = ajv.compile(snowReportSchema);
+let webhookAjv = ajv.compile(webhookSchema);
 
 module.exports = {
   validateEvent: (object) => validateObject(eventAjv, object),
@@ -45,6 +47,8 @@ module.exports = {
   validateEventSeriesArray: (array) => validateArray(eventSeriesAjv, array),
   validateSnowReport: (object) => validateObject(snowReportAjv, object),
   validateSnowReportArray: (array) => validateArray(snowReportAjv, array),
+  validateWebhook: (object) => validateObject(webhookAjv, object),
+  validateWebhookArray: (array) => validateArray(webhookAjv, array),
 }
 
 function validateObject(validation, object){
@@ -70,7 +74,7 @@ function validate(validation, object, result) {
   else {
     let message = object && object.id ? 'Object <'+object.id+'>' : 'Data';
     console.log('ERROR: '+message+' is INVALID!');
-    // console.log('ERROR: '+message+' is INVALID! ' + JSON.stringify(validation.errors,null,1));
+    console.log('ERROR: '+message+' is INVALID! ' + JSON.stringify(validation.errors,null,1));
     result.invalid.push(object);
     // console.log(validation.errors);
   }

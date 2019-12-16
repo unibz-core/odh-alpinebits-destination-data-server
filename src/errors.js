@@ -3,9 +3,17 @@ const types = {
     title: "No credentials were provided.",
     status: 401
   },
+  cantValidateBody: {
+    title: "Server failed to validate response.",
+    status: 401
+  },
   credentialsRejected: {
     title: "Credentials rejected.",
     status: 401
+  },
+  conflictingIDs: {
+    title: "ID already in use.",
+    status: 403
   },
   notFound: {
     title: "Resource(s) not found.",

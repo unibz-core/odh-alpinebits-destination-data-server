@@ -29,8 +29,13 @@ async function handleRequest(req, fetch, validate, serialize) {
 
   try {
     console.log('> Validating AlpineBits objects...');
-    const validation = validate(response.data);
-    console.log('OK: Objects validated (valid:'+validation.valid.length+', invalid: '+validation.invalid.length+')\n');
+
+    if (!response.data[0].type === 'webhooks') {
+      var validation = validate(response.data);
+      console.log('OK: Objects validated (valid:' + validation.valid.length + ', invalid: ' + validation.invalid.length + ')\n');
+    } else {
+      console.log('Ignoring webhook validation');
+    }
   }
   catch (error) {
     console.log('ERROR: Failed to validate data!');
@@ -76,4 +81,78 @@ module.exports = {
   getEventSeriesById: (req) => handleRequest(req, odhCon.fetchEventSeriesById, val.validateEventSeries, ser.serializeEventSeries),
   getSnowReports: (req) => handleRequest(req, odhCon.fetchSnowReports, val.validateSnowReportArray, ser.serializeSnowReports),
   getSnowReportById: (req) => handleRequest(req, odhCon.fetchSnowReportById, val.validateSnowReport, ser.serializeSnowReport),
+
+  getWebhooks: (req) => handleWebhookGetRequest(req, webhookUtil.getWebhooks, webhookUtil.validateWebhook, webhookUtil.serializeWebhook),
+  getWebhookById: (req) => handleWebhookGetRequest(req, webhookUtil.getWebhookById, webhookUtil.validateWebhook, webhookUtil.serializeWebhook),
+  createWebhook: (req) => handleWebhookChangeRequest(req, webhookUtil.createWebhook, webhookUtil.validateWebhook, webhookUtil.serializeWebhook),
+  updateWebhook: (req) => handleWebhookChangeRequest(req, webhookUtil.updateWebhook, webhookUtil.validateWebhook, webhookUtil.serializeWebhook),
+  deleteWebhook: (req) => handleWebhookChangeRequest(req, webhookUtil.deleteWebhook, webhookUtil.validateWebhook, webhookUtil.serializeWebhook),
+}
+
+const webhookUtil = require('./webhook.util');
+
+async function handleWebhookGetRequest(req, process, validate, serialize) {
+  let response;
+
+  try {
+    console.log('> Processing webhook request internally...');
+    response = process(req);
+    console.log('OK: Request completed.\n');
+  }
+  catch (error) {
+    throw error;
+  }
+
+  let dataJsonApi;
+  try {
+    console.log('> Serializing webhook in JSON:API...');
+    dataJsonApi = serialize(response.data.Items, req, response.meta);
+    console.log('OK: Sucessfully serialized objects.\n');
+  }
+  catch (error) {
+    console.log('ERROR: Failed to serialize response data!');
+    console.log(error);
+    throw errors.cantSerialize;
+  }
+
+  try {
+    console.log('> Validating Webhook objects...');
+
+    var validation = validate(dataJsonApi);
+    console.log('OK: Objects validated (valid:' + validation.valid.length + ', invalid: ' + validation.invalid.length + ')\n');
+  }
+  catch (error) {
+    console.log('ERROR: Failed to validate data!');
+    console.log(error);
+    throw errors.cantValidate;
+  }
+
+  return dataJsonApi;
+}
+
+async function handleWebhookChangeRequest(req, process, validate, serialize) {
+  try {
+    console.log('> Validating incoming request...');
+
+    var validation = validate(req.body);
+    console.log('OK: Objects validated (valid:' + validation.valid.length + ', invalid: ' + validation.invalid.length + ')\n');
+  }
+  catch (error) {
+    console.log('ERROR: Failed to validate data!');
+    console.log(error);
+    throw errors.cantValidateBody;
+  }
+
+  let response;
+
+  try {
+    console.log('> Processing incomming webhook request...');
+    response = process(req);
+    console.log('OK: Processment completed.\n');
+  }
+  catch (error) {
+    throw error;
+  }
+
+  return response;
 }

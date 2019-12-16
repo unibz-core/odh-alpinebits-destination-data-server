@@ -1,0 +1,39 @@
+[
+  {
+    "user": "alpinebits",
+    "id": "hook01",
+    "resourceType": "eventSeries",
+    "conditions": [
+      "alpinebits/add",
+      "alpinebits/delete"
+    ],
+    "callback": "http://webhook.site/3f4177fe-afdc-4d75-93e3-b60624e44c20"
+  },
+  {
+    "user": "alpinebits",
+    "id": "hook02",
+    "resourceType": "eventSeries",
+    "conditions": [
+      "custom/eventSeries.frequency.change"
+    ],
+    "callback": "http://webhook.site/3f4177fe-afdc-4d75-93e3-b60624e44c20",
+    "secret": "supersecret2",
+    "watching": [
+      {
+        "type": "eventSeries",
+        "id": "FD7DC58E68A9447FB987460138FB3C85"
+      }
+    ]
+  },
+  {
+    "user": "alpinebits",
+    "type": "webhooks",
+    "id": "hook03",
+    "resourceType": "eventSeries",
+    "callback": "http://webhook.site/3f4177fe-afdc-4d75-93e3-b60624e44c20",
+    "conditions": [
+      "alpinebits/add"
+    ],
+    "watching": []
+  }
+]

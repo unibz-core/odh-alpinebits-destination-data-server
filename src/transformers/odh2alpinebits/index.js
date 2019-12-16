@@ -4,10 +4,11 @@ const transformTrail = require('./trail.transform');
 const transformSnowpark = require('./snowpark.transform');
 const transformMountainArea = require('./mountainarea.transform');
 const transformEventSeries = require('./event-series.transform');
+const transformWebhooks = require('./webhook.transform');
 
 function transformArray(data, transformFn) {
   let result = [];
-
+  
   for (object of data.Items)
     result.push(transformFn(object));
 
@@ -27,4 +28,6 @@ module.exports = {
   transformMountainArea: data => transformMountainArea(data),
   transformEventSeriesArray: data => transformArray(data, transformEventSeries),
   transformEventSeries: data => transformEventSeries(data),
+  transformWebhooksArray: data => transformArray(data,transformWebhooks),
+  transformWebhooks: data => transformWebhooks(data),
 }

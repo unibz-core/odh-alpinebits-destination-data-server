@@ -14,7 +14,7 @@ function serializeArray (resourceType, data, request, meta) {
   links.addDataLinks(resource, request);
   includes.add(resource, request);
   fields.add(resource, request);
-
+  
   let Serializer = new JSONAPISerializer(resource.name, resource.opts);
   return Serializer.serialize(data);
 }
@@ -51,4 +51,6 @@ module.exports = {
   serializeEventSeriesArray: (data,request,meta) => serializeArray('eventSeries', data, request, meta),
   serializeSnowReport: (data,request,meta) => serializeObject('snowReports', data, request, meta),
   serializeSnowReportArray: (data,request,meta) => serializeArray('snowReports', data, request, meta),
+  serializeWebhook: (data,request,meta) => serializeObject('webhooks', data, request, meta),
+  serializeWebhookArray: (data,request,meta) => serializeArray('webhooks', data, request, meta),
 }

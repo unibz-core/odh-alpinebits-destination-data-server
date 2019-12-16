@@ -2,6 +2,7 @@ const axios = require('axios');
 const odh2ab = require ('../transformers/odh2alpinebits');
 const errors = require ('../errors');
 require('custom-env').env();
+const fs = require('fs');
 
 const EVENT_PATH = 'Event';
 const ACTIVITY_PATH = 'Activity';
@@ -106,7 +107,8 @@ function fetchEventSeriesById (request) {
 
 function getEventSeriesData(params) {
   let id = params.id;
-  let eventSeriesData = require('../../data/event-series.data');
+  let eventSeriesData = require('../../data/event-series.data.json');
+  //let eventSeriesData = JSON.parse(fs.readFileSync('../../data/event-series.data.json'));
   let res = {}
 
   if(id) {
@@ -140,7 +142,7 @@ function getEventSeriesData(params) {
   res.status = 200;
 
   return res;
-}
+};
 
 function fetchResourceById(resource, transform) {
   return (
@@ -390,4 +392,9 @@ module.exports = {
   fetchMountainAreaSnowparks: request => fetchMountainArea(request, 'snowparks'),
   fetchEventSeries: fetchEventSeries,
   fetchEventSeriesById: fetchEventSeriesById,
+  // fetchWebhooks: fetchWebhooks,
+  // fetchWebhookById: fetchWebhookById,
+  // postWebhook: postWebhook,
+  // patchWebhook: patchWebhook,
+  // deleteWebhook: deleteWebhook,
 }

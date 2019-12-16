@@ -199,6 +199,16 @@ const SNOW_REPORT = {
   relationships: []
 }
 
+const WEBHOOK = {
+  name: 'webhook',
+  opts: {
+    ...DEFAULT_OPTS,
+    attributes: [...META_ATTR, 'resourceType', 'conditions', 'callback','secret'],
+    watching: { ...EVENT.opts }
+  },
+  relationships: ['watching']
+}
+
 function typeForAttribute (attribute, data) {
   switch(data['@type']) {
     case 'Event':
@@ -232,6 +242,8 @@ function typeForAttribute (attribute, data) {
 
     return data['@type'];
   }
+  if(data.type === 'webhooks')
+    return WEBHOOK;
 }
 
 function getTypeFromRelationship(relationship) {
@@ -260,6 +272,8 @@ function getTypeFromRelationship(relationship) {
       return LIFT.name;
     case 'snowparks':
       return SNOWPARK.name;
+    case 'watching' :
+      return ;
   }
 }
 
@@ -273,7 +287,8 @@ const resources = {
   'snowparks': SNOWPARK,
   'mountainAreas': MOUNTAIN_AREA,
   'eventSeries': EVENT_SERIES,
-  'snowReports': SNOW_REPORT
+  'snowReports': SNOW_REPORT,
+  'webhooks': WEBHOOK
 }
 
 module.exports = {

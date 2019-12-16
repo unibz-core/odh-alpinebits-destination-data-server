@@ -1,9 +1,10 @@
 const express = require('express');
-const https = require('https')
+const https = require('https');
 const basicAuth = require('express-basic-auth');
 const cors = require('cors');
 const fs = require('fs');
 const errors = require('./errors');
+const webhookUtil = require('./connectors/webhook.util')
 require('custom-env').env();
 
 var app = express();
@@ -13,12 +14,15 @@ const corsOptions = {
   optionsSuccessStatus: 200
 }
 app.use(cors(corsOptions));
-app.use(express.json());
+app.use(express.json({ type: 'application/vnd.api+json' }));
+app.use(express.urlencoded({ extended: true }));
+//TODO: Catch bodyParser exceptions
 
 app.use( (req, res, next) => {
   //TODO: Add security layer
   //TODO: Add header/url/query validation layer
   console.log('> Request received: ' + process.env.REF_SERVER_URL + req.originalUrl);
+  
   next();
 });
 
@@ -66,4 +70,20 @@ const options = {key: privateKey, cert: certificate};
 
 https.createServer(options,app).listen(process.env.REF_SERVER_PORT, function () {
   console.log('DestinationData API listening at %s', process.env.REF_SERVER_URL);
-})
+});
+
+async function notificationLoop() { 
+  while(true) {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    try{
+      webhookUtil.sendNotifications();
+    }
+    catch(error) {
+      console.log(error);
+      return ;
+    }
+    await new Promise(resolve => setTimeout(resolve, 60000));
+  }
+};
+
+// notificationLoop();

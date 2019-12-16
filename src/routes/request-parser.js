@@ -8,6 +8,8 @@ function getSelfUrl(req) {
 
 function createRequest(req){
   return ({
+    user: req.auth.user,
+    headers: req.headers,
     baseUrl: getBaseUrl(req),
     selfUrl: getSelfUrl(req),
     params: req.params,

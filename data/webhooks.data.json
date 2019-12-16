@@ -1,0 +1,35 @@
+[
+  {
+    "user": "alpinebits",
+    "type": "webhooks",
+    "id": "9a41d94e-fd76-48b0-9c3f-d4d361f37348",
+    "resourceType": "events",
+    "callback": "http://webhook.site/3f4177fe-afdc-4d75-93e3-b60624e44c20",
+    "conditions": [
+      "alpinebits/add"
+    ],
+    "watching": []
+  },
+  {
+    "user": "alpinebits",
+    "type": "webhooks",
+    "id": "c5ab9455-a6cc-43d0-bc5b-5e264b60b66b",
+    "resourceType": "trails",
+    "callback": "http://webhook.site/3f4177fe-afdc-4d75-93e3-b60624e44c20",
+    "conditions": [
+      "alpinebits/modify"
+    ],
+    "watching": []
+  },
+  {
+    "user": "alpinebits",
+    "type": "webhooks",
+    "id": "eef71ea3-d275-43d3-bed9-41a1a5073974",
+    "resourceType": "lifts",
+    "callback": "http://webhook.site/3f4177fe-afdc-4d75-93e3-b60624e44c20",
+    "conditions": [
+      "alpinebits/delete"
+    ],
+    "watching": []
+  }
+]
