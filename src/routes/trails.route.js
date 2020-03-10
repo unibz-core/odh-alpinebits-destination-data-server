@@ -15,14 +15,14 @@ module.exports = function(app) {
       .catch(error => errors.handleError(error, req, res));
   });
 
+  app.get('/1.0/trails/:id/connections', function(req, res) {
+    errors.handleNotImplemented(req,res);
+  });
+
   app.get('/1.0/trails/:id/multimediaDescriptions', function(req, res) {
     connector.getTrailMedia(parseResourceRequest(req))
       .then(data => res.json(data))
       .catch(error => errors.handleError(error, req, res));
-  });
-
-  app.get('/1.0/trails/:id/relationships/multimediaDescriptions', function(req, res) {
-    errors.handleNotImplemented(req,res);
   });
 
 }

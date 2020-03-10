@@ -245,21 +245,5 @@ function transformVenue(source) {
       point.coordinates.push(source.Altitude);
   }
 
-  // Opening hours
-  if(source.EventDate && source.EventDate.length>1) {
-    for (date of source.EventDate) {
-      let hoursSpec = templates.createObject('HoursSpecification');
-      venue.openingHours.push(hoursSpec);
-
-      hoursSpec.validFrom = date.From.replace(/T.*/,'');
-      hoursSpec.validTo = date.To.replace(/T.*/,'');
-
-      hoursSpec.hours = [{
-        opens: date.Begin,
-        closes: date.End
-      }];
-    }
-  }
-
   return venue;
 }

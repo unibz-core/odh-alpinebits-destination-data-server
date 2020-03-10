@@ -14,12 +14,12 @@ module.exports = function(app) {
       .then(data => res.json(data))
       .catch(error => errors.handleError(error, req, res));
   });
-
-  app.get('/1.0/snowparks/:id/multimediaDescriptions', function(req, res) {
+  
+  app.get('/1.0/snowparks/:id/connections', function(req, res) {
     errors.handleNotImplemented(req,res);
   });
 
-  app.get('/1.0/snowparks/:id/connections', function(req, res) {
+  app.get('/1.0/snowparks/:id/multimediaDescriptions', function(req, res) {
     errors.handleNotImplemented(req,res);
   });
 }

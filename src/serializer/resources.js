@@ -57,14 +57,13 @@ const GEOMETRY = {
   }
 }
 
-const PLACE = {
-  name: 'places',
+const VENUE = {
+  name: 'venues',
   opts: {
     ...DEFAULT_OPTS,
-    attributes: [...BASIC_ATTR, 'multimediaDescriptions', 'address', 'geometries', 'howToArrive', 'connections', 'openingHours'],
+    attributes: [...BASIC_ATTR, 'multimediaDescriptions', 'address', 'geometries', 'howToArrive', 'connections'],
     multimediaDescriptions: MEDIA_OBJECT.opts,
     address: ADDRESS.opts,
-    openingHours: HOURS.opts,
     geometries: GEOMETRY.opts
   },
   relationships: ['geometries', 'multimediaDescriptions']
@@ -101,7 +100,7 @@ const _EVENT = {
   sponsors: AGENT.opts,
   contributors: CONTRIBUTION.opts,
   series: EVENT_SERIES.opts,
-  venues: PLACE.opts,
+  venues: VENUE.opts,
 }
 
 const SUB_EVENT = {
@@ -217,8 +216,7 @@ function typeForAttribute (attribute, data) {
     case 'MultiPolygon':
       return GEOMETRY.name;
     case 'Venue':
-    case 'Place':
-      return PLACE.name;
+      return VENUE.name;
     case 'Lift':
       return LIFT.name;
     case 'Trail':
@@ -250,7 +248,7 @@ function getTypeFromRelationship(relationship) {
     case 'series':
       return EVENT_SERIES.name;
     case 'venues':
-      return PLACE.name;
+      return VENUE.name;
     case 'geometries':
     case 'venues.geometries':
       return GEOMETRY.name;
@@ -267,7 +265,7 @@ const resources = {
   'events': EVENT,
   'agents': AGENT,
   'mediaObjects': MEDIA_OBJECT,
-  'places': PLACE,
+  'venues': VENUE,
   'lifts': LIFT,
   'trails': TRAIL,
   'snowparks': SNOWPARK,

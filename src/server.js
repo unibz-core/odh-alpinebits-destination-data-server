@@ -16,25 +16,23 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use( (req, res, next) => {
-  //TODO: Add security layer
-  //TODO: Add header/url/query validation layer
   console.log('> Request received: ' + process.env.REF_SERVER_URL + req.originalUrl);
   next();
 });
 
-app.use(basicAuth({
-    authorizer: (username, password) => {
-      const userMatches = basicAuth.safeCompare(username, process.env.USERNAME);
-      const passwordMatches = basicAuth.safeCompare(password, process.env.PASSWORD);
-      return userMatches & passwordMatches;
-    },
-    unauthorizedResponse: (req, res) => {
-      console.log('Unauthorized request ' + process.env.REF_SERVER_URL + req.originalUrl);
-      return req.auth
-        ? errors.createJSON(errors.credentialsRejected)
-        : errors.createJSON(errors.noCredentials)
-    }
-}))
+// app.use(basicAuth({
+//     authorizer: (username, password) => {
+//       const userMatches = basicAuth.safeCompare(username, process.env.USERNAME);
+//       const passwordMatches = basicAuth.safeCompare(password, process.env.PASSWORD);
+//       return userMatches & passwordMatches;
+//     },
+//     unauthorizedResponse: (req, res) => {
+//       console.log('Unauthorized request ' + process.env.REF_SERVER_URL + req.originalUrl);
+//       return req.auth
+//         ? errors.createJSON(errors.credentialsRejected)
+//         : errors.createJSON(errors.noCredentials)
+//     }
+// }))
 
 app.use( (req, res, next) => {
   res.setHeader('Content-Type', 'application/vnd.api+json');
@@ -51,7 +49,7 @@ require('./routes/mountain-areas.route.js')(app);
 require('./routes/event-series.route.js')(app);
 require('./routes/snow-reports.route.js')(app);
 
-require('./routes/places.route.js')(app);
+require('./routes/venues.route.js')(app);
 require('./routes/agents.route.js')(app);
 require('./routes/media-objects.route.js')(app);
 

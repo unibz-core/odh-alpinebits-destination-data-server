@@ -15,11 +15,12 @@ module.exports = function(app) {
       .catch(error => errors.handleError(error, req, res));
   });
 
+  app.get('/1.0/eventSeries/:id/editions', function(req, res) {
+    errors.handleNotImplemented(req,res);
+  });
+
   app.get('/1.0/eventSeries/:id/multimediaDescriptions', function(req, res) {
     errors.handleNotImplemented(req,res);
   });
 
-  app.get('/1.0/eventSeries/:id/relationships/multimediaDescriptions', function(req, res) {
-    errors.handleNotImplemented(req,res);
-  });
 }

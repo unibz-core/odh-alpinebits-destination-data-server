@@ -12,7 +12,7 @@ let opts = {
   },
   multiInclude: {
     relationships: ['organizers','venues','multimediaDescriptions'],
-    resourceTypes: ['agents','places','mediaObjects']
+    resourceTypes: ['agents','venues','mediaObjects']
   },
   selectInclude: {
     attribute: 'name',
@@ -28,7 +28,7 @@ let opts = {
     {
       attributes: ['name','address'],
       relationship: 'venues',
-      resourceType: 'places'
+      resourceType: 'venues'
     }
   ]
 }
