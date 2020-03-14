@@ -3,70 +3,41 @@ const DEFAULT_OPTS = {
   nullIfMissing: true,
 }
 
-const BASIC_ATTR = ['name','shortName','description','abstract','url'];
-const META_ATTR = ['dataProvider', 'lastUpdate'];
-
-const ADDRESS = {
-  opts: {
-    attributes: ['street', 'category', 'street', 'city', 'region', 'zipcode', 'complement', 'country'],
-  }
-}
-
-const HOURS = {
-  opts: {
-    attributes: ['hours', 'validFrom', 'validTo'],
-  }
-}
+const BASIC_ATTR = ['name','shortName','description','abstract','url','categories'];
 
 const MEDIA_OBJECT = {
   name: 'mediaObjects',
   opts: {
     ...DEFAULT_OPTS,
-    attributes: [...BASIC_ATTR,'contentType','height','width','duration','license','copyrightOwner'],
+    attributes: [...BASIC_ATTR,'contentType','height','width','duration','license','copyrightOwner','categories'],
     copyrightOwner: {
       attributes: [...BASIC_ATTR]
     }
   },
-  relationships: []
+  relationships: ['copyrightOwner']
 }
 
 const AGENT = {
   name: 'agents',
   opts: {
     ...DEFAULT_OPTS,
-    attributes: [...BASIC_ATTR,'category','multimediaDescriptions','contacts'],
+    attributes: [...BASIC_ATTR,'categories','multimediaDescriptions','contacts'],
     contacts: {
       attributes: [...BASIC_ATTR, 'email', 'telephone', 'address', 'availableHours'],
-      address: ADDRESS.opts,
-      availableHours: HOURS.opts
     },
     multimediaDescriptions: MEDIA_OBJECT.opts
   },
   relationships: ['multimediaDescriptions']
 }
 
-const GEOMETRY = {
-  name: 'geometries',
-  opts: {
-    ...DEFAULT_OPTS,
-    attributes: ['coordinates', 'category'],
-    transform: function (data) {
-       data.category = data['@type'];
-       return data;
-    }
-  }
-}
-
 const VENUE = {
   name: 'venues',
   opts: {
     ...DEFAULT_OPTS,
-    attributes: [...BASIC_ATTR, 'multimediaDescriptions', 'address', 'geometries', 'howToArrive', 'connections'],
+    attributes: [...BASIC_ATTR, 'multimediaDescriptions', 'address', 'geometries', 'howToArrive', 'connections', 'categories'],
     multimediaDescriptions: MEDIA_OBJECT.opts,
-    address: ADDRESS.opts,
-    geometries: GEOMETRY.opts
   },
-  relationships: ['geometries', 'multimediaDescriptions']
+  relationships: ['multimediaDescriptions']
 }
 
 const EVENT_SERIES = {
@@ -79,59 +50,33 @@ const EVENT_SERIES = {
   relationships: ['multimediaDescriptions']
 }
 
-const CONTRIBUTION = {
-  name: 'contributions',
-  opts: {
-    ...DEFAULT_OPTS,
-    attributes: ['agent', 'role'],
-    agent: AGENT.opts
-  }
-}
 
-const _EVENT_REL = ['multimediaDescriptions','publisher','organizers','sponsors','contributors','series','series.multimediaDescriptions','venues','venues.multimediaDescriptions','venues.geometries'];
-
-const _EVENT_ATTR = [...BASIC_ATTR, ..._EVENT_REL, 'startDate', 'endDate', 'originalStartDate', 'originalEndDate', 'categories', 'structure', 'status', 'capacity'];
-
-const _EVENT = {
-  ...DEFAULT_OPTS,
-  multimediaDescriptions: MEDIA_OBJECT.opts,
-  publisher: AGENT.opts,
-  organizers: AGENT.opts,
-  sponsors: AGENT.opts,
-  contributors: CONTRIBUTION.opts,
-  series: EVENT_SERIES.opts,
-  venues: VENUE.opts,
-}
-
-const SUB_EVENT = {
-  name: 'events',
-  opts: {
-    ..._EVENT,
-    attributes: [ ..._EVENT_ATTR ]
-  },
-  relationships: [ ..._EVENT_REL ]
-}
+const EVENT_REL = ['multimediaDescriptions','publisher','organizers','sponsors','contributors','series','series.multimediaDescriptions','venues','venues.multimediaDescriptions','venues'];
 
 const EVENT = {
   name: 'events',
   opts: {
-    ..._EVENT,
-    attributes: [..._EVENT_ATTR, ...META_ATTR],
-    subEvents: SUB_EVENT.opts
+    ...DEFAULT_OPTS,
+    attributes: [...BASIC_ATTR, ...EVENT_REL, 'startDate', 'endDate', 'originalStartDate', 'originalEndDate', 'categories', 'structure', 'status', 'capacity'],
+    multimediaDescriptions: MEDIA_OBJECT.opts,
+    publisher: AGENT.opts,
+    organizers: AGENT.opts,
+    sponsors: AGENT.opts,
+    contributors: AGENT.opts,
+    series: EVENT_SERIES.opts,
+    venues: VENUE.opts,
+    subEvents: {}
   },
-  relationships: [..._EVENT_REL]
+  relationships: [...EVENT_REL]
 }
 
 const LIFT = {
   name: 'lifts',
   opts: {
     ...DEFAULT_OPTS,
-    attributes: [...BASIC_ATTR, ...META_ATTR, 'category','length','minAltitude','maxAltitude','capacityPerHour','personsPerChair',
+    attributes: [...BASIC_ATTR, 'categories','length','minAltitude','maxAltitude','capacityPerHour','personsPerChair',
     'howToArrive','address','geometries','openingHours','connections','multimediaDescriptions'],
     multimediaDescriptions: MEDIA_OBJECT.opts,
-    address: ADDRESS.opts,
-    openingHours: HOURS.opts,
-    geometries: GEOMETRY.opts,
     connections: {}
   },
   relationships: ['multimediaDescriptions', 'connections']
@@ -141,11 +86,8 @@ const TRAIL = {
   name: 'trails',
   opts: {
     ...DEFAULT_OPTS,
-    attributes: [...BASIC_ATTR,...META_ATTR, 'category','length','minAltitude','maxAltitude','difficulty','connections','geometries','openingHours','address','howToArrive','multimediaDescriptions'],
+    attributes: [...BASIC_ATTR, 'categories','length','minAltitude','maxAltitude','difficulty','connections','geometries','openingHours','address','howToArrive','multimediaDescriptions'],
     multimediaDescriptions: MEDIA_OBJECT.opts,
-    address: ADDRESS.opts,
-    openingHours: HOURS.opts,
-    geometries: GEOMETRY.opts,
     connections: {}
   },
   relationships: ['multimediaDescriptions', 'connections']
@@ -155,12 +97,9 @@ const SNOWPARK = {
   name: 'snowparks',
   opts: {
     ...DEFAULT_OPTS,
-    attributes: [...BASIC_ATTR,...META_ATTR, 'category','difficulty','area','minAltitude','maxAltitude','capacityPerHour','personsPerChair',
+    attributes: [...BASIC_ATTR, 'categories','difficulty','area','minAltitude','maxAltitude','capacityPerHour','personsPerChair',
     'howToArrive','address','geometries','openingHours','features','connections','multimediaDescriptions'],
     multimediaDescriptions: MEDIA_OBJECT.opts,
-    address: ADDRESS.opts,
-    openingHours: HOURS.opts,
-    geometries: GEOMETRY.opts,
     connections: {},
     features: {}
   },
@@ -171,12 +110,9 @@ const MOUNTAIN_AREA = {
   name: 'mountainAreas',
   opts: {
     ...DEFAULT_OPTS,
-    attributes: [...BASIC_ATTR, ...META_ATTR,
+    attributes: [...BASIC_ATTR,
       'address','geometries','howToArrive','openingHours','area','minAltitude','maxAltitude','totalTrailLength','totalParkArea',
       'multimediaDescriptions','areaOwner','connections','lifts','snowparks','trails','subAreas'],
-    address: ADDRESS.opts,
-    geometries: GEOMETRY.opts,
-    openingHours: HOURS.opts,
     areaOwner: AGENT.opts,
     multimediaDescriptions: MEDIA_OBJECT.opts,
     lifts: LIFT.opts,
@@ -189,47 +125,8 @@ const MOUNTAIN_AREA = {
     'trails','subAreas']
 }
 
-const SNOW_REPORT = {
-  name: 'snowReports',
-  opts: {
-    ...DEFAULT_OPTS,
-    attributes: [...BASIC_ATTR,...META_ATTR,],
-  },
-  relationships: []
-}
-
 function typeForAttribute (attribute, data) {
-  switch(data['@type']) {
-    case 'Event':
-      return EVENT.name;
-    case 'Agent':
-      return AGENT.name;
-    case 'MediaObject':
-      return MEDIA_OBJECT.name;
-    case 'EventSeries':
-      return EVENT_SERIES.name;
-    case 'Point':
-    case 'LineString':
-    case 'Polygon':
-    case 'MultiPoint':
-    case 'MultiLineString':
-    case 'MultiPolygon':
-      return GEOMETRY.name;
-    case 'Venue':
-      return VENUE.name;
-    case 'Lift':
-      return LIFT.name;
-    case 'Trail':
-      return TRAIL.name;
-    case 'Snowpark':
-      return SNOWPARK.name;
-    case 'MountainArea':
-      return MOUNTAIN_AREA.name;
-    case 'SnowReport':
-      return SNOW_REPORT.name;
-
-    return data['@type'];
-  }
+  return data ? data['type'] : null;
 }
 
 function getTypeFromRelationship(relationship) {
@@ -241,17 +138,12 @@ function getTypeFromRelationship(relationship) {
     case 'publisher':
     case 'organizers':
     case 'sponsors':
-    case 'contributors.agent':
-      return AGENT.name;
     case 'contributors':
-      return CONTRIBUTION.name;
+      return AGENT.name;
     case 'series':
       return EVENT_SERIES.name;
     case 'venues':
       return VENUE.name;
-    case 'geometries':
-    case 'venues.geometries':
-      return GEOMETRY.name;
     case 'areaOwner':
       return AGENT.name;
     case 'lifts':
@@ -262,16 +154,15 @@ function getTypeFromRelationship(relationship) {
 }
 
 const resources = {
-  'events': EVENT,
   'agents': AGENT,
-  'mediaObjects': MEDIA_OBJECT,
-  'venues': VENUE,
-  'lifts': LIFT,
-  'trails': TRAIL,
-  'snowparks': SNOWPARK,
-  'mountainAreas': MOUNTAIN_AREA,
+  'events': EVENT,
   'eventSeries': EVENT_SERIES,
-  'snowReports': SNOW_REPORT
+  'lifts': LIFT,
+  'mediaObjects': MEDIA_OBJECT,
+  'mountainAreas': MOUNTAIN_AREA,
+  'snowparks': SNOWPARK,
+  'trails': TRAIL,
+  'venues': VENUE,
 }
 
 module.exports = {

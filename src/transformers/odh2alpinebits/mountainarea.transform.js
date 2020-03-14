@@ -80,7 +80,7 @@ module.exports = (object) => {
   const source = JSON.parse(JSON.stringify(object));
   let target = templates.createObject('MountainArea');
 
-  Object.assign(target, utils.transformMetadata(source));
+  target.meta = utils.transformMetadata(source);
 
   Object.assign(target, utils.transformBasicProperties(source));
   target.howToArrive = utils.transformHowToArrive(source.Detail);
@@ -90,10 +90,10 @@ module.exports = (object) => {
   target.maxAltitude = source.AltitudeTo;
   target.totalTrailLength = source.TotalSlopeKm;
 
-  target.multimediaDescriptions = []
-  for (image of source.ImageGallery)
-    target.multimediaDescriptions.push(utils.transformMediaObject(image));
-
+  for (image of source.ImageGallery){
+    const targetImage = utils.transformMediaObject(image);
+    target.multimediaDescriptions = utils.safePush(target.multimediaDescriptions, targetImage);
+  }
   if(source.SkiAreaMapURL) {
     let map = templates.createObject('MediaObject');
     Object.assign(map, {
@@ -119,8 +119,8 @@ module.exports = (object) => {
     point.coordinates = [ source.Longitude, source.Latitude ];
     if(source.Altitude)
       point.coordinates.push(source.Altitude);
-
-    target.geometries.push(point);
+    
+    target.geometries = [ point ];
   }
 
   if(source.GpsPolygon){
@@ -135,7 +135,8 @@ module.exports = (object) => {
     if(utils.isClockwise(outerRing))
       outerRing = outerRing.reverse();
 
-    target.geometries.push(polygon);
+    if(!target.geometries)
+      target.geometries = [ polygon ];
   }
 
   let contact = source.ContactInfos;
@@ -206,7 +207,7 @@ module.exports = (object) => {
 function conditionalTransform(object, type, transformFn) {
   if(Object.keys(object).join('')===['Id','Name'].join(''))
     return ({
-      '@type': type,
+      'type': type,
       'id': object.Id,
       'name': {
         'deu': object.Name,

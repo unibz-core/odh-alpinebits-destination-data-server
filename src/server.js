@@ -47,7 +47,6 @@ require('./routes/trails.route.js')(app);
 require('./routes/snowparks.route.js')(app);
 require('./routes/mountain-areas.route.js')(app);
 require('./routes/event-series.route.js')(app);
-require('./routes/snow-reports.route.js')(app);
 
 require('./routes/venues.route.js')(app);
 require('./routes/agents.route.js')(app);

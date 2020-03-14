@@ -2,38 +2,82 @@ const shajs = require('sha.js')
 const utils = require('./utils');
 const templates = require('./templates');
 
-module.exports = (object) => {
-  const source = JSON.parse(JSON.stringify(object));
+module.exports = (originalObject, included = {}, request) => {
+  const source = JSON.parse(JSON.stringify(originalObject));
   let target = templates.createObject('Event');
 
-  Object.assign(target, utils.transformMetadata(source));
-  Object.assign(target, utils.transformBasicProperties(source));
-  Object.assign(target, transformDates(source));
+  target.id = source.Id;
 
-  target.status = transformStatus(source.DateBegin, source.DateEnd);
+  let meta = target.meta;
+  Object.assign(meta, utils.transformMetadata(source));
 
+  let links = target.links;
+  links.self = request.baseUrl + '/' + target.type + '/' + target.id;
+  
+  /**
+   * 
+   *  ATTRIBUTES
+   * 
+   */
+
+  let attributes = target.attributes;
+  Object.assign(attributes, utils.transformBasicProperties(source));
+  Object.assign(attributes, transformDates(source));
+
+  attributes.status = 'published';
+
+  // Event categories
+  const categoryMapping = {
+    'Gastronomie/Typische Produkte': 'odh/gastronomy',
+    'Musik/Tanz': 'odh/music',
+    'Volksfeste/Festivals': 'odh/festival',
+    'Sport': 'odh/sports',
+    'Führungen/Besichtigungen': 'odh/tourism',
+    'Theater/Vorführungen': 'odh/theather',
+    'Kurse/Bildung': 'odh/education',
+    'Tagungen Vorträge': 'odh/conference',
+    'Familie': 'odh/family',
+    'Handwerk/Brauchtum': 'odh/handicrafts',
+    'Messen/Märkte': 'odh/market',
+    'Wanderungen/Ausflüge': 'odh/hike',
+    'Ausstellungen/Kunst': 'odh/art',
+  }
+  for (category of source.Topics) {
+    const targetCategory = categoryMapping[category.TopicInfo]
+    attributes.categories = utils.safePush(target.categories, targetCategory);
+  }
+
+  /**
+   * 
+   *  RELATIONSHIPS
+   * 
+   */
+
+  let relationships = target.relationships;
+  
   // Venue
   let newVenue = transformVenue(source);
-  target.venues.push(newVenue);
-
+  utils.addRelationshipToMany(relationships, 'venues', newVenue, links.self);
+  utils.addIncludedResource(included, newVenue);
+  
+  
   // Organizer
-  let newOrganizer = transformOrganizer(source.OrganizerInfos, source.ContactInfos)
-  target.organizers = [newOrganizer];
+  let newOrganizer = transformOrganizer(source)
+  utils.addRelationshipToMany(relationships, 'organizers', newOrganizer, links.self);
+  utils.addIncludedResource(included, newOrganizer);
 
   // Publisher
   let newPublisher = transformPublisher();
-  target.publisher = newPublisher;
-
-  // Event categories
-  target.categories = [];
-  for (category of source.Topics) {
-    target.categories.push(transformCategory(category));
-  }
+  utils.addRelationshipToOne(relationships, 'publisher', newPublisher, links.self);
+  utils.addIncludedResource(included, newPublisher);
 
   // Media Objects
-  target.multimediaDescriptions = []
-  for (image of source.ImageGallery)
-    target.multimediaDescriptions.push(utils.transformMediaObject(image));
+  for (image of source.ImageGallery){
+    const { mediaObject, copyrightOwner } = utils.transformMediaObject(image, links);
+    utils.addRelationshipToMany(relationships, 'multimediaDescriptions', mediaObject, links.self);
+    utils.addIncludedResource(included, mediaObject);
+    utils.addIncludedResource(included, copyrightOwner);
+  }
 
   return target;
 }
@@ -71,75 +115,44 @@ function transformDates(source) {
   return target;
 }
 
-function transformStatus(startDate, endDate) {
-  const startDateMiliseconds = new Date(startDate).getTime();
-  const endDateMiliseconds = new Date(endDate).getTime();
-  const now = Date.now();
-
-  if(now > endDateMiliseconds)
-    return 'realized';
-  if(now > startDateMiliseconds)
-    return 'ongoing';
-
-  return 'scheduled';
-}
-
-function transformCategory(category) {
-
-  const categoryMapping = {
-    'Gastronomie/Typische Produkte': 'alpinebits/gastronomy',
-    'Musik/Tanz': 'alpinebits/music',
-    'Volksfeste/Festivals': 'alpinebits/festival',
-    'Sport': 'alpinebits/sports',
-    'Führungen/Besichtigungen': 'alpinebits/tourism',
-    'Theater/Vorführungen': 'alpinebits/theather',
-    'Kurse/Bildung': 'alpinebits/education',
-    'Tagungen Vorträge': 'alpinebits/conference',
-    'Familie': 'alpinebits/family',
-    'Handwerk/Brauchtum': 'alpinebits/handicrafts',
-    'Messen/Märkte': 'alpinebits/market',
-    'Wanderungen/Ausflüge': 'alpinebits/hike',
-    'Ausstellungen/Kunst': 'alpinebits/art',
-  }
-
-  return categoryMapping[category.TopicInfo];
-}
-
 function transformPublisher() {
   let publisher = templates.createObject('Agent');
-  let lts = {
-    id: shajs('sha256').update('lts').digest('hex'),
-    name: {
-      deu: "LTS - Landesverband der Tourismusorganisationen Südtirols",
-      eng: "LTS - Landesverband der Tourismusorganisationen Südtirols",
-      ita: "LTS - Landesverband der Tourismusorganisationen Südtirols"
-    },
-    url: "https://lts.it"
-  }
-
-  Object.assign(publisher, lts);
+  
+  publisher.id = shajs('sha256').update('lts').digest('hex'),
+  publisher.attributes.name = {
+    deu: "LTS - Landesverband der Tourismusorganisationen Südtirols",
+    eng: "LTS - Landesverband der Tourismusorganisationen Südtirols",
+    ita: "LTS - Landesverband der Tourismusorganisationen Südtirols"
+  };
+  publisher.attributes.url = "https://lts.it";
+  
   return publisher;
 }
 
-function transformOrganizer(organizer, contact) {
+function transformOrganizer(source) {
+  
+  let organizer = source.OrganizerInfos;
+  let contact = source.ContactInfos;
 
   if(!organizer)
-    return {};
+    return null;
 
   let newOrganizer = templates.createObject('Agent');
+  let attributes = newOrganizer.attributes;
 
   const organizerMapping = [['Url','url']];
-  utils.transformMultilingualFields(organizer, newOrganizer, organizerMapping, false, true);
+  utils.transformMultilingualFields(organizer, attributes, organizerMapping, false, true);
 
   let newContact = templates.createObject('ContactPoint');
-  newOrganizer.contacts = [newContact];
+  attributes.contactPoints = [newContact];
 
   let newAddress = templates.createObject('Address');
-  newContact.address = newAddress;
+  attributes.address = newAddress;
 
   const addressMapping = [['Address','street'], ['City','city'], ['ZipCode','zipcode']];
   utils.transformMultilingualFields(organizer, newAddress, addressMapping, false);
   newAddress.zipcode = newAddress.zipcode.ita || newAddress.zipcode.eng || newAddress.zipcode.deu;
+  newAddress.country = 'IT';
 
   let inferredType = {
     error: 0,
@@ -149,23 +162,23 @@ function transformOrganizer(organizer, contact) {
 
   for (languageEntry of utils.languageMapping) {
     let [sourceLanguage, targetLanguage] = languageEntry;
+    
+    const sourceOrganizer = organizer[sourceLanguage];
 
-    if(organizer[sourceLanguage]) {
-      const phonenumber = organizer[sourceLanguage].Phonenumber.trim();
+    if(sourceOrganizer) {
+      let phonenumber = utils.safeGetString(['Phonenumber'], sourceOrganizer);
       newContact.telephone = newContact.telephone || phonenumber;
 
-      const email = organizer[sourceLanguage].Email.trim();
-      if(email)
-        newContact.email = email;
+      const email = utils.safeGetString(['Email'], sourceOrganizer);
+      newContact.email = newContact.email || email;
 
-      const orgId = organizer[sourceLanguage].Tax || organizer[sourceLanguage].Vat;
-      if(orgId)
-        newOrganizer.id = orgId;
+      const orgId =  utils.safeGetString(['Tax'], sourceOrganizer) ||  utils.safeGetString(['Vat'], sourceOrganizer) || email;
+      newOrganizer.id = newOrganizer.id || orgId;
 
       const ignoreValues = ['Undefiniert','!','-','.','sonstige'];
-      const companyName = organizer[sourceLanguage].CompanyName.trim();
-      const givenName = organizer[sourceLanguage].Givenname.trim();
-      const surname = organizer[sourceLanguage].Surname.trim();
+      const companyName = utils.safeGetString(['CompanyName'], sourceOrganizer);
+      const givenName = utils.safeGetString(['Givenname'], sourceOrganizer);
+      const surname = utils.safeGetString(['Surname'], sourceOrganizer); 
 
       const isValidCompanyName = companyName && !ignoreValues.includes(companyName);
       const isValidGivenName = givenName && !ignoreValues.includes(givenName);
@@ -176,38 +189,38 @@ function transformOrganizer(organizer, contact) {
       }
       else if(isValidCompanyName) {
         inferredType.organization++;
-        newOrganizer.name[targetLanguage] = companyName;
+        attributes.name = utils.safeAdd(attributes.name, targetLanguage, companyName);
       }
       else if ((isValidGivenName || isValidSurname) && !(isValidGivenName && isValidSurname)){
         if(isValidSurname){
           inferredType.organization++;
-          newOrganizer.name[targetLanguage] = surname;
+          attributes.name = utils.safeAdd(attributes.name, targetLanguage, surname);
         }
         else {
           inferredType.organization++;
-          newOrganizer.name[targetLanguage] = givenName;
+          attributes.name = utils.safeAdd(attributes.name, targetLanguage, givenName);
         }
       }
       else {
         inferredType.person++;
-        newOrganizer.name[targetLanguage] = givenName+' '+surname;
+        attributes.name = utils.safeAdd(attributes.name, targetLanguage, givenName+' '+surname);
       }
     }
   }
 
   // TODO: Decide how to handle the case in which we cannot infer whether the organizer is a person or an organization. We are currently setting the organizer to be an organization
-  newOrganizer.category = !inferredType.organization && inferredType.person ? 'person' : 'organization'
+  attributes.categories = !inferredType.organization && inferredType.person ? ['alpinebits/person'] : ['alpinebits/organization']
 
   //If email and telephone number are not specified in organizer, try to get it from the ContactInfos field.
   // TODO: improve this part of the code. Too many duplicates...
-  if(!newOrganizer.email)
-    newOrganizer.email = utils.safeGetOne([['de','Email'],['it','Email'],['en','Email']], contact);
+  if(!attributes.email)
+    attributes.email = utils.safeGetOne([['de','Email'],['it','Email'],['en','Email']], contact);
 
-  if(!newOrganizer.telephone)
-    newOrganizer.telephone = utils.safeGetOne([['de','Phonenumber'],['it','Phonenumber'],['en','Phonenumber']], contact);
+  if(!attributes.telephone)
+    attributes.telephone = utils.safeGetOne([['de','Phonenumber'],['it','Phonenumber'],['en','Phonenumber']], contact);
 
   if(!newOrganizer.id)
-    console.log('NO ID!');
+    newOrganizer.id = source.Id+"+organizer";
 
   return newOrganizer;
 }
@@ -215,35 +228,48 @@ function transformOrganizer(organizer, contact) {
 function transformVenue(source) {
   let venue = templates.createObject('Venue');
   venue.id = source.Id+'+location';
+  
+  /**
+   * 
+   *  ATTRIBUTES
+   * 
+   */
+  let attributes = venue.attributes;
 
-  const venueMapping = [ ['Location', 'name'] ];
-  utils.transformMultilingualFields(source.EventAdditionalInfos, venue, venueMapping, false);
+  const fieldMapping = [ ['Location', 'name'] ];
+  utils.transformMultilingualFields(source.EventAdditionalInfos, attributes, fieldMapping, false);
 
   let address = templates.createObject('Address');
-  venue.address = address;
+  attributes.address = address;
 
   if(source.ContactInfos) {
-    const venueAddressMapping = [
+    const addressFieldMapping = [
       ['Address', 'street'],
       ['City', 'city'],
       ['ZipCode', 'zipcode'],
     ];
-    utils.transformMultilingualFields(source.ContactInfos, address, venueAddressMapping, false);
+    utils.transformMultilingualFields(source.ContactInfos, address, addressFieldMapping, false);
 
     address.zipcode = address.zipcode.ita || address.zipcode.eng || address.zipcode.deu;
+    address.country = 'IT';
   }
 
   if(source.Latitude && source.Longitude) {
     let point = templates.createObject('Point');
-    point.id = source.Id+'+point';
-    venue.geometries.push(point);
-
+    attributes.geometries = [point];
+    
     point.coordinates.push(source.Latitude);
     point.coordinates.push(source.Longitude);
 
     if(source.Altitude)
       point.coordinates.push(source.Altitude);
   }
+
+  /**
+   * 
+   *  RELATIONSHIPS: No relationship is transformed
+   * 
+   */
 
   return venue;
 }

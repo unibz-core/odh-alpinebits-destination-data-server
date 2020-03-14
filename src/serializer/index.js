@@ -14,6 +14,7 @@ function serializeArray (resourceType, data, request, meta) {
   links.addDataLinks(resource, request);
   includes.add(resource, request);
   fields.add(resource, request);
+  meta.add(resource);
 
   let Serializer = new JSONAPISerializer(resource.name, resource.opts);
   return Serializer.serialize(data);

@@ -166,7 +166,7 @@ transform(openDataHubObject): a function to transform an OpenDataHub response in
   output: an obejct following the AlpineBits format
 */
 
-async function fetch(path, request, transform, field) {
+async function fetch(path, request, transformFn, field) {
   const instance = axios.create(axiosOpts);
   let res;
 
@@ -187,7 +187,7 @@ async function fetch(path, request, transform, field) {
 
   try {
     console.log('> Transforming data to the AlpineBits format...');
-    const data = transform(res.data);
+    const data = transformFn(res.data, request);
     console.log('OK: Sucessfully transformed data.\n');
     const meta = getResponseMeta(res.data);
 

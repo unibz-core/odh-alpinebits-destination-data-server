@@ -69,7 +69,7 @@ module.exports = (object) => {
   const source = JSON.parse(JSON.stringify(object));
   let target = templates.createObject('Snowpark');
 
-  Object.assign(target, utils.transformMetadata(source));
+  target.meta = utils.transformMetadata(source);
   Object.assign(target, utils.transformBasicProperties(source));
 
   target.minAltitude = source.AltitudeLowestPoint;
@@ -93,9 +93,10 @@ module.exports = (object) => {
   const geometry = utils.transformGeometry(source.GpsInfo, ['Startpunkt', 'Endpunkt'], source.GpsPoints, source.GpsTrack);
   if(geometry) target.geometries.push(geometry);
 
-  target.multimediaDescriptions = []
-  for (image of source.ImageGallery)
-    target.multimediaDescriptions.push(utils.transformMediaObject(image));
+  for (image of source.ImageGallery){
+    const targetImage = utils.transformMediaObject(image);
+    target.multimediaDescriptions = utils.safePush(target.multimediaDescriptions, targetImage);
+  }
 
   return target;
 }

@@ -68,7 +68,7 @@ module.exports = (object) => {
   const source = JSON.parse(JSON.stringify(object));
   let target = templates.createObject('Lift');
 
-  Object.assign(target, utils.transformMetadata(source));
+  target.meta = utils.transformMetadata(source);
   Object.assign(target, utils.transformBasicProperties(source));
 
   const categoryMapping = {
@@ -100,11 +100,12 @@ module.exports = (object) => {
   target.address = utils.transformAddress(source.ContactInfos, ['city','country','zipcode']);
 
   const geometry = utils.transformGeometry(source.GpsInfo, ['Talstation','Mittelstation','Bergstation'], source.GpsPoints, source.GpsTrack);
-  if(geometry) target.geometries.push(geometry);
+  if(geometry) target.geometries[geometry];
 
-  target.multimediaDescriptions = []
-  for (image of source.ImageGallery)
-    target.multimediaDescriptions.push(utils.transformMediaObject(image));
+  for (image of source.ImageGallery){
+    const targetImage = utils.transformMediaObject(image);
+    target.multimediaDescriptions = utils.safePush(target.multimediaDescriptions, targetImage);
+  }
 
   return target;
 }

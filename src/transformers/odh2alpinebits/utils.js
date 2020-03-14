@@ -22,13 +22,15 @@ function transformMultilingualFields(source, target, fieldMapping, isLanguageNes
     for (languageEntry of languageMapping) {
       let [sourceLanguage, targetLanguage] = languageEntry;
 
-      if(!target[targetField])
-        target[targetField] = {}
-
-      if(isLanguageNested && source[sourceField] && (!ignoreNullValues || source[sourceField][sourceLanguage]))
-        target[targetField][targetLanguage] = sanitizeHtml(source[sourceField][sourceLanguage], htmlSanitizeOpts);
-      else if (!isLanguageNested && source[sourceLanguage] && (!ignoreNullValues || source[sourceLanguage][sourceField]))
-        target[targetField][targetLanguage] = sanitizeHtml(source[sourceLanguage][sourceField], htmlSanitizeOpts);
+      if(isLanguageNested && source[sourceField] && (!ignoreNullValues || source[sourceField][sourceLanguage])){
+        const value = sanitizeHtml(source[sourceField][sourceLanguage], htmlSanitizeOpts);
+        target[targetField] = safeAdd(target[targetField], targetLanguage, value)
+      }
+        
+      else if (!isLanguageNested && source[sourceLanguage] && (!ignoreNullValues || source[sourceLanguage][sourceField])){
+        const value = sanitizeHtml(source[sourceLanguage][sourceField], htmlSanitizeOpts)
+        target[targetField] = safeAdd(target[targetField], targetLanguage, value)
+      }
     }
   }
 }
@@ -52,6 +54,20 @@ function transformArrayFields (source, target, fieldMapping, valueMapping = {}) 
     }
   }
 }
+function safeGetString(path, object) {
+  let value = path.reduce( (xs, x) => (xs && xs[x]) ? xs[x] : null, object );
+
+  if(typeof value === 'string' || value instanceof String){
+    value = value.trim();
+    
+    if(!value)
+      return null;
+    
+    return value;
+  }
+  
+  return null;
+}
 
 function safeGet (path, object) {
   let value = path.reduce( (xs, x) => (xs && xs[x]) ? xs[x] : null, object );
@@ -71,10 +87,58 @@ function safeGetOne(paths, object){
   }
 }
 
+function safePush(array, value){
+  if (value===null || (typeof value==="string" && value.trim().length===0))
+    return array;
+
+  if(!array)
+    array = [];
+
+  array.push(value);
+
+  return array;
+}
+
+function safeAdd(object, field, value){
+  if(!object)
+    object = {}
+
+  object[field] = value;
+  return object;
+}
+
+function addRelationshipToMany(relationships, relationshipName, resource, selfLink){
+  if(!relationships[relationshipName]){
+    relationships[relationshipName] = {
+      data: [],
+      link: {
+        related: selfLink + "/" + relationshipName
+      }
+    }
+  }
+  
+  const relationship = { 
+    type: resource.type, 
+    id: resource.id 
+  };
+
+  relationships[relationshipName].data.push(relationship);
+}
+
+function addRelationshipToOne(relationships, relationshipName, resource, selfLink){
+  relationships[relationshipName] = {
+    data: { 
+      type: resource.type, 
+      id: resource.id 
+    },
+    links: {
+      related: selfLink + "/" + relationshipName
+    }
+  }
+}
+
 function transformBasicProperties(source) {
   let target = {};
-  let fieldMapping = [['Id','id']]
-  transformFields(source, target, fieldMapping);
 
   // Basic textual descriptions
   if(source.Detail) {
@@ -91,10 +155,10 @@ function transformBasicProperties(source) {
 }
 
 function transformMetadata(source) {
-  target = {};
-  target.lastUpdate = source.LastChange+'+02:00';
-  target.dataProvider = "http://tourism.opendatahub.bz.it/";
-  return target;
+  meta = {};
+  meta.lastUpdate = source.LastChange+'+02:00';
+  meta.dataProvider = "http://tourism.opendatahub.bz.it/";
+  return meta;
 }
 
 function transformOperationSchedule(operationSchedule) {
@@ -206,13 +270,21 @@ function transformGeometry(gpsInfo, infoKeys, gpsPoints, gpsTrack){
   return geometry;
 }
 
-function transformMediaObject(mediaObject) {
-  let newMediaObject = templates.createObject('MediaObject');
+function transformMediaObject(source, baseLink) {
+  let mediaObject = templates.createObject('MediaObject');
+  let attributes = mediaObject.attributes;
+  let relationships = mediaObject.relationships;
 
-  const match = mediaObject.ImageUrl.match(/ID=(.*)/i);
-  newMediaObject.id = match.length>=2 ? match[1] : mediaObject.ImageUrl;
+  const match = source.ImageUrl.match(/ID=(.*)/i);
+  mediaObject.id = match.length>=2 ? match[1] : source.ImageUrl;
 
-  newMediaObject.contentType = 'image/jpeg'
+  /**
+   * 
+   *  ATTRIBUTES
+   * 
+   */
+
+  attributes.contentType = 'image/jpeg'
 
   // ['Width','width'], ['Height','height']
   const imageFieldMapping = [ ['ImageUrl','url'], ['License','license'] ];
@@ -224,19 +296,33 @@ function transformMediaObject(mediaObject) {
     }
   }
 
-  transformFields(mediaObject, newMediaObject, imageFieldMapping, imageValueMapping);
+  transformFields(source, attributes, imageFieldMapping, imageValueMapping);
 
   // ['ImageTitle', 'name']
   const imageMultilingualFieldMapping = [ ['ImageDesc', 'description'] ];
 
-  transformMultilingualFields(mediaObject, newMediaObject, imageMultilingualFieldMapping, true);
+  transformMultilingualFields(source, attributes, imageMultilingualFieldMapping, true);
 
-  const owner = templates.createObject('Agent');
-  owner.name.ita = owner.name.deu = owner.name.eng = mediaObject.CopyRight;
-  owner.id = shajs('sha256').update(mediaObject.CopyRight).digest('hex');
-  newMediaObject.copyrightOwner = owner;
+  /**
+   * 
+   *  RELATIONSHIPS
+   * 
+   */
 
-  return newMediaObject;
+  const copyrightOwner = templates.createObject('Agent');
+  copyrightOwner.id = shajs('sha256').update(source.CopyRight).digest('hex');
+  copyrightOwner.attributes.name = {
+    deu: source.CopyRight,
+    eng: source.CopyRight,
+    ita: source.CopyRight
+  };
+  
+  addRelationshipToOne(relationships, 'copyrightOwner', copyrightOwner, baseLink)
+
+  return ({ 
+    mediaObject,
+    copyrightOwner
+  });
 }
 
 function isClockwise(poly) {
@@ -249,10 +335,24 @@ function isClockwise(poly) {
     return sum > 0
 }
 
+function addIncludedResource(included, resource) {
+  if(!included[resource.type])
+    included[resource.type] = {};
+  
+  included[resource.type][resource.id] = resource;
+}
+
+
 module.exports = {
   languageMapping,
   safeGet,
+  safeGetString,
   safeGetOne,
+  safeAdd,
+  safePush,
+  addIncludedResource,
+  addRelationshipToMany,
+  addRelationshipToOne,
   isClockwise,
   transformMultilingualFields,
   transformFields,

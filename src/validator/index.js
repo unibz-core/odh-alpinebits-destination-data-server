@@ -28,23 +28,23 @@ let snowReportAjv = ajv.compile(snowReportSchema);
 
 module.exports = {
   validateEvent: (object) => validateObject(eventAjv, object),
-  validateEventArray: (array) => validateArray(eventAjv, array),
+  validateEventArray: (array) => validateObject(eventAjv, array),
   validateVenueArray: (object) => validateObject(venueAjv, object),
-  validateMediaObjectArray: (array) => validateArray(mediaObjectAjv, array),
+  validateMediaObjectArray: (array) => validateObject(mediaObjectAjv, array),
   validateAgent: (object) => validateObject(agentAjv, object),
-  validateAgentArray: (array) => validateArray(agentAjv, array),
+  validateAgentArray: (array) => validateObject(agentAjv, array),
   validateLift: (object) => validateObject(liftAjv, object),
-  validateLiftArray: (object) => validateArray(liftAjv, object),
+  validateLiftArray: (object) => validateObject(liftAjv, object),
   validateTrail: (object) => validateObject(trailAjv, object),
-  validateTrailArray: (object) => validateArray(trailAjv, object),
+  validateTrailArray: (object) => validateObject(trailAjv, object),
   validateSnowpark: (object) => validateObject(snowparkAjv, object),
-  validateSnowparkArray: (array) => validateArray(snowparkAjv, array),
+  validateSnowparkArray: (array) => validateObject(snowparkAjv, array),
   validateMountainArea: (object) => validateObject(mountainAreaAjv, object),
-  validateMountainAreaArray: (array) => validateArray(mountainAreaAjv, array),
+  validateMountainAreaArray: (array) => validateObject(mountainAreaAjv, array),
   validateEventSeries: (object) => validateObject(eventSeriesAjv, object),
-  validateEventSeriesArray: (array) => validateArray(eventSeriesAjv, array),
+  validateEventSeriesArray: (array) => validateObject(eventSeriesAjv, array),
   validateSnowReport: (object) => validateObject(snowReportAjv, object),
-  validateSnowReportArray: (array) => validateArray(snowReportAjv, array),
+  validateSnowReportArray: (array) => validateObject(snowReportAjv, array),
 }
 
 function validateObject(validation, object){
@@ -53,12 +53,12 @@ function validateObject(validation, object){
   return result;
 }
 
-function validateArray(validation, array){
-  let result = { valid: [], invalid: [] }
-  for (object of array)
-    validate(validation, object, result);
-  return result;
-}
+// function validateObject(validation, array){
+//   let result = { valid: [], invalid: [] }
+//   for (object of array)
+//     validate(validation, object, result);
+//   return result;
+// }
 
 function validate(validation, object, result) {
   let isValid = validation(object);

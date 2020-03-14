@@ -65,13 +65,14 @@ module.exports = (object) => {
   const source = JSON.parse(JSON.stringify(object));
   let target = templates.createObject('Trail');
 
-  Object.assign(target, utils.transformMetadata(source));
+  target.meta = utils.transformMetadata(source);
   Object.assign(target, utils.transformBasicProperties(source));
 
   // Media Objects
-  target.multimediaDescriptions = []
-  for (image of source.ImageGallery)
-    target.multimediaDescriptions.push(utils.transformMediaObject(image));
+  for (image of source.ImageGallery){
+    const targetImage = utils.transformMediaObject(image);
+    target.multimediaDescriptions = utils.safePush(target.multimediaDescriptions, targetImage);
+  }
 
   const categoryMapping = {
     'ski alpin': 'alpinebits/ski-slope',
