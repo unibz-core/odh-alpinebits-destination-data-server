@@ -189,12 +189,12 @@ async function fetch(path, request, transformFn, field) {
     console.log('> Transforming data to the AlpineBits format...');
     const data = transformFn(res.data, request);
     console.log('OK: Sucessfully transformed data.\n');
-    const meta = getResponseMeta(res.data);
 
-    if(field)
-      return { data: data[field], meta };
+    // FIXME: returning subroutes
+    // if(field)
+    //   return { data: data[field], meta };
 
-    return { data, meta };
+    return data;
   }
   catch(error) {
     handleTransformationError(error);
@@ -347,24 +347,6 @@ function getPaginationQuery(request) {
       pageArray.push('pagenumber='+page.number);
   }
   return pageArray;
-}
-
-function getResponseMeta(dataOdh){
-  let count = dataOdh.TotalResults;
-  let current = dataOdh.CurrentPage;
-  let last = pages = dataOdh.TotalPages;
-  let next = (current < last) ? current+1 : last;
-  let first = 1;
-  let prev = 1;
-
-  if(current > 1) {
-    if(current <= last)
-      prev = current-1;
-    else
-      prev = last;
-  }
-
-  return ({ page: { current, first, last, prev, next, pages, count } });
 }
 
 module.exports = {

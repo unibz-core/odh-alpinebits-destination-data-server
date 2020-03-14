@@ -18,8 +18,8 @@ async function handleRequest(req, fetchFn, validateFn) {
   let response;
 
   try {
-    console.log('> Dispatching requests to OpenDataHub connector...');
-    response = await fetchFn(req);
+    console.log('> Dispatching request to the OpenDataHub connector...');
+    data = await fetchFn(req);
     console.log('OK: Request completed.\n');
   }
   catch (error) {
@@ -28,10 +28,10 @@ async function handleRequest(req, fetchFn, validateFn) {
 
   try {
     console.log('> Validating AlpineBits objects...');
-    const validation = validateFn(response.data);
+    const validation = validateFn(data);
     console.log('OK: Objects validated (valid:'+validation.valid.length+', invalid: '+validation.invalid.length+')\n');
     
-    return response.data;
+    return data;
   }
   catch (error) {
     console.log('ERROR: Failed to validate data!');
