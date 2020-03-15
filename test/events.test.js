@@ -21,7 +21,7 @@ let opts = {
   },
   multiSelectInclude: [
     {
-      attributes: ['name','category'],
+      attributes: ['name','categories'],
       relationship: 'organizers',
       resourceType: 'agents'
     },

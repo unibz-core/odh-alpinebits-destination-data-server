@@ -78,7 +78,7 @@ module.exports.basicRouteTests = (opts) => {
       return utils.axiosInstance.get(`/1.0/${opts.route}?${pageParam}&fields[${opts.resourceType}]=${opts.sampleAttributes[0]}`)
         .then( (res) => {
           res.data.data.forEach( object => {
-            expect(Object.keys(object.attributes)).toEqual([opts.sampleAttributes[0]])
+            expect(Object.keys(object.attributes).sort()).toEqual([opts.sampleAttributes[0]])
           })
         })
     })
@@ -88,7 +88,7 @@ module.exports.basicRouteTests = (opts) => {
       return utils.axiosInstance.get(`/1.0/${opts.route}?${pageParam}&fields[${opts.resourceType}]=${fields.join(',')}`)
         .then( (res) => {
           res.data.data.forEach( object => {
-            expect(Object.keys(object.attributes)).toEqual(fields)
+            expect(Object.keys(object.attributes).sort()).toEqual(fields.sort())
           })
         })
     })
@@ -98,8 +98,8 @@ module.exports.basicRouteTests = (opts) => {
       return utils.axiosInstance.get(`/1.0/${opts.route}?${pageParam}&fields[${opts.resourceType}]=`+fields.join(','))
         .then( (res) => {
           res.data.data.forEach( object => {
-            expect(Object.keys(object.attributes)).toEqual(opts.sampleAttributes);
-            expect(Object.keys(object.relationships)).toEqual(opts.sampleRelationships);
+            expect(Object.keys(object.attributes).sort()).toEqual(opts.sampleAttributes.sort());
+            expect(Object.keys(object.relationships).sort()).toEqual(opts.sampleRelationships.sort());
           })
         })
     })
@@ -174,7 +174,7 @@ module.exports.basicRouteTests = (opts) => {
           expect(res.data.included).toBeDefined();
           res.data.included.forEach( object => {
             expect(object.type).toEqual(opts.selectInclude.resourceType);
-            expect(Object.keys(object.attributes)).toEqual([opts.selectInclude.attribute]);
+            expect(Object.keys(object.attributes).sort()).toEqual([opts.selectInclude.attribute].sort());
           })
         })
     })
@@ -197,7 +197,7 @@ module.exports.basicRouteTests = (opts) => {
           expect(res.data.included).toBeDefined();
           res.data.included.forEach( object => {
             expect(resourceTypes).toContain(object.type)
-            expect(Object.keys(object.attributes)).toEqual(expectedAttributesPerType[object.type]);
+            expect(Object.keys(object.attributes).sort()).toEqual(expectedAttributesPerType[object.type].sort());
           })
         })
     })

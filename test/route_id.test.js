@@ -70,7 +70,7 @@ module.exports.basicResourceRouteTests = (opts) => {
       const url = `${baseUrl}?fields[${opts.resourceType}]=${opts.sampleAttributes.join(',')}`;
 
       return utils.axiosInstance.get(url)
-        .then( res => expect(Object.keys(res.data.data.attributes)).toEqual(opts.sampleAttributes) )
+        .then( res => expect(Object.keys(res.data.data.attributes).sort()).toEqual(opts.sampleAttributes.sort()))
     })
 
     test(`/${opts.route}/:id: multi-attribute and multi-relationship selection`, () => {
@@ -79,8 +79,8 @@ module.exports.basicResourceRouteTests = (opts) => {
 
       return utils.axiosInstance.get(url)
         .then( res => {
-          expect(Object.keys(res.data.data.attributes)).toEqual(opts.sampleAttributes);
-          expect(Object.keys(res.data.data.relationships)).toEqual(opts.sampleRelationships);
+          expect(Object.keys(res.data.data.attributes).sort()).toEqual(opts.sampleAttributes.sort());
+          expect(Object.keys(res.data.data.relationships).sort()).toEqual(opts.sampleRelationships.sort());
         })
     })
 
@@ -121,7 +121,7 @@ module.exports.basicResourceRouteTests = (opts) => {
           expect(res.data.included).toBeDefined();
           res.data.included.forEach( object => {
             expect(object.type).toEqual(opts.selectInclude.resourceType);
-            expect(Object.keys(object.attributes)).toEqual([opts.selectInclude.attribute]);
+            expect(Object.keys(object.attributes).sort()).toEqual([opts.selectInclude.attribute].sort());
           })
         })
     })
@@ -144,7 +144,7 @@ module.exports.basicResourceRouteTests = (opts) => {
           expect(res.data.included).toBeDefined();
           res.data.included.forEach( object => {
             expect(resourceTypes).toContain(object.type)
-            expect(Object.keys(object.attributes)).toEqual(expectedAttributesPerType[object.type]);
+            expect(Object.keys(object.attributes).sort()).toEqual(expectedAttributesPerType[object.type].sort());
           })
         })
     })
