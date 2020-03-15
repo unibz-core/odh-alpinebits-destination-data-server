@@ -26,26 +26,34 @@ module.exports = (originalObject, included = {}, request) => {
 
   attributes.status = 'published';
 
-  // Event categories
-  const categoryMapping = {
-    'Gastronomie/Typische Produkte': 'odh/gastronomy',
-    'Musik/Tanz': 'odh/music',
-    'Volksfeste/Festivals': 'odh/festival',
-    'Sport': 'odh/sports',
-    'Führungen/Besichtigungen': 'odh/tourism',
-    'Theater/Vorführungen': 'odh/theather',
-    'Kurse/Bildung': 'odh/education',
-    'Tagungen Vorträge': 'odh/conference',
-    'Familie': 'odh/family',
-    'Handwerk/Brauchtum': 'odh/handicrafts',
-    'Messen/Märkte': 'odh/market',
-    'Wanderungen/Ausflüge': 'odh/hike',
-    'Ausstellungen/Kunst': 'odh/art',
-  }
-  for (category of source.Topics) {
-    const targetCategory = categoryMapping[category.TopicInfo]
-    attributes.categories = utils.safePush(target.categories, targetCategory);
-  }
+  // // Event categories
+  // const categoryMapping = {
+  //   'Gastronomie/Typische Produkte': 'odh/gastronomy',
+  //   'Musik/Tanz': 'odh/music',
+  //   'Volksfeste/Festivals': 'odh/festival',
+  //   'Sport': 'odh/sports',
+  //   'Führungen/Besichtigungen': 'odh/tourism',
+  //   'Theater/Vorführungen': 'odh/theather',
+  //   'Kurse/Bildung': 'odh/education',
+  //   'Tagungen Vorträge': 'odh/conference',
+  //   'Familie': 'odh/family',
+  //   'Handwerk/Brauchtum': 'odh/handicrafts',
+  //   'Messen/Märkte': 'odh/market',
+  //   'Wanderungen/Ausflüge': 'odh/hike',
+  //   'Ausstellungen/Kunst': 'odh/art',
+  // }
+  let categories = [];
+  
+  source.Topics.forEach(topic => {
+    
+    // if(categoryMapping[tag])
+    //   categories.push(categoryMapping[tag]);
+    
+    categories.push("odh/"+ topic.TopicInfo.replace(/[\/|\s]/g,'-').toLowerCase());
+  })
+
+  if(categories.length>0)
+    attributes.categories = categories;
 
   /**
    * 

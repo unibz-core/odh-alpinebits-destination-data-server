@@ -61,18 +61,26 @@ IGNORED:
 const utils = require('./utils');
 const templates = require('./templates');
 
-module.exports = (object) => {
-  const source = JSON.parse(JSON.stringify(object));
+module.exports = (originalObject, included = {}, request) => {
+  const source = JSON.parse(JSON.stringify(originalObject));
   let target = templates.createObject('Trail');
 
-  target.meta = utils.transformMetadata(source);
-  Object.assign(target, utils.transformBasicProperties(source));
+  target.id = source.Id;
 
-  // Media Objects
-  for (image of source.ImageGallery){
-    const targetImage = utils.transformMediaObject(image);
-    target.multimediaDescriptions = utils.safePush(target.multimediaDescriptions, targetImage);
-  }
+  let meta = target.meta;
+  Object.assign(meta, utils.transformMetadata(source));
+
+  let links = target.links;
+  Object.assign(links, utils.createSelfLink(target, request));
+
+   /**
+   * 
+   *  ATTRIBUTES
+   * 
+   */
+
+  let attributes = target.attributes;
+  Object.assign(attributes, utils.transformBasicProperties(source));
 
   const categoryMapping = {
     'ski alpin': 'alpinebits/ski-slope',
@@ -81,36 +89,55 @@ module.exports = (object) => {
     'loipen': 'alpinebits/cross-country',
   };
 
-  source.SmgTags.find(tag => {
-    if(categoryMapping[tag]) {
-      target.category = categoryMapping[tag];
-      return true;
-    }
-    return false;
+  let categories = [];
+  source.SmgTags.forEach(tag => {
+    if(categoryMapping[tag])
+      categories.push(categoryMapping[tag]);
+    
+    categories.push("odh/"+ tag.replace(/\s/g, '-'));
   })
 
-  target.length = source.DistanceLength > 0 ? source.DistanceLength : null;
+  if(categories.length>0)
+    attributes.categories = categories;
 
-  target.minAltitude = source.AltitudeLowestPoint;
-  target.maxAltitude = source.AltitudeHighestPoint;
+  attributes.length = source.DistanceLength > 0 ? source.DistanceLength : null;
+
+  attributes.minAltitude = source.AltitudeLowestPoint;
+  attributes.maxAltitude = source.AltitudeHighestPoint;
 
   const difficultyMapping = {
     '2': 'beginner',
     '4': 'intermediate',
     '6': 'expert'
   }
-  target.difficulty = {
+  attributes.difficulty = {
     'eu': difficultyMapping[source.Difficulty]
   };
 
   const geometry = utils.transformGeometry(source.GpsInfo, ['Startpunkt', 'Endpunkt'], source.GpsPoints, source.GpsTrack);
-  if(geometry) target.geometries.push(geometry);
+  if(geometry) 
+    attributes.geometries = [geometry];
 
-  target.openingHours = utils.transformOperationSchedule(source.OperationSchedule);
+  attributes.openingHours = utils.transformOperationSchedule(source.OperationSchedule);
 
-  target.address = utils.transformAddress(source.ContactInfos, ['city','country','zipcode']);
+  attributes.address = utils.transformAddress(source.ContactInfos, ['city','country','zipcode']);
 
-  target.howToArrive = utils.transformHowToArrive(source.Detail);
+  attributes.howToArrive = utils.transformHowToArrive(source.Detail);
+
+  /**
+   * 
+   *  RELATIONSHIPS
+   * 
+   */
+
+  let relationships = target.relationships;
+
+  for (image of source.ImageGallery){
+    const { mediaObject, copyrightOwner } = utils.transformMediaObject(image, links);
+    utils.addRelationshipToMany(relationships, 'multimediaDescriptions', mediaObject, links.self);
+    utils.addIncludedResource(included, mediaObject);
+    utils.addIncludedResource(included, copyrightOwner);
+  }
 
   return target;
 }

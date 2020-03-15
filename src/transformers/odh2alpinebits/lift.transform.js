@@ -103,6 +103,7 @@ module.exports = (originalObject, included = {}, request) => {
   }
 
   attributes.categories = categoryMapping[source.SubType];
+  attributes.categories.push("odh/"+ source.SubType.replace(/\s/g, '-'));
 
   attributes.length = source.DistanceLength>0 ? source.DistanceLength : null;
 
