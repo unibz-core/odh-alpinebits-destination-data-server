@@ -175,7 +175,8 @@ function transformOperationSchedule(operationSchedule) {
     newEntry.validFrom = entry.Start.replace(/T.*/,'');
     newEntry.validTo = entry.Stop.replace(/T.*/,'');
 
-    if(entry.OperationScheduleTime) {
+    if(Array.isArray(entry.OperationScheduleTime) && entry.OperationScheduleTime.length>0) {
+
       entry.OperationScheduleTime.forEach( hours => {
         newEntry.hours = safePush(newEntry.hours, { opens: hours.Start, closes: hours.End });
         newEntry.daysOfWeek = []

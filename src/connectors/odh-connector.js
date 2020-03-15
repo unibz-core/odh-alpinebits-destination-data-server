@@ -200,7 +200,7 @@ async function fetch(path, request, transformFn, field) {
   }
 }
 
-async function fetchMountainArea(request, field, transform) {
+async function fetchMountainArea(request, field) {
   const instance = axios.create(axiosOpts);
   let areaId = request.params.id;
   let areaRes, regionRes;
@@ -266,14 +266,14 @@ async function fetchMountainArea(request, field, transform) {
 
   try {
     console.log('> Transforming data to the AlpineBits format...');
-    const data = areaId ? odh2ab.transformMountainArea(res) : odh2ab.transformMountainAreaArray(res);
+    const data = areaId ? odh2ab.transformMountainArea(res, request) : odh2ab.transformMountainAreaArray(res, request);
     console.log('OK: Sucessfully transformed data.\n');
-    const meta =  areaId ? {} : getResponseMeta(res);
 
-    if(field)
-      return { data: data[field], meta };
+    // FIXME: Handle sub-resources
+    // if(field)
+    //   return { data: data[field], meta };
 
-    return { data, meta };
+    return data;
   }
   catch(error) {
     handleTransformationError(error);

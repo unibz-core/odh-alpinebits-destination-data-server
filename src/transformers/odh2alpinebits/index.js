@@ -106,9 +106,9 @@ function getIncludedOnResource(resource, request, includedMap, filteredMap) {
 function createPaginationObjects (odhData, request) {
   const { selfUrl } = request;
 
-  let count = odhData.TotalResults;
-  let current = odhData.CurrentPage;
-  let last = pages = odhData.TotalPages;
+  let count = parseInt(odhData.TotalResults);
+  let current = parseInt(odhData.CurrentPage);
+  let last = pages = parseInt(odhData.TotalPages);
   let next = (current < last) ? current+1 : last;
   let first = 1;
   let prev = 1;

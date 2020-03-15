@@ -19,15 +19,16 @@ function getVersion1Response(request, response) {
   let data = {
     data: null,
     links: {
+      self: SERVER_URL+'/1.0',
       events: SERVER_URL+'/1.0/events',
       eventSeries: SERVER_URL+'/1.0/eventSeries',
       lifts: SERVER_URL+'/1.0/lifts',
       mountainAreas: SERVER_URL+'/1.0/mountainAreas',
       snowparks: SERVER_URL+'/1.0/snowparks',
       trails: SERVER_URL+'/1.0/trails',
-      agents: SERVER_URL+'/1.0/agents',
-      mediaObjects: SERVER_URL+'/1.0/mediaObjects',
-      venues: SERVER_URL+'/1.0/venues'
+      // agents: SERVER_URL+'/1.0/agents',
+      // mediaObjects: SERVER_URL+'/1.0/mediaObjects',
+      // venues: SERVER_URL+'/1.0/venues'
     }
   };
 
