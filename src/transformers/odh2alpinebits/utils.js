@@ -205,20 +205,19 @@ function transformOperationSchedule(operationSchedule) {
 }
 
 function transformHowToArrive(detail) {
-  let howToArrive = {};
 
   const deGetThere = safeGet(['de','GetThereText'], detail);
   const itGetThere = safeGet(['it','GetThereText'], detail);
   const enGetThere = safeGet(['en','GetThereText'], detail);
 
   if(deGetThere || itGetThere || enGetThere)
-    howToArrive = {
+    return ({
       deu: sanitizeHtml(deGetThere, htmlSanitizeOpts),
       ita: sanitizeHtml(itGetThere, htmlSanitizeOpts),
       eng: sanitizeHtml(enGetThere, htmlSanitizeOpts)
-    };
+    });
 
-  return howToArrive;
+  return null;
 }
 
 function transformAddress(contactInfo, fields){
@@ -243,8 +242,6 @@ function transformAddress(contactInfo, fields){
 
   if(fields.includes('zipcode'))
     address.zipcode = safeGetOne([['de','ZipCode'],['it','ZipCode'],['en','ZipCode']], contactInfo);
-
-  address.region = {}
 
   return address;
 }

@@ -94,7 +94,7 @@ module.exports = (originalObject, included = {}, request) => {
     if(categoryMapping[tag])
       categories.push(categoryMapping[tag]);
     
-    categories.push("odh/"+ tag.replace(/\s/g, '-'));
+    categories.push("odh/"+ tag.replace(/[\/|\s]/g,'-').toLowerCase());
   })
 
   if(categories.length>0)
