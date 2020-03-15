@@ -1,200 +1,330 @@
 
 module.exports = [
   {
-    "type": "eventSeries",
-    "id": "1",
-    "name": {
-      "eng": "Südtirol Jazz Festival",
-      "ita": "Südtirol Jazz Festival",
-      "deu": "Südtirol Jazz Festival"
+    type: "eventSeries",
+    id: "0",
+    meta: {
+      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      dataProvider: "http://tourism.opendatahub.bz.it/"
     },
-    "shortName": null,
-    "description": null,
-    "abstract": null,
-    "url": "https://www.suedtiroljazzfestival.com/",
-    "frequency": "annual",
-    "editions": null
+    links: {
+      self: null
+    },
+    attributes: {
+      name: {
+        eng: "Südtirol Jazz Festival",
+        ita: "Südtirol Jazz Festival",
+        deu: "Südtirol Jazz Festival"
+      },
+      shortName: null,
+      description: null,
+      abstract: null,
+      url: "https://www.suedtiroljazzfestival.com/",
+      frequency: "annual"
+    },
+    relationships: {
+      multimediaDescriptions: null,
+      editions: null
+    }
   },
   {
-    "type": "eventSeries",
-    "id": "2",
-    "name": {
-      "eng": "Bolzano Christmas Market"
+    type: "eventSeries",
+    id: "1",
+    meta: {
+      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      dataProvider: "http://tourism.opendatahub.bz.it/"
     },
-    "shortName": null,
-    "description": null,
-    "abstract": null,
-    "url": null,
-    "frequency": "annual",
-    "editions": null
+    links: {
+      self: null
+    },
+    attributes: {
+      name: {
+        eng: "Bolzano Christmas Market"
+      },
+      shortName: null,
+      description: null,
+      abstract: null,
+      url: null,
+      frequency: "annual"
+    },
+    relationships: {
+      multimediaDescriptions: null,
+      editions: null
+    }
   },
   {
-    "type": "eventSeries",
-    "id": "3",
-    "name": {
-      "eng": "Südtirol Hip-Hop Festival"
+    type: "eventSeries",
+    id: "2",
+    meta: {
+      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      dataProvider: "http://tourism.opendatahub.bz.it/"
     },
-    "shortName": null,
-    "description": null,
-    "abstract": null,
-    "url": null,
-    "frequency": "annual",
-    "editions": null
+    links: {
+      self: null
+    },
+    attributes: {
+      name: {
+        eng: "Südtirol Rock Festival",
+      },
+      shortName: null,
+      description: null,
+      abstract: null,
+      url: null,
+      frequency: null
+    },
+    relationships: {
+      multimediaDescriptions: null,
+      editions: null
+    }
   },
   {
-    "type": "eventSeries",
-    "id": "4",
-    "name": {
-      "eng": "Südtirol Country Music Festival"
+    type: "eventSeries",
+    id: "",
+    meta: {
+      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      dataProvider: "http://tourism.opendatahub.bz.it/"
     },
-    "shortName": null,
-    "description": null,
-    "abstract": null,
-    "url": null,
-    "frequency": "annual",
-    "editions": null
+    links: {
+      self: null
+    },
+    attributes: {
+      name: {
+        eng: "Südtirol Pop Festival",
+      },
+      shortName: null,
+      description: null,
+      abstract: null,
+      url: null,
+      frequency: null
+    },
+    relationships: {
+      multimediaDescriptions: null,
+      editions: null
+    }
   },
   {
-    "type": "eventSeries",
-    "id": "5",
-    "name": {
-      "eng": "Südtirol Techno Festival"
+    type: "eventSeries",
+    id: "",
+    meta: {
+      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      dataProvider: "http://tourism.opendatahub.bz.it/"
     },
-    "shortName": null,
-    "description": null,
-    "abstract": null,
-    "url": null,
-    "frequency": "annual",
-    "editions": null
+    links: {
+      self: null
+    },
+    attributes: {
+      name: {
+        eng: "Südtirol Blues Festival",
+      },
+      shortName: null,
+      description: null,
+      abstract: null,
+      url: null,
+      frequency: null
+    },
+    relationships: {
+      multimediaDescriptions: null,
+      editions: null
+    }
   },
   {
-    "type": "eventSeries",
-    "id": "6",
-    "name": {
-      "eng": "Südtirol Heavy Metal Festival"
+    type: "eventSeries",
+    id: "",
+    meta: {
+      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      dataProvider: "http://tourism.opendatahub.bz.it/"
     },
-    "shortName": null,
-    "description": null,
-    "abstract": null,
-    "url": null,
-    "frequency": "annual",
-    "editions": null
+    links: {
+      self: null
+    },
+    attributes: {
+      name: {
+        eng: "Südtirol Local Music Festival",
+      },
+      shortName: null,
+      description: null,
+      abstract: null,
+      url: null,
+      frequency: null
+    },
+    relationships: {
+      multimediaDescriptions: null,
+      editions: null
+    }
   },
   {
-    "type": "eventSeries",
-    "id": "7",
-    "name": {
-      "eng": "Südtirol Blues Festival"
+    type: "eventSeries",
+    id: "",
+    meta: {
+      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      dataProvider: "http://tourism.opendatahub.bz.it/"
     },
-    "shortName": null,
-    "description": null,
-    "abstract": null,
-    "url": null,
-    "frequency": "annual",
-    "editions": null
+    links: {
+      self: null
+    },
+    attributes: {
+      name: {
+        eng: "Südtirol Eletronic Music Festival",
+      },
+      shortName: null,
+      description: null,
+      abstract: null,
+      url: null,
+      frequency: null
+    },
+    relationships: {
+      multimediaDescriptions: null,
+      editions: null
+    }
   },
   {
-    "type": "eventSeries",
-    "id": "8",
-    "name": {
-      "eng": "Südtirol Tirolese Music Festival"
+    type: "eventSeries",
+    id: "",
+    meta: {
+      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      dataProvider: "http://tourism.opendatahub.bz.it/"
     },
-    "shortName": null,
-    "description": null,
-    "abstract": null,
-    "url": null,
-    "frequency": "annual",
-    "editions": null
+    links: {
+      self: null
+    },
+    attributes: {
+      name: {
+        eng: "Südtirol Country Music Festival",
+      },
+      shortName: null,
+      description: null,
+      abstract: null,
+      url: null,
+      frequency: null
+    },
+    relationships: {
+      multimediaDescriptions: null,
+      editions: null
+    }
   },
   {
-    "type": "eventSeries",
-    "id": "9",
-    "name": {
-      "eng": "Südtirol Reggaeton Festival"
+    type: "eventSeries",
+    id: "",
+    meta: {
+      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      dataProvider: "http://tourism.opendatahub.bz.it/"
     },
-    "shortName": null,
-    "description": null,
-    "abstract": null,
-    "url": null,
-    "frequency": "annual",
-    "editions": null
+    links: {
+      self: null
+    },
+    attributes: {
+      name: {
+        eng: "Südtirol Classical Music Festival",
+      },
+      shortName: null,
+      description: null,
+      abstract: null,
+      url: null,
+      frequency: null
+    },
+    relationships: {
+      multimediaDescriptions: null,
+      editions: null
+    }
   },
   {
-    "type": "eventSeries",
-    "id": "9",
-    "name": {
-      "eng": "Südtirol Samba Festival"
+    type: "eventSeries",
+    id: "",
+    meta: {
+      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      dataProvider: "http://tourism.opendatahub.bz.it/"
     },
-    "shortName": null,
-    "description": null,
-    "abstract": null,
-    "url": null,
-    "frequency": "annual",
-    "editions": null
+    links: {
+      self: null
+    },
+    attributes: {
+      name: {
+        eng: "Südtirol Punk Rock Festival",
+      },
+      shortName: null,
+      description: null,
+      abstract: null,
+      url: null,
+      frequency: null
+    },
+    relationships: {
+      multimediaDescriptions: null,
+      editions: null
+    }
   },
   {
-    "type": "eventSeries",
-    "id": "10",
-    "name": {
-      "eng": "Südtirol Classic Festival"
+    type: "eventSeries",
+    id: "",
+    meta: {
+      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      dataProvider: "http://tourism.opendatahub.bz.it/"
     },
-    "shortName": null,
-    "description": null,
-    "abstract": null,
-    "url": null,
-    "frequency": "annual",
-    "editions": null
+    links: {
+      self: null
+    },
+    attributes: {
+      name: {
+        eng: "Südtirol K-Pop Festival",
+      },
+      shortName: null,
+      description: null,
+      abstract: null,
+      url: null,
+      frequency: null
+    },
+    relationships: {
+      multimediaDescriptions: null,
+      editions: null
+    }
   },
   {
-    "type": "eventSeries",
-    "id": "11",
-    "name": {
-      "eng": "Südtirol Folk Festival"
+    type: "eventSeries",
+    id: "",
+    meta: {
+      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      dataProvider: "http://tourism.opendatahub.bz.it/"
     },
-    "shortName": null,
-    "description": null,
-    "abstract": null,
-    "url": null,
-    "frequency": "annual",
-    "editions": null
+    links: {
+      self: null
+    },
+    attributes: {
+      name: {
+        eng: "Südtirol International Music Festival",
+      },
+      shortName: null,
+      description: null,
+      abstract: null,
+      url: null,
+      frequency: null
+    },
+    relationships: {
+      multimediaDescriptions: null,
+      editions: null
+    }
   },
   {
-    "type": "eventSeries",
-    "id": "12",
-    "name": {
-      "eng": "Südtirol Cha-Cha-Cha Festival"
+    type: "eventSeries",
+    id: "",
+    meta: {
+      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      dataProvider: "http://tourism.opendatahub.bz.it/"
     },
-    "shortName": null,
-    "description": null,
-    "abstract": null,
-    "url": null,
-    "frequency": "annual",
-    "editions": null
+    links: {
+      self: null
+    },
+    attributes: {
+      name: {
+        eng: "Südtirol Heavy Metal Festival",
+      },
+      shortName: null,
+      description: null,
+      abstract: null,
+      url: null,
+      frequency: null
+    },
+    relationships: {
+      multimediaDescriptions: null,
+      editions: null
+    }
   },
-  {
-    "type": "eventSeries",
-    "id": "13",
-    "name": {
-      "eng": "Südtirol Disco Festival"
-    },
-    "shortName": null,
-    "description": null,
-    "abstract": null,
-    "url": null,
-    "frequency": "annual",
-    "editions": null
-  },
-  {
-    "type": "eventSeries",
-    "id": "14",
-    "name": {
-      "eng": "Südtirol K-Pop Festival"
-    },
-    "shortName": null,
-    "description": null,
-    "abstract": null,
-    "url": null,
-    "frequency": "annual",
-    "editions": null
-  }
 ]

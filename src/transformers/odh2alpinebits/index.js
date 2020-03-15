@@ -13,43 +13,94 @@ function transformArray(odhData, request, transformFn) {
     let resource = transformFn(object, includedMap, request);
     data.push(resource);
   }
+  selectFields(data, request);
 
-  filterSelectedFields(data, request);
-
-  const included = getIncludedArray(includedMap);
   const { meta, links } = createPaginationObjects(odhData, request);
 
-  return ({
+  let response = {
     meta,
     links,
-    data,
-    included
-  });
-}
+    data
+  }
 
+  const included = createIncludedArray(data, includedMap, request);
+  if(included){
+    selectFields(included, request);
+    response.included = included;
+  }
+
+  return response;
+}
 
 function transformObject(odhData, request, transformFn) {
   let includedMap = {};
+  
   let data = transformFn(odhData, includedMap, request);
-  const included = getIncludedArray(includedMap);
-  filterSelectedFields(data, request);
+  selectFields(data, request);
+  
+  let response = {
+    links: {
+      self: request.selfUrl
+    },
+    data
+  }
 
-  return ({
-    data,
-    included
-  });
+  const included = createIncludedArray(data, includedMap, request);
+  
+  if(included){
+    selectFields(included, request);
+    response.included = included;
+  }
+
+  return response;
 }
 
-function getIncludedArray(includedMap) {
-  let included = []
+function createIncludedArray(data, includedMap, request) {
+  if(!data || !request || !request.query || !request.query.include)
+    return;
+
+  const include = request.query.include;
   
-  Object.values(includedMap).forEach( 
-    (resourceMap) => {
-      included = included.concat(Object.values(resourceMap));
-    }
+  if(Object.keys(include).length===0)
+    return;
+
+  let filteredMap = {};
+  Object.keys(includedMap).forEach(field => filteredMap[field] = {});
+
+  if(Array.isArray(data))
+    data.forEach(resource => getIncludedOnResource(resource, request, includedMap, filteredMap));
+  else
+    getIncludedOnResource(data, request, includedMap, filteredMap);
+
+  let included = []
+
+  Object.values(filteredMap).forEach( 
+    resourceMap => included = included.concat(Object.values(resourceMap))
   );
 
   return included;
+}
+
+function getIncludedOnResource(resource, request, includedMap, filteredMap) {
+  if(!resource || !filteredMap || !request || !request.query || !request.query.include)
+    return;
+  
+  const include = request.query.include;
+
+  if(Object.keys(include).length===0)
+    return;
+
+  Object.keys(include).forEach(field => {
+    let relationship = resource.relationships[field];
+
+    if(!relationship)
+      return;
+    
+    if(Array.isArray(relationship.data))
+      relationship.data.forEach( related => filteredMap[related.type][related.id] = includedMap[related.type][related.id] );
+    else 
+      filteredMap[relationship.data.type][relationship.data.id] = includedMap[relationship.data.type][relationship.data.id];
+  })
 }
 
 function createPaginationObjects (odhData, request) {
@@ -102,19 +153,19 @@ function createPaginationObjects (odhData, request) {
   return { meta, links} ;
 }
 
-function filterSelectedFields(data, request){
+function selectFields(data, request){
   const fields = request.query.fields;
 
   if(!Object.keys(fields).length===0)
     return;
 
   if(Array.isArray(data))
-    data.forEach(resource => filterSelectedFieldsFromResource(resource, fields))
+    data.forEach(resource => selectFieldsOnResource(resource, fields))
   else
-    filterSelectedFieldsFromResource(data, fields)
+    selectFieldsOnResource(data, fields)
 }
 
-function filterSelectedFieldsFromResource(resource, fields){
+function selectFieldsOnResource(resource, fields){
   let selectedFields = fields[resource.type]
   if(!selectedFields)
     return;
