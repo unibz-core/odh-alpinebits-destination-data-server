@@ -111,7 +111,7 @@ function addRelationshipToMany(relationships, relationshipName, resource, selfLi
   if(!relationships[relationshipName]){
     relationships[relationshipName] = {
       data: [],
-      link: {
+      links: {
         related: selfLink + "/" + relationshipName
       }
     }
@@ -162,10 +162,10 @@ function transformMetadata(source) {
 }
 
 function transformOperationSchedule(operationSchedule) {
-  let openingHours = []
-
   if(!operationSchedule)
-    return openingHours;
+    return null;
+
+  let openingHours = [];
 
   operationSchedule.forEach( entry => {
     let newEntry = templates.createObject('HoursSpecification');
@@ -175,10 +175,30 @@ function transformOperationSchedule(operationSchedule) {
     newEntry.validFrom = entry.Start.replace(/T.*/,'');
     newEntry.validTo = entry.Stop.replace(/T.*/,'');
 
-    if(entry.OperationScheduleTime)
-      entry.OperationScheduleTime.forEach( hours =>
-        newEntry.hours.push({ opens: hours.Start, closes: hours.End})
-      );
+    if(entry.OperationScheduleTime) {
+      entry.OperationScheduleTime.forEach( hours => {
+        newEntry.hours = safePush(newEntry.hours, { opens: hours.Start, closes: hours.End });
+        newEntry.daysOfWeek = []
+
+        if(hours.Sunday)
+          newEntry.daysOfWeek.push('sunday');
+        if(hours.Monday)
+          newEntry.daysOfWeek.push('monday');
+        if(hours.Tuesday)
+          newEntry.daysOfWeek.push('tuesday');
+        if(hours.Wednesday)
+          newEntry.daysOfWeek.push('wednesday');
+        if(hours.Thuresday)
+          newEntry.daysOfWeek.push('thursday');
+        if(hours.Friday)
+          newEntry.daysOfWeek.push('friday');
+        if(hours.Saturday)
+          newEntry.daysOfWeek.push('saturday');
+      });
+
+      if(newEntry.daysOfWeek.length===0)
+        newEntry.daysOfWeek = null;
+    }
   })
 
   return openingHours;
@@ -342,9 +362,9 @@ function addIncludedResource(included, resource) {
   included[resource.type][resource.id] = resource;
 }
 
-function addSelfLink(resource, request){
+function createSelfLink(resource, request){
   const link = request.baseUrl + '/' + resource.type + '/' + resource.id;
-  resource.links.self = link; 
+  return ({ self: link });
 }
 
 
@@ -358,7 +378,7 @@ module.exports = {
   addIncludedResource,
   addRelationshipToMany,
   addRelationshipToOne,
-  addSelfLink,
+  createSelfLink,
   isClockwise,
   transformMultilingualFields,
   transformFields,
