@@ -161,14 +161,21 @@ module.exports.basicResourceRouteTests = (opts) => {
 
       Object.keys(data.relationships).forEach( key => {
         let rel = data.relationships[key];
-        if(!rel.data || (Array.isArray(rel.data) && rel.data.length===0)){
-          expect(rel.links).not.toBeDefined();
-        }
-        else {
-          expect(rel.links).toBeDefined();
-          expect(rel.links.related).toBeDefined();
+        
+        if(!rel)
+          return;
+        
+        expect(rel.data).toBeDefined();
+
+        if(Array.isArray(rel.data))
+          expect(rel.data.length).not.toEqual(0);
+
+        expect(rel.links).toBeDefined();
+        expect(rel.links.related).toBeDefined();
+        
+        //TODO: check this later
+        if(rel.links.related)
           promises.push(utils.get(rel.links.related));
-        }
       });
 
       return Promise.all(promises).then( resArray => {

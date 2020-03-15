@@ -11,8 +11,8 @@ module.exports = (originalObject, included = {}, request) => {
   let meta = target.meta;
   Object.assign(meta, utils.transformMetadata(source));
 
+  utils.addSelfLink(target, request);
   let links = target.links;
-  links.self = request.baseUrl + '/' + target.type + '/' + target.id;
   
   /**
    * 

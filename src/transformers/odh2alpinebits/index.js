@@ -204,3 +204,5 @@ module.exports = {
   transformEventSeriesArray: (odhData, request) => transformArray(odhData, request, transformEventSeries),
   transformEventSeries: (odhData, request) => transformObject(odhData, request, transformEventSeries),
 }
+
+//FIXME: eventSeries not working

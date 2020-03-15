@@ -342,6 +342,11 @@ function addIncludedResource(included, resource) {
   included[resource.type][resource.id] = resource;
 }
 
+function addSelfLink(resource, request){
+  const link = request.baseUrl + '/' + resource.type + '/' + resource.id;
+  resource.links.self = link; 
+}
+
 
 module.exports = {
   languageMapping,
@@ -353,6 +358,7 @@ module.exports = {
   addIncludedResource,
   addRelationshipToMany,
   addRelationshipToOne,
+  addSelfLink,
   isClockwise,
   transformMultilingualFields,
   transformFields,

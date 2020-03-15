@@ -63,16 +63,16 @@ function fetchEventSeries (request) {
     throw errors.notFound;
   }
 
-  console.log('OK: Data found on \'Event Series - Mock Data\'.\n');
+  console.log('OK: Mock data found for \'Event Series\'.\n');
 
   try {
     console.log('> Transforming data to the AlpineBits format...');
-    const data = odh2ab.transformEventSeriesArray(res.data);
+    const data = odh2ab.transformEventSeriesArray(res.data, request);
     console.log('OK: Sucessfully transformed data.\n');
-    const meta = getResponseMeta(res.data);
-
-    // TODO: Support fetchSubResource()
-    return { data, meta };
+    
+    //TODO: support fecthing subresource
+    //TODO: generalize this function
+    return data;
   }
   catch(error) {
     handleTransformationError(error);
@@ -92,12 +92,11 @@ function fetchEventSeriesById (request) {
 
   try {
     console.log('> Transforming data to the AlpineBits format...');
-    const data = odh2ab.transformEventSeries(res.data);
+    const data = odh2ab.transformEventSeries(res.data, request);
     console.log('OK: Sucessfully transformed data.\n');
-    const meta = getResponseMeta(res.data);
 
     // TODO: Support fetchSubResource()
-    return { data, meta };
+    return data;
   }
   catch(error) {
     handleTransformationError(error);
@@ -358,10 +357,10 @@ module.exports = {
   fetchEventVenues: fetchSubResource(EVENT_PATH, odh2ab.transformEvent, 'venues'),
   fetchLifts,
   fetchLiftById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformLift),
-  fetchTrails: fetchTrails,
+  fetchTrails,
   fetchTrailById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformTrail),
   fetchTrailMediaObjects: fetchSubResource(ACTIVITY_PATH, odh2ab.transformTrail, 'multimediaDescriptions'),
-  fetchSnowparks: fetchSnowparks,
+  fetchSnowparks,
   fetchSnowparkById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformSnowpark),
   fetchMountainAreas: request => fetchMountainArea(request, null),
   fetchMountainAreaById: request => fetchMountainArea(request, null),
@@ -370,6 +369,6 @@ module.exports = {
   fetchMountainAreaLifts: request => fetchMountainArea(request, 'lifts'),
   fetchMountainAreaTrails: request => fetchMountainArea(request, 'trails'),
   fetchMountainAreaSnowparks: request => fetchMountainArea(request, 'snowparks'),
-  fetchEventSeries: fetchEventSeries,
-  fetchEventSeriesById: fetchEventSeriesById,
+  fetchEventSeries,
+  fetchEventSeriesById,
 }
