@@ -12,7 +12,16 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/events"
+                "$ref": "#/definitions/lifts"
+              },
+              {
+                "$ref": "#/definitions/mountainAreas"
+              },
+              {
+                "$ref": "#/definitions/snowparks"
+              },
+              {
+                "$ref": "#/definitions/trails"
               }
             ]
           }

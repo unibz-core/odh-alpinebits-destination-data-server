@@ -125,7 +125,7 @@ module.exports = (originalObject, included = {}, request) => {
   let relationships = target.relationships;
 
   for (image of source.ImageGallery){
-    const { mediaObject, copyrightOwner } = utils.transformMediaObject(image, links);
+    const { mediaObject, copyrightOwner } = utils.transformMediaObject(image, links, request);
     utils.addRelationshipToMany(relationships, 'multimediaDescriptions', mediaObject, links.self);
     utils.addIncludedResource(included, mediaObject);
     utils.addIncludedResource(included, copyrightOwner);

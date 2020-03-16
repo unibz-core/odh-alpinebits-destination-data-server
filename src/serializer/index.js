@@ -50,6 +50,4 @@ module.exports = {
   serializeMountainAreaArray: (data,request,meta) => serializeArray('mountainAreas', data, request, meta),
   serializeEventSeries: (data,request,meta) => serializeObject('eventSeries', data, request, meta),
   serializeEventSeriesArray: (data,request,meta) => serializeArray('eventSeries', data, request, meta),
-  serializeSnowReport: (data,request,meta) => serializeObject('snowReports', data, request, meta),
-  serializeSnowReportArray: (data,request,meta) => serializeArray('snowReports', data, request, meta),
 }

@@ -26,7 +26,7 @@ function transformArray(odhData, request, transformFn) {
   const included = createIncludedArray(data, includedMap, request);
   if(included){
     selectFields(included, request);
-    response.included = included;
+    response.included = included
   }
 
   return response;
@@ -46,7 +46,6 @@ function transformObject(odhData, request, transformFn) {
   }
 
   const included = createIncludedArray(data, includedMap, request);
-  
   if(included){
     selectFields(included, request);
     response.included = included;
@@ -78,7 +77,7 @@ function createIncludedArray(data, includedMap, request) {
     resourceMap => included = included.concat(Object.values(resourceMap))
   );
 
-  return included;
+  return included.length>0 ? included : null;
 }
 
 function getIncludedOnResource(resource, request, includedMap, filteredMap) {

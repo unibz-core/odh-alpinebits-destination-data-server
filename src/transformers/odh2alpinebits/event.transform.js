@@ -65,24 +65,24 @@ module.exports = (originalObject, included = {}, request) => {
   let relationships = target.relationships;
   
   // Venue
-  let newVenue = transformVenue(source);
+  let newVenue = transformVenue(source, request);
   utils.addRelationshipToMany(relationships, 'venues', newVenue, links.self);
   utils.addIncludedResource(included, newVenue);
   
   
   // Organizer
-  let newOrganizer = transformOrganizer(source)
+  let newOrganizer = transformOrganizer(source, request)
   utils.addRelationshipToMany(relationships, 'organizers', newOrganizer, links.self);
   utils.addIncludedResource(included, newOrganizer);
 
   // Publisher
-  let newPublisher = transformPublisher();
+  let newPublisher = transformPublisher(request);
   utils.addRelationshipToOne(relationships, 'publisher', newPublisher, links.self);
   utils.addIncludedResource(included, newPublisher);
 
   // Media Objects
   for (image of source.ImageGallery){
-    const { mediaObject, copyrightOwner } = utils.transformMediaObject(image, links);
+    const { mediaObject, copyrightOwner } = utils.transformMediaObject(image, links, request);
     utils.addRelationshipToMany(relationships, 'multimediaDescriptions', mediaObject, links.self);
     utils.addIncludedResource(included, mediaObject);
     utils.addIncludedResource(included, copyrightOwner);
@@ -124,7 +124,7 @@ function transformDates(source) {
   return target;
 }
 
-function transformPublisher() {
+function transformPublisher(request) {
   let publisher = templates.createObject('Agent');
   
   publisher.id = shajs('sha256').update('lts').digest('hex'),
@@ -134,11 +134,14 @@ function transformPublisher() {
     ita: "LTS - Landesverband der Tourismusorganisationen Südtirols"
   };
   publisher.attributes.url = "https://lts.it";
+
+  let links = publisher.links;
+  Object.assign(links, utils.createSelfLink(publisher, request));
   
   return publisher;
 }
 
-function transformOrganizer(source) {
+function transformOrganizer(source, request) {
   
   let organizer = source.OrganizerInfos;
   let contact = source.ContactInfos;
@@ -228,6 +231,14 @@ function transformOrganizer(source) {
   if(!newOrganizer.id)
     newOrganizer.id = source.Id+"+organizer";
   
+  let links = newOrganizer.links;
+  Object.assign(links, utils.createSelfLink(newOrganizer, request));
+
+  if(!newOrganizer.attributes.name)
+    newOrganizer.attributes.name = {
+      "eng": "Unnamed organizer"
+    };
+  
   if(!newContact.email)
     newContact.email = utils.safeGetOne([['de','Email'],['it','Email'],['en','Email']], contact);
 
@@ -243,10 +254,13 @@ function transformOrganizer(source) {
   return newOrganizer;
 }
 
-function transformVenue(source) {
+function transformVenue(source, request) {
   let venue = templates.createObject('Venue');
   venue.id = source.Id+'+location';
   
+  let links = venue.links;
+  Object.assign(links, utils.createSelfLink(venue, request));
+
   /**
    * 
    *  ATTRIBUTES
@@ -256,6 +270,11 @@ function transformVenue(source) {
 
   const fieldMapping = [ ['Location', 'name'] ];
   utils.transformMultilingualFields(source.EventAdditionalInfos, attributes, fieldMapping, false);
+
+  if(!attributes.name)
+    attributes.name = {
+      "eng": "Unnamed venue"
+    };
 
   let address = templates.createObject('Address');
   attributes.address = address;
@@ -269,8 +288,9 @@ function transformVenue(source) {
     utils.transformMultilingualFields(source.ContactInfos, address, addressFieldMapping, false);
     address.zipcode = utils.safeGetOne([['zipcode','ita'],['zipcode','eng'],['zipcode','deu']], address);
     address.country = 'IT';
+    
     if(!address.city)
-      address = {
+      address.city = {
         eng: "Missing city!!! FIX ME!"
       }
   }

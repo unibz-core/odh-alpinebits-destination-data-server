@@ -12,7 +12,7 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/events"
+                "$ref": "#/definitions/snowparks"
               }
             ]
           }

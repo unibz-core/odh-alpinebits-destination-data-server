@@ -107,6 +107,8 @@ function safeGetOne(paths, object){
     if(value)
       return value;
   }
+
+  return null;
 }
 
 function safePush(array, value){
@@ -134,7 +136,7 @@ function addRelationshipToMany(relationships, relationshipName, resource, selfLi
     relationships[relationshipName] = {
       data: [],
       links: {
-        related: selfLink + "/" + relationshipName
+        related: encodeURI(selfLink + "/" + relationshipName)
       }
     }
   }
@@ -154,7 +156,7 @@ function addRelationshipToOne(relationships, relationshipName, resource, selfLin
       id: resource.id 
     },
     links: {
-      related: selfLink + "/" + relationshipName
+      related: encodeURI(selfLink + "/" + relationshipName)
     }
   }
 }
@@ -309,14 +311,17 @@ function transformGeometry(gpsInfo, infoKeys, gpsPoints, gpsTrack){
 
   return geometry;
 }
-
-function transformMediaObject(source, baseLink) {
+// TODO: removeBaseLink
+function transformMediaObject(source, baseLink, request) {
   let mediaObject = templates.createObject('MediaObject');
   let attributes = mediaObject.attributes;
   let relationships = mediaObject.relationships;
 
   const match = source.ImageUrl.match(/ID=(.*)/i);
   mediaObject.id = match.length>=2 ? match[1] : source.ImageUrl;
+  
+  let links = mediaObject.links;
+  Object.assign(links, createSelfLink(mediaObject, request));
 
   /**
    * 
@@ -357,7 +362,7 @@ function transformMediaObject(source, baseLink) {
     ita: source.CopyRight
   };
   
-  addRelationshipToOne(relationships, 'copyrightOwner', copyrightOwner, baseLink)
+  addRelationshipToOne(relationships, 'copyrightOwner', copyrightOwner, links.self)
 
   return ({ 
     mediaObject,
@@ -383,7 +388,7 @@ function addIncludedResource(included, resource) {
 }
 
 function createSelfLink(resource, request){
-  const link = request.baseUrl + '/' + resource.type + '/' + resource.id;
+  const link = encodeURI(request.baseUrl + '/' + resource.type + '/' + resource.id);
   return ({ self: link });
 }
 

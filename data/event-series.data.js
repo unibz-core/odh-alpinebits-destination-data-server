@@ -19,15 +19,17 @@ module.exports = [
       shortName: null,
       description: null,
       abstract: null,
+      categories: null,
       url: "https://www.suedtiroljazzfestival.com/",
       frequency: "annual"
+
     },
     relationships: {
       multimediaDescriptions: {
         data: [
           {
             type: "mediaObjects",
-            id: 0
+            id: "0"
           }
         ],
         links: {
@@ -83,6 +85,7 @@ module.exports = [
       shortName: null,
       description: null,
       abstract: null,
+      categories: null,
       url: null,
       frequency: "annual"
     },
@@ -109,6 +112,7 @@ module.exports = [
       shortName: null,
       description: null,
       abstract: null,
+      categories: null,
       url: null,
       frequency: null
     },
@@ -135,6 +139,7 @@ module.exports = [
       shortName: null,
       description: null,
       abstract: null,
+      categories: null,
       url: null,
       frequency: null
     },
@@ -161,6 +166,7 @@ module.exports = [
       shortName: null,
       description: null,
       abstract: null,
+      categories: null,
       url: null,
       frequency: null
     },
@@ -187,6 +193,7 @@ module.exports = [
       shortName: null,
       description: null,
       abstract: null,
+      categories: null,
       url: null,
       frequency: null
     },
@@ -213,6 +220,7 @@ module.exports = [
       shortName: null,
       description: null,
       abstract: null,
+      categories: null,
       url: null,
       frequency: null
     },
@@ -239,6 +247,7 @@ module.exports = [
       shortName: null,
       description: null,
       abstract: null,
+      categories: null,
       url: null,
       frequency: null
     },
@@ -265,6 +274,7 @@ module.exports = [
       shortName: null,
       description: null,
       abstract: null,
+      categories: null,
       url: null,
       frequency: null
     },
@@ -291,6 +301,7 @@ module.exports = [
       shortName: null,
       description: null,
       abstract: null,
+      categories: null,
       url: null,
       frequency: null
     },
@@ -317,6 +328,7 @@ module.exports = [
       shortName: null,
       description: null,
       abstract: null,
+      categories: null,
       url: null,
       frequency: null
     },
@@ -343,6 +355,7 @@ module.exports = [
       shortName: null,
       description: null,
       abstract: null,
+      categories: null,
       url: null,
       frequency: null
     },
@@ -369,6 +382,7 @@ module.exports = [
       shortName: null,
       description: null,
       abstract: null,
+      categories: null,
       url: null,
       frequency: null
     },

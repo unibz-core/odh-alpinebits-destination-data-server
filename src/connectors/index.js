@@ -28,7 +28,7 @@ async function handleRequest(req, fetchFn, validateFn) {
 
   try {
     console.log('> Validating generated message...');
-    const isValid = validateFn(data);
+    validateFn(data);
     return data;
   }
   catch (error) {
