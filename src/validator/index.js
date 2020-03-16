@@ -10,17 +10,18 @@ const liftsSchema = require('./schemas/lifts.schema.json');
 const liftsArraySchema = require('./schemas/lifts.array.schema.json');
 const mediaObjectsSchema = require('./schemas/mediaobjects.schema.json');
 const mediaObjectsArraySchema = require('./schemas/mediaobjects.array.schema.json');
+const venuesSchema = require('./schemas/venues.schema.json');
+const venuesArraySchema = require('./schemas/venues.array.schema.json');
+const trailsSchema = require('./schemas/trails.schema.json');
+const trailsArraySchema = require('./schemas/trails.array.schema.json');
+const snowparksSchema = require('./schemas/snowparks.schema.json');
+const snowparksArraySchema = require('./schemas/snowparks.array.schema.json');
+const mountainAreasSchema = require('./schemas/mountainareas.schema.json');
+const mountainAreasArraySchema = require('./schemas/mountainareas.array.schema.json');
 
-// const venuesSchema = require('./schemas/venues.schema.json');
-// const venuesArraySchema = require('./schemas/venues.array.schema.json');
-// const trailsSchema = require('./schemas/trails.schema.json');
-// const trailsArraySchema = require('./schemas/trails.array.schema.json');
-// const snowparksSchema = require('./schemas/snowparks.schema.json');
-// const snowparksArraySchema = require('./schemas/snowparks.array.schema.json');
-// const mountainAreasSchema = require('./schemas/mountainareas.schema.json');
-// const mountainAreasArraySchema = require('./schemas/mountainareas.array.schema.json');
 const ajvOptions = { 
-  verbose: false 
+  verbose: false,
+  allErrors: true 
 }; 
 
 let ajv = new Ajv(ajvOptions);
@@ -53,14 +54,29 @@ let mediaObjectsValidation = ajv.compile(mediaObjectsSchema);
 ajv = new Ajv(ajvOptions);
 let mediaObjectsArrayValidation = ajv.compile(mediaObjectsArraySchema);
 
-// let venuesValidation = ajv.compile(venuesSchema);
-// let venuesArrayValidation = ajv.compile(venuesArraySchema);
-// let trailsValidation = ajv.compile(trailsSchema);
-// let trailsArrayValidation = ajv.compile(trailsArraySchema);
-// let snowparksValidation = ajv.compile(snowparksSchema);
-// let snowparksArrayValidation = ajv.compile(snowparksArraySchema);
-// let mountainAreasValidation = ajv.compile(mountainAreasSchema);
-// let mountainAreasArrayValidation = ajv.compile(mountainAreasArraySchema);
+ajv = new Ajv(ajvOptions);
+let venuesValidation = ajv.compile(venuesSchema);
+
+ajv = new Ajv(ajvOptions);
+let venuesArrayValidation = ajv.compile(venuesArraySchema);
+
+ajv = new Ajv(ajvOptions);
+let trailsValidation = ajv.compile(trailsSchema);
+
+ajv = new Ajv(ajvOptions);
+let trailsArrayValidation = ajv.compile(trailsArraySchema);
+
+ajv = new Ajv(ajvOptions);
+let snowparksValidation = ajv.compile(snowparksSchema);
+
+ajv = new Ajv(ajvOptions);
+let snowparksArrayValidation = ajv.compile(snowparksArraySchema);
+
+ajv = new Ajv(ajvOptions);
+let mountainAreasValidation = ajv.compile(mountainAreasSchema);
+
+ajv = new Ajv(ajvOptions);
+let mountainAreasArrayValidation = ajv.compile(mountainAreasArraySchema);
 
 module.exports = {
   validateAgent: (message) => validate(agentsValidation, message),
@@ -92,7 +108,8 @@ function validate(validation, message) {
   else {
     console.log('ERROR: Generated message is INVALID!');
     // console.log('ERROR: '+message+' is INVALID! ' + JSON.stringify(validation.errors,null,1));
-    // console.log(JSON.stringify(validation.errors,null,2));
+    console.log(JSON.stringify(validation.errors,null,2));
+    // console.log(JSON.stringify(message,null,2));
   }
 
   return isValid;

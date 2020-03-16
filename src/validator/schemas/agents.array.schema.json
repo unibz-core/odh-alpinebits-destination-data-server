@@ -3383,7 +3383,8 @@
       "enum": [
         "IT",
         "DE",
-        "AU"
+        "AT",
+        "CH"
       ]
     },
     "geometry": {

@@ -3,8 +3,8 @@ module.exports.basicSchemaTests = (opts) => {
   
   describe(`Default request returns valid message on /${opts.route}`, () => {
     for (let i = opts.schema.pageStart; i <= opts.schema.pageEnd; i++) {
-      test(`/${opts.route}: page[number]=${i}`, () => {
-        return utils.axiosInstance.get(`/1.0/${opts.route}?page[size]=${opts.pageSize}&page[number]=${i}`)
+      test(`/${opts.route}: page[number]=${i} and page[size]=${opts.schema.pageSize}`, () => {
+        return utils.axiosInstance.get(`/1.0/${opts.route}?page[size]=${opts.schema.pageSize}&page[number]=${i}`)
                 .then( (res) => {
                   let isValid = opts.schema.validate(res.data);
                   expect(isValid).toBe(true);

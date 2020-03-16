@@ -108,8 +108,9 @@ module.exports = (originalObject, included = {}, request) => {
   attributes.length = source.DistanceLength>0 ? source.DistanceLength : null;
 
   attributes.howToArrive = utils.transformHowToArrive(source.Detail);
-
-  attributes.personsPerChair = parseInt(source.PoiType, 10);
+  
+  let ppc = parseInt(source.PoiType, 10);
+  attributes.personsPerChair =  ppc ? ppc : null;
 
   attributes.openingHours = utils.transformOperationSchedule(source.OperationSchedule);
 

@@ -1234,10 +1234,10 @@
                   "$ref": "#/definitions/optionalNonZeroPositiveInteger"
                 },
                 "maxAltitude": {
-                  "$ref": "#/definitions/optionalNonZeroPositiveInteger"
+                  "$ref": "#/definitions/optionalPositiveInteger"
                 },
                 "minAltitude": {
-                  "$ref": "#/definitions/optionalNonZeroPositiveInteger"
+                  "$ref": "#/definitions/optionalPositiveInteger"
                 },
                 "openingHours": {
                   "$ref": "#/definitions/hoursSpecifications"
@@ -1708,10 +1708,10 @@
                   "$ref": "#/definitions/text"
                 },
                 "maxAltitude": {
-                  "$ref": "#/definitions/optionalNonZeroPositiveInteger"
+                  "$ref": "#/definitions/optionalPositiveInteger"
                 },
                 "minAltitude": {
-                  "$ref": "#/definitions/optionalNonZeroPositiveInteger"
+                  "$ref": "#/definitions/optionalPositiveInteger"
                 },
                 "openingHours": {
                   "$ref": "#/definitions/hoursSpecifications"
@@ -2340,10 +2340,10 @@
                   "$ref": "#/definitions/optionalNonZeroPositiveInteger"
                 },
                 "maxAltitude": {
-                  "$ref": "#/definitions/optionalNonZeroPositiveInteger"
+                  "$ref": "#/definitions/optionalPositiveInteger"
                 },
                 "minAltitude": {
-                  "$ref": "#/definitions/optionalNonZeroPositiveInteger"
+                  "$ref": "#/definitions/optionalPositiveInteger"
                 },
                 "openingHours": {
                   "$ref": "#/definitions/hoursSpecifications"
@@ -2607,10 +2607,10 @@
                   "$ref": "#/definitions/optionalNonZeroPositiveInteger"
                 },
                 "maxAltitude": {
-                  "$ref": "#/definitions/optionalNonZeroPositiveInteger"
+                  "$ref": "#/definitions/optionalPositiveInteger"
                 },
                 "minAltitude": {
-                  "$ref": "#/definitions/optionalNonZeroPositiveInteger"
+                  "$ref": "#/definitions/optionalPositiveInteger"
                 },
                 "openingHours": {
                   "$ref": "#/definitions/hoursSpecifications"
@@ -3383,7 +3383,8 @@
       "enum": [
         "IT",
         "DE",
-        "AU"
+        "AT",
+        "CH"
       ]
     },
     "geometry": {

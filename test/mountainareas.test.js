@@ -1,5 +1,9 @@
 const { basicResourceRouteTests } = require('./route_id.test');
 const { basicRouteTests } = require('./route.test');
+const validator = require('../src/validator');
+const { basicSchemaTests } = require('./route.schema.test');
+
+const validate = validator.validateMountainAreasArray;
 
 let opts = {
   pageSize: 2,
@@ -31,8 +35,15 @@ let opts = {
       relationship: 'areaOwner',
       resourceType: 'agents'
     }
-  ]
+  ],
+  schema: {
+    validate,
+    pageStart: 1,
+    pageEnd: 10,
+    pageSize: 50
+  }
 }
 
-basicRouteTests(opts);
-basicResourceRouteTests(opts);
+// basicRouteTests(opts);
+// basicResourceRouteTests(opts);
+basicSchemaTests(opts);

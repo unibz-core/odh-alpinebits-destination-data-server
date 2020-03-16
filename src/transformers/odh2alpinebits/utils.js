@@ -248,26 +248,54 @@ function transformHowToArrive(detail) {
 function transformAddress(contactInfo, fields){
   let address = templates.createObject('Address');
 
-  if(fields.includes('street'))
-    address.street = {
-      deu: safeGet(['de','Address'], contactInfo),
-      ita: safeGet(['it','Address'], contactInfo),
-      eng: safeGet(['en','Address'], contactInfo)
-    };
+  if(fields.includes('street')) {
+    address.street = {};
 
-  if(fields.includes('city'))
-    address.city = {
-      deu: safeGet(['de','City'], contactInfo),
-      ita: safeGet(['it','City'], contactInfo),
-      eng: safeGet(['en','City'], contactInfo)
-    };
+    let deu = safeGet(['de','Address'], contactInfo)
+    if(deu)
+      address.street.deu = deu;
+
+    let ita = safeGet(['it','Address'], contactInfo)
+    if(ita)
+      address.street.ita = ita;
+
+    let eng = safeGet(['en','Address'], contactInfo)
+    if(eng)
+      address.street.eng = eng;
+    
+    if(!address.street.deu && !address.street.eng && !address.street.ita)
+      address.street = null;
+  }
+  
+
+  if(fields.includes('city')){
+    address.city = {};
+
+    let deu = safeGet(['de','City'], contactInfo)
+    if(deu)
+      address.city.deu = deu;
+
+    let ita = safeGet(['it','City'], contactInfo)
+    if(ita)
+      address.city.ita = ita;
+
+    let eng = safeGet(['en','City'], contactInfo)
+    if(eng)
+      address.city.eng = eng;
+    
+    if(!address.city.deu && !address.city.eng && !address.city.ita)
+      address.city = null;
+  }
 
   if(fields.includes('country'))
     address.country = safeGetOne([['de','CountryCode'],['it','CountryCode'],['en','CountryCode']], contactInfo);
 
   if(fields.includes('zipcode'))
     address.zipcode = safeGetOne([['de','ZipCode'],['it','ZipCode'],['en','ZipCode']], contactInfo);
-
+  
+  if(!address.city || !address.country)
+    return null;
+  
   return address;
 }
 
