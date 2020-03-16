@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const Ajv = require('ajv');
 
-const eventSchema = require('./schemas/event.schema');
+const eventsArraySchema = require('./schemas/events.array.schema.json');
 const venueSchema = require('./schemas/venue.schema');
 const agentSchema = require('./schemas/agent.schema');
 const mediaObjectSchema = require('./schemas/mediaobject.schema');
@@ -15,63 +15,63 @@ const snowReportSchema = require('./schemas/snowreport.schema');
 
 let ajv = new Ajv({ verbose: false });
 
-let eventAjv = ajv.compile(eventSchema);
-let venueAjv = ajv.compile(venueSchema);
-let mediaObjectAjv = ajv.compile(mediaObjectSchema);
-let agentAjv = ajv.compile(agentSchema);
-let liftAjv = ajv.compile(liftSchema);
-let trailAjv = ajv.compile(trailSchema);
-let snowparkAjv = ajv.compile(snowparkSchema);
-let mountainAreaAjv = ajv.compile(mountainAreaSchema);
-let eventSeriesAjv = ajv.compile(eventSeriesSchema);
-let snowReportAjv = ajv.compile(snowReportSchema);
+let eventsArrayValidation = ajv.compile(eventsArraySchema);
+
+let venueValidation = ajv.compile(venueSchema);
+let mediaObjectValidation = ajv.compile(mediaObjectSchema);
+let agentValidation = ajv.compile(agentSchema);
+let liftValidation = ajv.compile(liftSchema);
+let trailValidation = ajv.compile(trailSchema);
+let snowparkValidation = ajv.compile(snowparkSchema);
+let mountainAreaValidation = ajv.compile(mountainAreaSchema);
+let eventSeriesValidation = ajv.compile(eventSeriesSchema);
+let snowReportValidation = ajv.compile(snowReportSchema);
 
 module.exports = {
-  validateEvent: (object) => validateObject(eventAjv, object),
-  validateEventArray: (array) => validateObject(eventAjv, array),
-  validateVenueArray: (object) => validateObject(venueAjv, object),
-  validateMediaObjectArray: (array) => validateObject(mediaObjectAjv, array),
-  validateAgent: (object) => validateObject(agentAjv, object),
-  validateAgentArray: (array) => validateObject(agentAjv, array),
-  validateLift: (object) => validateObject(liftAjv, object),
-  validateLiftArray: (object) => validateObject(liftAjv, object),
-  validateTrail: (object) => validateObject(trailAjv, object),
-  validateTrailArray: (object) => validateObject(trailAjv, object),
-  validateSnowpark: (object) => validateObject(snowparkAjv, object),
-  validateSnowparkArray: (array) => validateObject(snowparkAjv, array),
-  validateMountainArea: (object) => validateObject(mountainAreaAjv, object),
-  validateMountainAreaArray: (array) => validateObject(mountainAreaAjv, array),
-  validateEventSeries: (object) => validateObject(eventSeriesAjv, object),
-  validateEventSeriesArray: (array) => validateObject(eventSeriesAjv, array),
-  validateSnowReport: (object) => validateObject(snowReportAjv, object),
-  validateSnowReportArray: (array) => validateObject(snowReportAjv, array),
+  validateEvent: (message) => validateObject(eventValidation, message),
+  validateEventArray: (message) => validate(eventsArrayValidation, message),
+  validateVenueArray: (message) => validateObject(venueValidation, message),
+  validateMediaObjectArray: (message) => validateObject(mediaObjectValidation, message),
+  validateAgent: (message) => validateObject(agentValidation, message),
+  validateAgentArray: (message) => validateObject(agentValidation, message),
+  validateLift: (message) => validateObject(liftValidation, message),
+  validateLiftArray: (message) => validateObject(liftValidation, message),
+  validateTrail: (message) => validateObject(trailValidation, message),
+  validateTrailArray: (message) => validateObject(trailValidation, message),
+  validateSnowpark: (message) => validateObject(snowparkValidation, message),
+  validateSnowparkArray: (message) => validateObject(snowparkValidation, message),
+  validateMountainArea: (message) => validateObject(mountainAreaValidation, message),
+  validateMountainAreaArray: (message) => validateObject(mountainAreaValidation, message),
+  validateEventSeries: (message) => validateObject(eventSeriesValidation, message),
+  validateEventSeriesArray: (message) => validateObject(eventSeriesValidation, message),
+  validateSnowReport: (message) => validateObject(snowReportValidation, message),
+  validateSnowReportArray: (message) => validateObject(snowReportValidation, message),
 }
 
-function validateObject(validation, object){
-  let result = { valid: [], invalid: [] }
-  validate(validation, object, result);
-  return result;
-}
-
-// function validateObject(validation, array){
-//   let result = { valid: [], invalid: [] }
-//   for (object of array)
-//     validate(validation, object, result);
+// function validateObject(validation, message){
+//   let result = {  }
+//   validate(validation, message, result);
 //   return result;
 // }
 
-function validate(validation, object, result) {
-  let isValid = validation(object);
+// function validateObject(validation, message){
+//   let result = { valid: [], invalid: [] }
+//   for (message of message)
+//     validate(validation, message, result);
+//   return result;
+// }
+
+function validate(validation, message) {
+  let isValid = validation(message);
 
   if(isValid){
-    console.log('OK: Object <'+object.id+'> is VALID.');
-    result.valid.push(object);
+    console.log('OK: Generated message is VALID.');
   }
   else {
-    let message = object && object.id ? 'Object <'+object.id+'>' : 'Data';
-    console.log('ERROR: '+message+' is INVALID!');
+    console.log('ERROR: Generated message is INVALID!');
     // console.log('ERROR: '+message+' is INVALID! ' + JSON.stringify(validation.errors,null,1));
-    result.invalid.push(object);
     // console.log(validation.errors);
   }
+
+  return validation;
 }

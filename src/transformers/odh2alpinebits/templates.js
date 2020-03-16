@@ -12,7 +12,7 @@ const datatypes = {
     street: null,
     city: null,
     region: null,
-    country: null,
+    country: "IT",
     complement: null,
     categories: null,
     zipcode: null

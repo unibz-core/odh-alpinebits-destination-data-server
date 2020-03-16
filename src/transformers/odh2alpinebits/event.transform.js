@@ -49,7 +49,8 @@ module.exports = (originalObject, included = {}, request) => {
     // if(categoryMapping[tag])
     //   categories.push(categoryMapping[tag]);
     
-    categories.push("odh/"+ topic.TopicInfo.replace(/[\/|\s]/g,'-').toLowerCase());
+    if(topic && topic.TopicInfo)
+      categories.push("odh/"+ topic.TopicInfo.replace(/[\/|\s]/g,'-').toLowerCase());
   })
 
   if(categories.length>0)
@@ -152,21 +153,23 @@ function transformOrganizer(source) {
   utils.transformMultilingualFields(organizer, attributes, organizerMapping, false, true);
 
   let newContact = templates.createObject('ContactPoint');
-  attributes.contactPoints = [newContact];
+  attributes.contactPoints = [ newContact ];
 
-  let newAddress = templates.createObject('Address');
-  attributes.address = newAddress;
+  let organizerAddress = templates.createObject('Address');
+  newContact.address = organizerAddress;
 
   const addressMapping = [['Address','street'], ['City','city'], ['ZipCode','zipcode']];
-  utils.transformMultilingualFields(organizer, newAddress, addressMapping, false);
-  newAddress.zipcode = newAddress.zipcode.ita || newAddress.zipcode.eng || newAddress.zipcode.deu;
-  newAddress.country = 'IT';
-
+  utils.transformMultilingualFields(organizer, organizerAddress, addressMapping, false);
+  organizerAddress.zipcode = utils.safeGetOne([['zipcode','ita'],['zipcode','eng'],['zipcode','deu']], organizerAddress);
+  organizerAddress.country = 'IT';
+  
   let inferredType = {
     error: 0,
     organization: 0,
     person: 0
   };
+
+
 
   for (languageEntry of utils.languageMapping) {
     let [sourceLanguage, targetLanguage] = languageEntry;
@@ -183,7 +186,8 @@ function transformOrganizer(source) {
       const orgId =  utils.safeGetString(['Tax'], sourceOrganizer) ||  utils.safeGetString(['Vat'], sourceOrganizer) || email;
       newOrganizer.id = newOrganizer.id || orgId;
 
-      const ignoreValues = ['Undefiniert','!','-','.','sonstige'];
+      // const ignoreValues = ['Undefiniert','!','-','.','sonstige'];
+      const ignoreValues = [];
       const companyName = utils.safeGetString(['CompanyName'], sourceOrganizer);
       const givenName = utils.safeGetString(['Givenname'], sourceOrganizer);
       const surname = utils.safeGetString(['Surname'], sourceOrganizer); 
@@ -221,14 +225,20 @@ function transformOrganizer(source) {
 
   //If email and telephone number are not specified in organizer, try to get it from the ContactInfos field.
   // TODO: improve this part of the code. Too many duplicates...
-  if(!attributes.email)
-    attributes.email = utils.safeGetOne([['de','Email'],['it','Email'],['en','Email']], contact);
-
-  if(!attributes.telephone)
-    attributes.telephone = utils.safeGetOne([['de','Phonenumber'],['it','Phonenumber'],['en','Phonenumber']], contact);
-
   if(!newOrganizer.id)
     newOrganizer.id = source.Id+"+organizer";
+  
+  if(!newContact.email)
+    newContact.email = utils.safeGetOne([['de','Email'],['it','Email'],['en','Email']], contact);
+
+  if(!newContact.telephone)
+    newContact.telephone = utils.safeGetOne([['de','Phonenumber'],['it','Phonenumber'],['en','Phonenumber']], contact);
+
+  if(!newContact.address.city || !newContact.address.country)
+    newContact.address = null;
+
+  if(!newContact.email && !newContact.telephone && !newContact.address)
+    attributes.contactPoints = null;
 
   return newOrganizer;
 }
@@ -257,9 +267,12 @@ function transformVenue(source) {
       ['ZipCode', 'zipcode'],
     ];
     utils.transformMultilingualFields(source.ContactInfos, address, addressFieldMapping, false);
-
-    address.zipcode = address.zipcode.ita || address.zipcode.eng || address.zipcode.deu;
+    address.zipcode = utils.safeGetOne([['zipcode','ita'],['zipcode','eng'],['zipcode','deu']], address);
     address.country = 'IT';
+    if(!address.city)
+      address = {
+        eng: "Missing city!!! FIX ME!"
+      }
   }
 
   if(source.Latitude && source.Longitude) {

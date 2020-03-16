@@ -20,7 +20,7 @@ function transformArray(odhData, request, transformFn) {
   let response = {
     meta,
     links,
-    data
+    data: data.length>0 ? data : null
   }
 
   const included = createIncludedArray(data, includedMap, request);

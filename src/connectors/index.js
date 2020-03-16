@@ -27,10 +27,8 @@ async function handleRequest(req, fetchFn, validateFn) {
   }
 
   try {
-    console.log('> Validating AlpineBits objects...');
-    const validation = validateFn(data);
-    console.log('OK: Objects validated (valid:'+validation.valid.length+', invalid: '+validation.invalid.length+')\n');
-    
+    console.log('> Validating generated message...');
+    const isValid = validateFn(data);
     return data;
   }
   catch (error) {

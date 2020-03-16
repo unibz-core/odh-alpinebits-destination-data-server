@@ -23,12 +23,34 @@ function transformMultilingualFields(source, target, fieldMapping, isLanguageNes
       let [sourceLanguage, targetLanguage] = languageEntry;
 
       if(isLanguageNested && source[sourceField] && (!ignoreNullValues || source[sourceField][sourceLanguage])){
-        const value = sanitizeHtml(source[sourceField][sourceLanguage], htmlSanitizeOpts);
+        let value = sanitizeHtml(source[sourceField][sourceLanguage], htmlSanitizeOpts);
+        
+        if(typeof value === 'string' || value instanceof String){
+          value = value.trim();
+        
+          if(value==="")
+            continue;
+        }
+
+        if(value===null)
+          continue
+          
         target[targetField] = safeAdd(target[targetField], targetLanguage, value)
       }
         
       else if (!isLanguageNested && source[sourceLanguage] && (!ignoreNullValues || source[sourceLanguage][sourceField])){
-        const value = sanitizeHtml(source[sourceLanguage][sourceField], htmlSanitizeOpts)
+        let value = sanitizeHtml(source[sourceLanguage][sourceField], htmlSanitizeOpts)
+
+        if(typeof value === 'string' || value instanceof String){
+          value = value.trim();
+        
+          if(value==="")
+            continue;
+        }
+
+        if(value===null)
+          continue
+
         target[targetField] = safeAdd(target[targetField], targetLanguage, value)
       }
     }
