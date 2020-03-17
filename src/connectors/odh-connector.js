@@ -8,6 +8,11 @@ const ACTIVITY_PATH = 'Activity';
 const ACTIVITY_REDUCED_PATH = 'ActivityReduced';
 const SKIAREA_PATH = 'Skiarea';
 const SKIAREGION_PATH = 'Skiregion';
+const ODH_TAG_MAP = {
+  trails: 'ski alpin,ski alpin (rundkurs),rodelbahnen,loipen',
+  lifts: 'aufstiegsanlagen',
+  snowparks: 'snowpark'
+}
 
 const EVENT_SERIES_PATH = '../../data/event-series.data';
 
@@ -52,32 +57,6 @@ function fetchSnowparks (request) {
 
   return fetch(path, request, odh2ab.transformSnowparkArray)
 }
-
-// function fetchMockData (request, filePath) {
-//   const { page } = request.query;
-//   let pageSize = page && page.size ? page.size : 10;
-//   let pageNumber = page && page.number ? page.number : 1;
-
-//   res = loadMockDataFromFile({ pageSize, pageNumber }, filePath);
-
-//   if(!res.data || res.status!==200){
-//     console.log('ERROR: Resource not found!');
-//     throw errors.notFound;
-//   }
-
-//   console.log('OK: Mock data found for \'Event Series\'.\n');
-
-//   try {
-//     console.log('> Transforming data to the AlpineBits format...');
-//     const data = odh2ab.transformEventSeriesArray(res.data, request);
-//     console.log('OK: Sucessfully transformed data.\n');
-    
-//     return data;
-//   }
-//   catch(error) {
-//     handleTransformationError(error);
-//   }
-// }
 
 function fechMockData (request, filePath, transformFn) {
   res = loadMockDataFromFile(request, filePath);
@@ -265,10 +244,6 @@ async function fetchMountainArea(request, field) {
     const data = areaId ? odh2ab.transformMountainArea(res, request) : odh2ab.transformMountainAreaArray(res, request);
     console.log('OK: Sucessfully transformed data.\n');
 
-    // FIXME: Handle sub-resources
-    // if(field)
-    //   return { data: data[field], meta };
-
     return data;
   }
   catch(error) {
@@ -307,6 +282,25 @@ function fetchMountainSubResources(request, area, opts) {
       });
   })
 }
+
+function fetchMountainAreaDependentRelationship(request, transformFn) {
+  const id = request.params.id;
+  let basePath = id.includes('SKI') ? SKIAREA_PATH : SKIAREGION_PATH;
+  let path = `${basePath}/${id}`;
+
+  return fetch(path, request, transformFn);
+}
+
+function fetchMountainAreaIndependentRelationship(request, relationship, transformFn) {
+  const odhTag = ODH_TAG_MAP[relationship]
+  const areaId = request.params.id;
+  const id = areaId.includes('SKI') ? 'ska'+areaId : 'skr'+areaId;
+  let path = `${ACTIVITY_PATH}?odhtagfilter=${odhTag}&areafilter=${id}&pagesize=1000`
+  
+  return fetch(path, request, transformFn);
+}
+
+
 
 function handleConnectionError(error) {
   console.log(error);
@@ -362,11 +356,11 @@ module.exports = {
   fetchSnowparkMediaObjects: fetchResourceById(ACTIVITY_PATH, odh2ab.transformMultimediaDescriptionsRelationship),
   fetchMountainAreas: request => fetchMountainArea(request, null),
   fetchMountainAreaById: request => fetchMountainArea(request, null),
-  fetchMountainAreaMedia: request => fetchMountainArea(request, 'multimediaDescriptions'),
-  fetchMountainAreaOwner: request => fetchMountainArea(request, 'areaOwner'),
-  fetchMountainAreaLifts: request => fetchMountainArea(request, 'lifts'),
-  fetchMountainAreaTrails: request => fetchMountainArea(request, 'trails'),
-  fetchMountainAreaSnowparks: request => fetchMountainArea(request, 'snowparks'),
+  fetchMountainAreaMedia: request => fetchMountainAreaDependentRelationship(request, odh2ab.transformAreaMultimedDescriptionsRelationship),
+  fetchMountainAreaOwner: request => fetchMountainAreaDependentRelationship(request, odh2ab.transformAreaOwnerRelationship),
+  fetchMountainAreaLifts: request => fetchMountainAreaIndependentRelationship(request, 'lifts', odh2ab.transformLiftArray),
+  fetchMountainAreaTrails: request => fetchMountainAreaIndependentRelationship(request, 'trails', odh2ab.transformTrailArray),
+  fetchMountainAreaSnowparks: request => fetchMountainAreaIndependentRelationship(request, 'snowparks', odh2ab.transformSnowparkArray),
   fetchEventSeries: request => fechMockData(request, EVENT_SERIES_PATH, odh2ab.transformEventSeriesArray),
   fetchEventSeriesById: request => fechMockData(request, EVENT_SERIES_PATH, odh2ab.transformEventSeries),
   fetchEventSeriesMedia: request => fechMockData(request, EVENT_SERIES_PATH, odh2ab.transformMockMultimediaDescriptionsRelationship),

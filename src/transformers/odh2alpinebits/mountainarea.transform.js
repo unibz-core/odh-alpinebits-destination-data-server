@@ -75,9 +75,10 @@ const templates = require('./templates');
 const transformLift = require('./lift.transform');
 const transformTrail = require('./trail.transform');
 const transformSnowpark = require('./snowpark.transform');
-const { transformMediaObject } = require('./media-object.transform');
+const { transformMultimediaDescriptionsRelationship, 
+  transformMediaObject } = require('./media-object.transform');
 
-module.exports = (originalObject, included = {}, request) => {
+function transformMountainArea(originalObject, included = {}, request) {
   const source = JSON.parse(JSON.stringify(originalObject));
   let target = templates.createObject('MountainArea');
 
@@ -159,22 +160,10 @@ module.exports = (originalObject, included = {}, request) => {
     utils.addIncludedResource(included, copyrightOwner);
   }
 
-  if(source.SkiAreaMapURL) {
-    let map = templates.createObject('MediaObject');
-    map.id = target.id+'+map';
-    map.attributes.name = {
-      deu: 'Ski map of '+attributes.name.deu,
-      eng: 'Ski map of '+attributes.name.eng,
-      ita: 'Ski map of '+attributes.name.ita
-    };
-    map.attributes.url = source.SkiAreaMapURL,
-    map.attributes.contentType = 'image/jpg',
-    map.attributes.license = 'CC0-1.0'
-
+  let map = transformAreaMap(source, included, request);
+  if(map) {
     utils.addRelationshipToMany(relationships, 'multimediaDescriptions', map, links.self);
     utils.addIncludedResource(included, map);
-
-    Object.assign(map.links, utils.createSelfLink(map, request));
   }
 
   let { areaOwner, ownerLogo } = transformAreaOwner(source.ContactInfos, request);
@@ -212,7 +201,6 @@ module.exports = (originalObject, included = {}, request) => {
 }
 
 function transformAreaOwner(contactInfo, request){
-
   let areaOwner = templates.createObject('Agent');
   
   let idBaseAttributes = [ ['de','Email'],['it','Email'],['en','Email'],
@@ -222,6 +210,9 @@ function transformAreaOwner(contactInfo, request){
 
   areaOwner.id = shajs('sha256').update(idBase).digest('hex');
   
+  let links = areaOwner.links;
+  Object.assign(links, utils.createSelfLink(areaOwner, request));
+
   areaOwner.attributes.categories = ['alpinebits/organization'];
   areaOwner.attributes.url = utils.safeGetOne([['de','Url'],['it','Url'],['en','Url']], contactInfo);
   areaOwner.attributes.name = {
@@ -271,6 +262,52 @@ function transformAreaOwner(contactInfo, request){
   })
 }
 
+function transformAreaOwnerRelationship(sourceArea, included, request) {
+  let { areaOwner, ownerLogo } = transformAreaOwner(sourceArea.ContactInfos, request);
+  
+  if(ownerLogo)
+    utils.addIncludedResource(included, ownerLogo);
+
+  return areaOwner;
+}
+
+function transformAreaMultimedDescriptionsRelationship (sourceArea, included, request) {
+  let data = transformMultimediaDescriptionsRelationship(sourceArea, included, request);
+
+  if(!data)
+    data = [];
+
+  let map = transformAreaMap(sourceArea, included, request);  
+
+  if(map)
+    data.push(map);
+
+  if(!data)
+    return null;
+
+  return data;
+}
+
+function transformAreaMap(sourceArea, included, request) {
+  if(!sourceArea.SkiAreaMapURL) 
+    return null
+
+  let map = templates.createObject('MediaObject');
+  map.id = sourceArea.Id+'+map';
+  map.attributes.name = {
+    deu: 'Skikarte',
+    eng: 'Ski map',
+    ita: 'Mappa comprensorio sciistico'
+  };
+  map.attributes.url = sourceArea.SkiAreaMapURL,
+  map.attributes.contentType = 'image/jpg',
+  map.attributes.license = 'CC0-1.0'
+
+  Object.assign(map.links, utils.createSelfLink(map, request));
+
+  return map;
+}
+
 function conditionalTransform(originalObject, included, request, type, transformFn) {
   if(Object.keys(originalObject).join('')===['Id','Name'].join(''))
     return ({
@@ -278,12 +315,18 @@ function conditionalTransform(originalObject, included, request, type, transform
       id: originalObject.Id,
       attributes: {
         name: {
-          deu: object.Name,
-          ita: object.Name,
-          eng: object.Name
+          deu: originalObject.Name,
+          ita: originalObject.Name,
+          eng: originalObject.Name
         }
       }
     })
 
   return transformFn(originalObject, included, request);
+}
+
+module.exports = {
+  transformMountainArea,
+  transformAreaOwnerRelationship,
+  transformAreaMultimedDescriptionsRelationship
 }

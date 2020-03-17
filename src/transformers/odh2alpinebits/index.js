@@ -2,11 +2,13 @@ const transformEvent = require('./event.transform');
 const { transformOrganizersRelationship } = require('./organizer.transform');
 const { transformPublisherRelationship } = require('./publisher.transform');
 const { transformVenuesRelationship } = require('./venue.transform');
-const { transformMockMultimediaDescriptionsRelationship } = require('./media-object.transform');
+const { transformMockMultimediaDescriptionsRelationship, 
+  transformMultimediaDescriptionsRelationship } = require('./media-object.transform');
 const transformLift = require('./lift.transform');
 const transformTrail = require('./trail.transform');
 const transformSnowpark = require('./snowpark.transform');
-const transformMountainArea = require('./mountainarea.transform');
+const { transformAreaMultimedDescriptionsRelationship, 
+  transformMountainArea, transformAreaOwnerRelationship } = require('./mountainarea.transform');
 const transformEventSeries = require('./event-series.transform');
 
 function transformArray(odhData, request, transformFn) {
@@ -59,11 +61,20 @@ function transformObject(odhData, request, transformFn) {
   if(data){
     selectFields(data, request);
     const included = createIncludedArray(data, includedMap, request);
+    
     if(included){
       selectFields(included, request);
       response.included = included;
     }
+
+    if(data.length > 0)
+      response.meta = {
+        count: data.length,
+        pages: 1
+      };
   }
+
+  
   return response;
 }
 
@@ -219,5 +230,12 @@ module.exports = {
   transformOrganizersRelationship: (odhData, request) => transformObject(odhData, request, transformOrganizersRelationship),
   transformPublisherRelationship: (odhData, request) => transformObject(odhData, request, transformPublisherRelationship),
   transformVenuesRelationship: (odhData, request) => transformObject(odhData, request, transformVenuesRelationship),
-  transformMockMultimediaDescriptionsRelationship: (odhData, request) => transformObject(odhData, request, transformMockMultimediaDescriptionsRelationship),
+  transformAreaOwnerRelationship: (odhData, request) => transformObject(odhData, request, transformAreaOwnerRelationship),
+  transformAreaMultimedDescriptionsRelationship: 
+    (odhData, request) => transformObject(odhData, request, transformAreaMultimedDescriptionsRelationship),
+  transformMultimediaDescriptionsRelationship: 
+    (odhData, request) => transformObject(odhData, request, transformMultimediaDescriptionsRelationship),
+  transformMockMultimediaDescriptionsRelationship: 
+    (odhData, request) => transformObject(odhData, request, transformMockMultimediaDescriptionsRelationship),
+
 }
