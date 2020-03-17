@@ -4,7 +4,7 @@ module.exports = [
     type: "eventSeries",
     id: "0",
     meta: {
-      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      lastUpdate: "2020-04-01T00:00:00.00+01:00",
       dataProvider: "http://tourism.opendatahub.bz.it/"
     },
     links: {
@@ -107,7 +107,7 @@ module.exports = [
     type: "eventSeries",
     id: "1",
     meta: {
-      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      lastUpdate: "2020-04-01T00:00:00.00+01:00",
       dataProvider: "http://tourism.opendatahub.bz.it/"
     },
     links: {
@@ -134,7 +134,7 @@ module.exports = [
     type: "eventSeries",
     id: "2",
     meta: {
-      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      lastUpdate: "2020-04-01T00:00:00.00+01:00",
       dataProvider: "http://tourism.opendatahub.bz.it/"
     },
     links: {
@@ -161,7 +161,7 @@ module.exports = [
     type: "eventSeries",
     id: "3",
     meta: {
-      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      lastUpdate: "2020-04-01T00:00:00.00+01:00",
       dataProvider: "http://tourism.opendatahub.bz.it/"
     },
     links: {
@@ -188,7 +188,7 @@ module.exports = [
     type: "eventSeries",
     id: "4",
     meta: {
-      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      lastUpdate: "2020-04-01T00:00:00.00+01:00",
       dataProvider: "http://tourism.opendatahub.bz.it/"
     },
     links: {
@@ -215,7 +215,7 @@ module.exports = [
     type: "eventSeries",
     id: "5",
     meta: {
-      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      lastUpdate: "2020-04-01T00:00:00.00+01:00",
       dataProvider: "http://tourism.opendatahub.bz.it/"
     },
     links: {
@@ -242,7 +242,7 @@ module.exports = [
     type: "eventSeries",
     id: "6",
     meta: {
-      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      lastUpdate: "2020-04-01T00:00:00.00+01:00",
       dataProvider: "http://tourism.opendatahub.bz.it/"
     },
     links: {
@@ -269,7 +269,7 @@ module.exports = [
     type: "eventSeries",
     id: "7",
     meta: {
-      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      lastUpdate: "2020-04-01T00:00:00.00+01:00",
       dataProvider: "http://tourism.opendatahub.bz.it/"
     },
     links: {
@@ -296,7 +296,7 @@ module.exports = [
     type: "eventSeries",
     id: "8",
     meta: {
-      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      lastUpdate: "2020-04-01T00:00:00.00+01:00",
       dataProvider: "http://tourism.opendatahub.bz.it/"
     },
     links: {
@@ -323,7 +323,7 @@ module.exports = [
     type: "eventSeries",
     id: "9",
     meta: {
-      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      lastUpdate: "2020-04-01T00:00:00.00+01:00",
       dataProvider: "http://tourism.opendatahub.bz.it/"
     },
     links: {
@@ -350,7 +350,7 @@ module.exports = [
     type: "eventSeries",
     id: "10",
     meta: {
-      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      lastUpdate: "2020-04-01T00:00:00.00+01:00",
       dataProvider: "http://tourism.opendatahub.bz.it/"
     },
     links: {
@@ -377,7 +377,7 @@ module.exports = [
     type: "eventSeries",
     id: "11",
     meta: {
-      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      lastUpdate: "2020-04-01T00:00:00.00+01:00",
       dataProvider: "http://tourism.opendatahub.bz.it/"
     },
     links: {
@@ -404,7 +404,7 @@ module.exports = [
     type: "eventSeries",
     id: "12",
     meta: {
-      lastUpdate: "2020-04-01T00:00:00.00+02:00",
+      lastUpdate: "2020-04-01T00:00:00.00+01:00",
       dataProvider: "http://tourism.opendatahub.bz.it/"
     },
     links: {

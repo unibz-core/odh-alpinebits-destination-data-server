@@ -182,7 +182,7 @@ function transformMetadata(source) {
   meta = {};
   
   if(typeof source.LastChange === 'string' || source.LastChange instanceof String){
-    meta.lastUpdate = source.LastChange.replace(/Z/g,'')+'+02:00';
+    meta.lastUpdate = source.LastChange.replace(/Z/g,'')+'+01:00';
   }
   meta.dataProvider = "http://tourism.opendatahub.bz.it/";
   return meta;

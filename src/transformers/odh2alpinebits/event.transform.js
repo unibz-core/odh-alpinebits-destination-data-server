@@ -122,8 +122,8 @@ function transformDates(sourceEvent) {
     target.endDate = lastDate.To.replace(/T.*/,'T'+lastDate.End);
   }
 
-  target.startDate += '+02:00'
-  target.endDate += '+02:00'
+  target.startDate += '+01:00'
+  target.endDate += '+01:00'
 
   return target;
 }
