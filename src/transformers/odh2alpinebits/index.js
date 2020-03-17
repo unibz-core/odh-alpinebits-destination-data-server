@@ -22,9 +22,13 @@ function transformArray(odhData, request, transformFn) {
   const { meta, links } = createPaginationObjects(odhData, request);
 
   let response = {
+    jsonapi: {
+      version: "1.0"
+    },
     meta,
     links,
-    data: data.length>0 ? data : null
+    data: data.length>0 ? data : null,
+    included: null
   }
 
   const included = createIncludedArray(data, includedMap, request);
@@ -41,10 +45,15 @@ function transformObject(odhData, request, transformFn) {
   
   let data = transformFn(odhData, includedMap, request);
   let response = {
+    jsonapi: {
+      version: "1.0"
+    },
+    meta: null,
     links: {
       self: request.selfUrl
     },
-    data
+    data,
+    included: null
   }
 
   if(data){
