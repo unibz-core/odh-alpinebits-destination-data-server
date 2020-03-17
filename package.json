@@ -4,7 +4,7 @@
   "scripts": {
     "dev-server": "nodemon src/server.js",
     "server": "node src/server.js",
-    "test": "jest test/snowparks.test.js"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
