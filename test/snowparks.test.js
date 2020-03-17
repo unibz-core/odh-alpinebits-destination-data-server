@@ -3,7 +3,7 @@ const { basicRouteTests } = require('./route.test');
 const { basicSchemaTests } = require('./route.schema.test');
 
 const validator = require('../src/validator');
-const validate = validator.validateSnowparksArray;
+const validate = validator.validateSnowparkArray;
 
 let opts = {
   route: 'snowparks',
@@ -13,8 +13,8 @@ let opts = {
   schema: {
     validate,
     pageStart: 1,
-    pageEnd: 10,
-    pageSize: 50
+    pageEnd: 2,
+    pageSize: 20
   }
 }
 

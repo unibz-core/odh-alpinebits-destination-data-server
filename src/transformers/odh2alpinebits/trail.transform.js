@@ -102,8 +102,8 @@ module.exports = (originalObject, included = {}, request) => {
 
   attributes.length = source.DistanceLength > 0 ? source.DistanceLength : null;
 
-  attributes.minAltitude = source.AltitudeLowestPoint;
-  attributes.maxAltitude = source.AltitudeHighestPoint;
+  attributes.minAltitude = source.AltitudeLowestPoint || null;
+  attributes.maxAltitude = source.AltitudeHighestPoint || null;
 
   const difficultyMapping = {
     '2': 'beginner',

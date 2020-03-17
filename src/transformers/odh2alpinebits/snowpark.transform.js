@@ -86,8 +86,8 @@ module.exports = (originalObject, included = {}, request) => {
   let attributes = target.attributes;
   Object.assign(attributes, utils.transformBasicProperties(source));
 
-  attributes.minAltitude = source.AltitudeLowestPoint;
-  attributes.maxAltitude = source.AltitudeHighestPoint;
+  attributes.minAltitude = source.AltitudeLowestPoint || null;
+  attributes.maxAltitude = source.AltitudeHighestPoint || null;
 
   let categories = [];
   source.SmgTags.forEach(tag => 
