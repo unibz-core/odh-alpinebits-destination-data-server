@@ -342,64 +342,6 @@ function transformGeometry(gpsInfo, infoKeys, gpsPoints, gpsTrack){
 
   return geometry;
 }
-// TODO: removeBaseLink
-function transformMediaObject(source, baseLink, request) {
-  let mediaObject = templates.createObject('MediaObject');
-  let attributes = mediaObject.attributes;
-  let relationships = mediaObject.relationships;
-
-  const match = source.ImageUrl.match(/ID=(.*)/i);
-  mediaObject.id = match.length>=2 ? match[1] : source.ImageUrl;
-  
-  let links = mediaObject.links;
-  Object.assign(links, createSelfLink(mediaObject, request));
-
-  /**
-   * 
-   *  ATTRIBUTES
-   * 
-   */
-
-  attributes.contentType = 'image/jpeg'
-
-  // ['Width','width'], ['Height','height']
-  const imageFieldMapping = [ ['ImageUrl','url'], ['License','license'] ];
-
-  const imageValueMapping = {
-    License: {
-      'CC0': 'CC0-1.0',
-      'CC1': 'CC1-1.0'
-    }
-  }
-
-  transformFields(source, attributes, imageFieldMapping, imageValueMapping);
-
-  // ['ImageTitle', 'name']
-  const imageMultilingualFieldMapping = [ ['ImageDesc', 'description'] ];
-
-  transformMultilingualFields(source, attributes, imageMultilingualFieldMapping, true);
-
-  /**
-   * 
-   *  RELATIONSHIPS
-   * 
-   */
-
-  const copyrightOwner = templates.createObject('Agent');
-  copyrightOwner.id = shajs('sha256').update(source.CopyRight).digest('hex');
-  copyrightOwner.attributes.name = {
-    deu: source.CopyRight,
-    eng: source.CopyRight,
-    ita: source.CopyRight
-  };
-  
-  addRelationshipToOne(relationships, 'copyrightOwner', copyrightOwner, links.self)
-
-  return ({ 
-    mediaObject,
-    copyrightOwner
-  });
-}
 
 function isClockwise(poly) {
     var sum = 0
@@ -444,6 +386,5 @@ module.exports = {
   transformOperationSchedule,
   transformHowToArrive,
   transformAddress,
-  transformGeometry,
-  transformMediaObject
+  transformGeometry
 }

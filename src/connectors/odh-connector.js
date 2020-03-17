@@ -150,15 +150,6 @@ function fetchResourceById(resource, transform) {
   );
 }
 
-function fetchSubResource(resource, transform, field) {
-  return (
-    function(request) {
-      let path = resource+'/'+request.params.id;
-      return fetch(path, request, transform, field);
-    }
-  );
-}
-
 /*
 transform(openDataHubObject): a function to transform an OpenDataHub response into the AlpineBits format
   input: an object retrieved from the OpenDataHub API
@@ -351,15 +342,15 @@ function getPaginationQuery(request) {
 module.exports = {
   fetchEvents,
   fetchEventById: fetchResourceById(EVENT_PATH, odh2ab.transformEvent),
-  fetchEventPublisher: fetchSubResource(EVENT_PATH, odh2ab.transformEvent, 'publisher'),
-  fetchEventMediaObjects: fetchSubResource(EVENT_PATH, odh2ab.transformEvent, 'multimediaDescriptions'),
-  fetchEventOrganizers: fetchSubResource(EVENT_PATH, odh2ab.transformEvent, 'organizers'),
-  fetchEventVenues: fetchSubResource(EVENT_PATH, odh2ab.transformEvent, 'venues'),
+  fetchEventPublisher: fetchResourceById(EVENT_PATH, odh2ab.transformPublisherRelationship),
+  fetchEventMediaObjects: fetchResourceById(EVENT_PATH, odh2ab.transformMultimediaDescriptionsRelationship),
+  fetchEventOrganizers: fetchResourceById(EVENT_PATH, odh2ab.transformOrganizersRelationship),
+  fetchEventVenues: fetchResourceById(EVENT_PATH, odh2ab.transformVenuesRelationship),
   fetchLifts,
   fetchLiftById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformLift),
   fetchTrails,
   fetchTrailById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformTrail),
-  fetchTrailMediaObjects: fetchSubResource(ACTIVITY_PATH, odh2ab.transformTrail, 'multimediaDescriptions'),
+  fetchTrailMediaObjects: fetchResourceById(ACTIVITY_PATH, odh2ab.transformTrail),
   fetchSnowparks,
   fetchSnowparkById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformSnowpark),
   fetchMountainAreas: request => fetchMountainArea(request, null),

@@ -1,15 +1,19 @@
 const shajs = require('sha.js')
 const utils = require('./utils');
 const templates = require('./templates');
+const { transformOrganizer } = require('./organizer.transform');
+const { transformPublisher } = require('./publisher.transform');
+const { transformVenue } = require('./venue.transform');
+const { transformMediaObject } = require('./media-object.transform');
 
 module.exports = (originalObject, included = {}, request) => {
-  const source = JSON.parse(JSON.stringify(originalObject));
+  const sourceEvent = JSON.parse(JSON.stringify(originalObject));
   let target = templates.createObject('Event');
 
-  target.id = source.Id;
+  target.id = sourceEvent.Id;
 
   let meta = target.meta;
-  Object.assign(meta, utils.transformMetadata(source));
+  Object.assign(meta, utils.transformMetadata(sourceEvent));
 
   let links = target.links;
   Object.assign(links, utils.createSelfLink(target, request));
@@ -21,8 +25,8 @@ module.exports = (originalObject, included = {}, request) => {
    */
 
   let attributes = target.attributes;
-  Object.assign(attributes, utils.transformBasicProperties(source));
-  Object.assign(attributes, transformDates(source));
+  Object.assign(attributes, utils.transformBasicProperties(sourceEvent));
+  Object.assign(attributes, transformDates(sourceEvent));
 
   attributes.status = 'published';
 
@@ -44,7 +48,7 @@ module.exports = (originalObject, included = {}, request) => {
   // }
   let categories = [];
   
-  source.Topics.forEach(topic => {
+  sourceEvent.Topics.forEach(topic => {
     
     // if(categoryMapping[tag])
     //   categories.push(categoryMapping[tag]);
@@ -65,24 +69,24 @@ module.exports = (originalObject, included = {}, request) => {
   let relationships = target.relationships;
   
   // Venue
-  let newVenue = transformVenue(source, request);
-  utils.addRelationshipToMany(relationships, 'venues', newVenue, links.self);
-  utils.addIncludedResource(included, newVenue);
+  let venue = transformVenue(sourceEvent, included, request);
+  utils.addRelationshipToMany(relationships, 'venues', venue, links.self);
+  utils.addIncludedResource(included, venue);
   
   
   // Organizer
-  let newOrganizer = transformOrganizer(source, request)
-  utils.addRelationshipToMany(relationships, 'organizers', newOrganizer, links.self);
-  utils.addIncludedResource(included, newOrganizer);
+  let organizer = transformOrganizer(sourceEvent, included, request)
+  utils.addRelationshipToMany(relationships, 'organizers', organizer, links.self);
+  utils.addIncludedResource(included, organizer);
 
   // Publisher
-  let newPublisher = transformPublisher(request);
-  utils.addRelationshipToOne(relationships, 'publisher', newPublisher, links.self);
-  utils.addIncludedResource(included, newPublisher);
+  let publisher = transformPublisher(sourceEvent, included, request);
+  utils.addRelationshipToOne(relationships, 'publisher', publisher, links.self);
+  utils.addIncludedResource(included, publisher);
 
   // Media Objects
-  for (image of source.ImageGallery){
-    const { mediaObject, copyrightOwner } = utils.transformMediaObject(image, links, request);
+  for (image of sourceEvent.ImageGallery){
+    const { mediaObject, copyrightOwner } = transformMediaObject(image, links, request);
     utils.addRelationshipToMany(relationships, 'multimediaDescriptions', mediaObject, links.self);
     utils.addIncludedResource(included, mediaObject);
     utils.addIncludedResource(included, copyrightOwner);
@@ -91,28 +95,28 @@ module.exports = (originalObject, included = {}, request) => {
   return target;
 }
 
-function transformDates(source) {
+function transformDates(sourceEvent) {
   let target = {}
 
-  if(!source.EventDate || source.EventDate.length==0) {
+  if(!sourceEvent.EventDate || sourceEvent.EventDate.length==0) {
     const mapping = [ ['DateBegin','startDate'], ['DateEnd','endDate'] ]
-    utils.transformFields(source, target, mapping);
+    utils.transformFields(sourceEvent, target, mapping);
   }
-  else if(source.EventDate && source.EventDate.length===1) {
-    const date = source.EventDate[0];
+  else if(sourceEvent.EventDate && sourceEvent.EventDate.length===1) {
+    const date = sourceEvent.EventDate[0];
     target.startDate = date.From.replace(/T.*/,'T'+date.Begin);
     target.endDate = date.To.replace(/T.*/,'T'+date.End);
   }
   else {
-    let dateList = source.EventDate.map( (entry, idx) => {
+    let dateList = sourceEvent.EventDate.map( (entry, idx) => {
       const startDateTime = entry.From.replace(/T.*/,'T'+entry.Begin);
       return { date: new Date(startDateTime).getTime(), index: idx};
     })
 
     dateList.sort((a, b) => (a.date > b.date) ? 1 : -1);
 
-    const firstDate = source.EventDate[dateList.shift().index];
-    const lastDate = source.EventDate[dateList.pop().index];
+    const firstDate = sourceEvent.EventDate[dateList.shift().index];
+    const lastDate = sourceEvent.EventDate[dateList.pop().index];
 
     target.startDate = firstDate.From.replace(/T.*/,'T'+firstDate.Begin);
     target.endDate = lastDate.To.replace(/T.*/,'T'+lastDate.End);
@@ -122,195 +126,4 @@ function transformDates(source) {
   target.endDate += '+02:00'
 
   return target;
-}
-
-function transformPublisher(request) {
-  let publisher = templates.createObject('Agent');
-  
-  publisher.id = shajs('sha256').update('lts').digest('hex'),
-  publisher.attributes.name = {
-    deu: "LTS - Landesverband der Tourismusorganisationen Südtirols",
-    eng: "LTS - Landesverband der Tourismusorganisationen Südtirols",
-    ita: "LTS - Landesverband der Tourismusorganisationen Südtirols"
-  };
-  publisher.attributes.url = "https://lts.it";
-
-  let links = publisher.links;
-  Object.assign(links, utils.createSelfLink(publisher, request));
-  
-  return publisher;
-}
-
-function transformOrganizer(source, request) {
-  
-  let organizer = source.OrganizerInfos;
-  let contact = source.ContactInfos;
-
-  if(!organizer)
-    return null;
-
-  let newOrganizer = templates.createObject('Agent');
-  let attributes = newOrganizer.attributes;
-
-  const organizerMapping = [['Url','url']];
-  utils.transformMultilingualFields(organizer, attributes, organizerMapping, false, true);
-
-  let newContact = templates.createObject('ContactPoint');
-  attributes.contactPoints = [ newContact ];
-
-  let organizerAddress = templates.createObject('Address');
-  newContact.address = organizerAddress;
-
-  const addressMapping = [['Address','street'], ['City','city'], ['ZipCode','zipcode']];
-  utils.transformMultilingualFields(organizer, organizerAddress, addressMapping, false);
-  organizerAddress.zipcode = utils.safeGetOne([['zipcode','ita'],['zipcode','eng'],['zipcode','deu']], organizerAddress);
-  organizerAddress.country = 'IT';
-  
-  let inferredType = {
-    error: 0,
-    organization: 0,
-    person: 0
-  };
-
-
-
-  for (languageEntry of utils.languageMapping) {
-    let [sourceLanguage, targetLanguage] = languageEntry;
-    
-    const sourceOrganizer = organizer[sourceLanguage];
-
-    if(sourceOrganizer) {
-      let phonenumber = utils.safeGetString(['Phonenumber'], sourceOrganizer);
-      newContact.telephone = newContact.telephone || phonenumber;
-
-      const email = utils.safeGetString(['Email'], sourceOrganizer);
-      newContact.email = newContact.email || email;
-
-      const orgId =  utils.safeGetString(['Tax'], sourceOrganizer) ||  utils.safeGetString(['Vat'], sourceOrganizer) || email;
-      newOrganizer.id = newOrganizer.id || orgId;
-
-      // const ignoreValues = ['Undefiniert','!','-','.','sonstige'];
-      const ignoreValues = [];
-      const companyName = utils.safeGetString(['CompanyName'], sourceOrganizer);
-      const givenName = utils.safeGetString(['Givenname'], sourceOrganizer);
-      const surname = utils.safeGetString(['Surname'], sourceOrganizer); 
-
-      const isValidCompanyName = companyName && !ignoreValues.includes(companyName);
-      const isValidGivenName = givenName && !ignoreValues.includes(givenName);
-      const isValidSurname = surname && !ignoreValues.includes(surname);
-
-      if(!isValidCompanyName && !isValidGivenName && !isValidSurname) {
-        inferredType.error++;
-      }
-      else if(isValidCompanyName) {
-        inferredType.organization++;
-        attributes.name = utils.safeAdd(attributes.name, targetLanguage, companyName);
-      }
-      else if ((isValidGivenName || isValidSurname) && !(isValidGivenName && isValidSurname)){
-        if(isValidSurname){
-          inferredType.organization++;
-          attributes.name = utils.safeAdd(attributes.name, targetLanguage, surname);
-        }
-        else {
-          inferredType.organization++;
-          attributes.name = utils.safeAdd(attributes.name, targetLanguage, givenName);
-        }
-      }
-      else {
-        inferredType.person++;
-        attributes.name = utils.safeAdd(attributes.name, targetLanguage, givenName+' '+surname);
-      }
-    }
-  }
-
-  // TODO: Decide how to handle the case in which we cannot infer whether the organizer is a person or an organization. We are currently setting the organizer to be an organization
-  attributes.categories = !inferredType.organization && inferredType.person ? ['alpinebits/person'] : ['alpinebits/organization']
-
-  //If email and telephone number are not specified in organizer, try to get it from the ContactInfos field.
-  // TODO: improve this part of the code. Too many duplicates...
-  if(!newOrganizer.id)
-    newOrganizer.id = source.Id+"+organizer";
-  
-  let links = newOrganizer.links;
-  Object.assign(links, utils.createSelfLink(newOrganizer, request));
-
-  if(!newOrganizer.attributes.name)
-    newOrganizer.attributes.name = {
-      "eng": "Unnamed organizer"
-    };
-  
-  if(!newContact.email)
-    newContact.email = utils.safeGetOne([['de','Email'],['it','Email'],['en','Email']], contact);
-
-  if(!newContact.telephone)
-    newContact.telephone = utils.safeGetOne([['de','Phonenumber'],['it','Phonenumber'],['en','Phonenumber']], contact);
-
-  if(!newContact.address.city || !newContact.address.country)
-    newContact.address = null;
-
-  if(!newContact.email && !newContact.telephone && !newContact.address)
-    attributes.contactPoints = null;
-
-  return newOrganizer;
-}
-
-function transformVenue(source, request) {
-  let venue = templates.createObject('Venue');
-  venue.id = source.Id+'+location';
-  
-  let links = venue.links;
-  Object.assign(links, utils.createSelfLink(venue, request));
-
-  /**
-   * 
-   *  ATTRIBUTES
-   * 
-   */
-  let attributes = venue.attributes;
-
-  const fieldMapping = [ ['Location', 'name'] ];
-  utils.transformMultilingualFields(source.EventAdditionalInfos, attributes, fieldMapping, false);
-
-  if(!attributes.name)
-    attributes.name = {
-      "eng": "Unnamed venue"
-    };
-
-  let address = templates.createObject('Address');
-  attributes.address = address;
-
-  if(source.ContactInfos) {
-    const addressFieldMapping = [
-      ['Address', 'street'],
-      ['City', 'city'],
-      ['ZipCode', 'zipcode'],
-    ];
-    utils.transformMultilingualFields(source.ContactInfos, address, addressFieldMapping, false);
-    address.zipcode = utils.safeGetOne([['zipcode','ita'],['zipcode','eng'],['zipcode','deu']], address);
-    address.country = 'IT';
-    
-    if(!address.city)
-      address.city = {
-        eng: "Missing city!!! FIX ME!"
-      }
-  }
-
-  if(source.Latitude && source.Longitude) {
-    let point = templates.createObject('Point');
-    attributes.geometries = [point];
-    
-    point.coordinates.push(source.Latitude);
-    point.coordinates.push(source.Longitude);
-
-    if(source.Altitude)
-      point.coordinates.push(source.Altitude);
-  }
-
-  /**
-   * 
-   *  RELATIONSHIPS: No relationship is transformed
-   * 
-   */
-
-  return venue;
 }

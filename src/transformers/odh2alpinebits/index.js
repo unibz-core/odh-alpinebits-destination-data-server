@@ -1,4 +1,8 @@
 const transformEvent = require('./event.transform');
+const { transformOrganizersRelationship } = require('./organizer.transform');
+const { transformPublisherRelationship } = require('./publisher.transform');
+const { transformVenuesRelationship } = require('./venue.transform');
+const { transformMultimediaDescriptionsRelationship } = require('./media-object.transform');
 const transformLift = require('./lift.transform');
 const transformTrail = require('./trail.transform');
 const transformSnowpark = require('./snowpark.transform');
@@ -202,6 +206,11 @@ module.exports = {
   transformMountainArea: (odhData, request) => transformObject(odhData, request, transformMountainArea),
   transformEventSeriesArray: (odhData, request) => transformArray(odhData, request, transformEventSeries),
   transformEventSeries: (odhData, request) => transformObject(odhData, request, transformEventSeries),
+  
+  transformOrganizersRelationship: (odhData, request) => transformObject(odhData, request, transformOrganizersRelationship),
+  transformPublisherRelationship: (odhData, request) => transformObject(odhData, request, transformPublisherRelationship),
+  transformVenuesRelationship: (odhData, request) => transformObject(odhData, request, transformVenuesRelationship),
+  transformMultimediaDescriptionsRelationship: (odhData, request) => transformObject(odhData, request, transformMultimediaDescriptionsRelationship),
 }
 
 //FIXME: eventSeries not working
