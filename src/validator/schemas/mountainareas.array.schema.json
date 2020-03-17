@@ -1234,10 +1234,10 @@
                   "$ref": "#/definitions/optionalNonZeroPositiveInteger"
                 },
                 "maxAltitude": {
-                  "$ref": "#/definitions/optionalNonZeroPositiveInteger"
+                  "$ref": "#/definitions/optionalPositiveInteger"
                 },
                 "minAltitude": {
-                  "$ref": "#/definitions/optionalNonZeroPositiveInteger"
+                  "$ref": "#/definitions/optionalPositiveInteger"
                 },
                 "openingHours": {
                   "$ref": "#/definitions/hoursSpecifications"
@@ -1708,10 +1708,10 @@
                   "$ref": "#/definitions/text"
                 },
                 "maxAltitude": {
-                  "$ref": "#/definitions/optionalNonZeroPositiveInteger"
+                  "$ref": "#/definitions/optionalPositiveInteger"
                 },
                 "minAltitude": {
-                  "$ref": "#/definitions/optionalNonZeroPositiveInteger"
+                  "$ref": "#/definitions/optionalPositiveInteger"
                 },
                 "openingHours": {
                   "$ref": "#/definitions/hoursSpecifications"
@@ -1719,7 +1719,7 @@
                 "snowCondition": {
                   "$ref": "#/definitions/snowCondition"
                 },
-                "totalParkArea": {
+                "totalParkLength": {
                   "$ref": "#/definitions/optionalNonZeroPositiveInteger"
                 },
                 "totalTrailLength": {
@@ -1735,7 +1735,7 @@
                 "minAltitude",
                 "openingHours",
                 "snowCondition",
-                "totalParkArea",
+                "totalParkLength",
                 "totalTrailLength"
               ]
             }
@@ -2340,10 +2340,10 @@
                   "$ref": "#/definitions/optionalNonZeroPositiveInteger"
                 },
                 "maxAltitude": {
-                  "$ref": "#/definitions/optionalNonZeroPositiveInteger"
+                  "$ref": "#/definitions/optionalPositiveInteger"
                 },
                 "minAltitude": {
-                  "$ref": "#/definitions/optionalNonZeroPositiveInteger"
+                  "$ref": "#/definitions/optionalPositiveInteger"
                 },
                 "openingHours": {
                   "$ref": "#/definitions/hoursSpecifications"
@@ -2607,10 +2607,10 @@
                   "$ref": "#/definitions/optionalNonZeroPositiveInteger"
                 },
                 "maxAltitude": {
-                  "$ref": "#/definitions/optionalNonZeroPositiveInteger"
+                  "$ref": "#/definitions/optionalPositiveInteger"
                 },
                 "minAltitude": {
-                  "$ref": "#/definitions/optionalNonZeroPositiveInteger"
+                  "$ref": "#/definitions/optionalPositiveInteger"
                 },
                 "openingHours": {
                   "$ref": "#/definitions/hoursSpecifications"

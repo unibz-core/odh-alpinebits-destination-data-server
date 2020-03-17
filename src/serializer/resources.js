@@ -111,7 +111,7 @@ const MOUNTAIN_AREA = {
   opts: {
     ...DEFAULT_OPTS,
     attributes: [...BASIC_ATTR,
-      'address','geometries','howToArrive','openingHours','area','minAltitude','maxAltitude','totalTrailLength','totalParkArea',
+      'address','geometries','howToArrive','openingHours','area','minAltitude','maxAltitude','totalTrailLength','totalParkLength',
       'multimediaDescriptions','areaOwner','connections','lifts','snowparks','trails','subAreas'],
     areaOwner: AGENT.opts,
     multimediaDescriptions: MEDIA_OBJECT.opts,

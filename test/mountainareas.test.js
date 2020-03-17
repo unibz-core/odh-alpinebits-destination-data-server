@@ -3,7 +3,7 @@ const { basicRouteTests } = require('./route.test');
 const validator = require('../src/validator');
 const { basicSchemaTests } = require('./route.schema.test');
 
-const validate = validator.validateMountainAreasArray;
+const validate = validator.validateMountainAreaArray;
 
 let opts = {
   pageSize: 2,
@@ -39,11 +39,11 @@ let opts = {
   schema: {
     validate,
     pageStart: 1,
-    pageEnd: 10,
-    pageSize: 50
+    pageEnd: 2,
+    pageSize: 10
   }
 }
 
-// basicRouteTests(opts);
-// basicResourceRouteTests(opts);
+basicRouteTests(opts);
+basicResourceRouteTests(opts);
 basicSchemaTests(opts);

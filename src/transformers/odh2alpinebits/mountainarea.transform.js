@@ -100,9 +100,9 @@ module.exports = (originalObject, included = {}, request) => {
   attributes.howToArrive = utils.transformHowToArrive(source.Detail);
   attributes.address = utils.transformAddress(source.ContactInfos, ['city','country','zipcode']);
 
-  attributes.minAltitude = source.AltitudeFrom;
-  attributes.maxAltitude = source.AltitudeTo;
-  attributes.totalTrailLength = parseInt(source.TotalSlopeKm);
+  attributes.minAltitude = source.AltitudeFrom || null;
+  attributes.maxAltitude = source.AltitudeTo || null;
+  attributes.totalTrailLength = parseInt(source.TotalSlopeKm) || null;
 
   attributes.openingHours = utils.transformOperationSchedule(source.OperationSchedule);
 
@@ -228,12 +228,20 @@ function transformAreaOwner(contactInfo, request){
     ita: utils.safeGet(['it','CompanyName'], contactInfo),
     eng: utils.safeGet(['en','CompanyName'], contactInfo),
   };
-  areaOwner.attributes.contacts = [{
-    ...templates.createObject('ContactPoint'),
-    email: utils.safeGetOne([['de','Email'],['it','Email'],['en','Email']], contactInfo),
-    telephone: utils.safeGetOne([['de','Phonenumber'],['it','Phonenumber'],['en','Phonenumber']], contactInfo),
-    address: utils.transformAddress(contactInfo, ['street','city','country','zipcode'])
-  }];
+
+  let contactPoint = templates.createObject('ContactPoint');
+  contactPoint.email = utils.safeGetOne([['de','Email'],['it','Email'],['en','Email']], contactInfo);
+  contactPoint.telephone = utils.safeGetOne([['de','Phonenumber'],['it','Phonenumber'],['en','Phonenumber']], contactInfo);
+  contactPoint.address = utils.transformAddress(contactInfo, ['street','city','country','zipcode']);
+
+  if(contactPoint.address && (!contactPoint.address.city || !contactPoint.address.country))
+    contactPoint.address = null;
+
+  if(!contactPoint.email && !contactPoint.telephone && !contactPoint.address)
+    contactPoint = null;
+
+  if(contactPoint)
+    areaOwner.attributes.contactPoints = [ contactPoint ];
 
   let ownerLogo;
   let logoUrl = utils.safeGetOne([['de','LogoUrl'],['it','LogoUrl'],['en','LogoUrl']], contactInfo);
@@ -251,9 +259,9 @@ function transformAreaOwner(contactInfo, request){
     ownerLogo.attributes.contentType = 'image/jpg';
     ownerLogo.attributes.license = 'CC0-1.0';
 
-    utils.addRelationshipToMany(areaOwner.relationships, 'multimediaDescriptions', ownerLogo, areaOwner.links.self);
     Object.assign(areaOwner.links, utils.createSelfLink(areaOwner, request));
     Object.assign(ownerLogo.links, utils.createSelfLink(ownerLogo, request));
+    utils.addRelationshipToMany(areaOwner.relationships, 'multimediaDescriptions', ownerLogo, areaOwner.links.self);
   }
 
   return ({

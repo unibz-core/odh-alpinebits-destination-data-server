@@ -1711,7 +1711,7 @@
                 "snowCondition": {
                   "$ref": "#/definitions/snowCondition"
                 },
-                "totalParkArea": {
+                "totalParkLength": {
                   "$ref": "#/definitions/optionalNonZeroPositiveInteger"
                 },
                 "totalTrailLength": {
@@ -1727,7 +1727,7 @@
                 "minAltitude",
                 "openingHours",
                 "snowCondition",
-                "totalParkArea",
+                "totalParkLength",
                 "totalTrailLength"
               ]
             }

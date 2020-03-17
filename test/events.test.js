@@ -2,7 +2,7 @@ const { basicRouteTests } = require('./route.test');
 const { basicResourceRouteTests } = require('./route_id.test');
 const { basicSchemaTests } = require('./route.schema.test');
 const validator = require('../src/validator');
-const validate = validator.validateEventsArray;
+const validate = validator.validateEventArray;
 
 let opts = {
   route: 'events',
@@ -42,6 +42,6 @@ let opts = {
   }
 }
 
-// basicRouteTests(opts);
-// basicResourceRouteTests(opts);
+basicRouteTests(opts);
+basicResourceRouteTests(opts);
 basicSchemaTests(opts);

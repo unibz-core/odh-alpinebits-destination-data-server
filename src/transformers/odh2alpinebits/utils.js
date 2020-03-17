@@ -180,7 +180,10 @@ function transformBasicProperties(source) {
 
 function transformMetadata(source) {
   meta = {};
-  meta.lastUpdate = source.LastChange+'+02:00';
+  
+  if(typeof source.LastChange === 'string' || source.LastChange instanceof String){
+    meta.lastUpdate = source.LastChange.replace(/Z/g,'')+'+02:00';
+  }
   meta.dataProvider = "http://tourism.opendatahub.bz.it/";
   return meta;
 }
