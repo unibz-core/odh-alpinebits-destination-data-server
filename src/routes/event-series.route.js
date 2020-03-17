@@ -20,7 +20,9 @@ module.exports = function(app) {
   });
 
   app.get('/1.0/eventSeries/:id/multimediaDescriptions', function(req, res) {
-    errors.handleNotImplemented(req,res);
+    connector.getEventSeriesMedia(parseResourceRequest(req))
+      .then(data => res.json(data))
+      .catch(error => errors.handleError(error, req, res));
   });
 
 }

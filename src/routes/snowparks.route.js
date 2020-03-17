@@ -20,6 +20,8 @@ module.exports = function(app) {
   });
 
   app.get('/1.0/snowparks/:id/multimediaDescriptions', function(req, res) {
-    errors.handleNotImplemented(req,res);
+    connector.getSnowparkMedia(parseResourceRequest(req))
+      .then(data => res.json(data))
+      .catch(error => errors.handleError(error, req, res));
   });
 }

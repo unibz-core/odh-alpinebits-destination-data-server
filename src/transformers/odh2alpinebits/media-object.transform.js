@@ -2,6 +2,27 @@ const shajs = require('sha.js')
 const utils = require('./utils');
 const templates = require('./templates');
 
+function transformMockMultimediaDescriptionsRelationship(sourceResource, included, request) {
+  let sourceArray = sourceResource.relationships.multimediaDescriptions;
+
+  if(!sourceArray || !sourceArray.data)
+    return null;
+  
+  let data = [];
+
+  for (reference of sourceArray.data){
+    let mediaObject = sourceResource.included.find( element => 
+      element.type===reference.type && element.id===reference.id
+    );
+    data.push(mediaObject);
+  }
+
+  if(data.length===0)
+    return null;
+
+  return data;
+}
+
 function transformMultimediaDescriptionsRelationship(sourceResource, included, request) {
   let data = [];
 
@@ -79,7 +100,8 @@ function transformMediaObject(source, included, request) {
 
 module.exports = {
   transformMediaObject,
-  transformMultimediaDescriptionsRelationship
+  transformMultimediaDescriptionsRelationship,
+  transformMockMultimediaDescriptionsRelationship
 }
 
 

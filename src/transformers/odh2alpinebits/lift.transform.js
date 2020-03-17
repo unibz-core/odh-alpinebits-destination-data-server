@@ -63,6 +63,7 @@ IGNORED:
 
 const utils = require('./utils');
 const templates = require('./templates');
+const { transformMediaObject } = require('./media-object.transform');
 
 module.exports = (originalObject, included = {}, request) => {
   const source = JSON.parse(JSON.stringify(originalObject));
@@ -129,7 +130,7 @@ module.exports = (originalObject, included = {}, request) => {
   let relationships = target.relationships;
 
   for (image of source.ImageGallery){
-    const { mediaObject, copyrightOwner } = utils.transformMediaObject(image, links, request);
+    const { mediaObject, copyrightOwner } = transformMediaObject(image, links, request);
     utils.addRelationshipToMany(relationships, 'multimediaDescriptions', mediaObject, links.self);
     utils.addIncludedResource(included, mediaObject);
     utils.addIncludedResource(included, copyrightOwner);

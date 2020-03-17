@@ -9,6 +9,8 @@ const ACTIVITY_REDUCED_PATH = 'ActivityReduced';
 const SKIAREA_PATH = 'Skiarea';
 const SKIAREGION_PATH = 'Skiregion';
 
+const EVENT_SERIES_PATH = '../../data/event-series.data';
+
 const axiosOpts = {
   baseURL: process.env.ODH_BASE_URL,
   timeout: process.env.ODH_TIMEOUT,
@@ -51,51 +53,45 @@ function fetchSnowparks (request) {
   return fetch(path, request, odh2ab.transformSnowparkArray)
 }
 
-function fetchEventSeries (request) {
-  const { page } = request.query;
-  let pageSize = page && page.size ? page.size : 10;
-  let pageNumber = page && page.number ? page.number : 1;
+// function fetchMockData (request, filePath) {
+//   const { page } = request.query;
+//   let pageSize = page && page.size ? page.size : 10;
+//   let pageNumber = page && page.number ? page.number : 1;
 
-  res = getEventSeriesData({ pageSize, pageNumber });
+//   res = loadMockDataFromFile({ pageSize, pageNumber }, filePath);
 
-  if(!res.data || res.status!==200){
-    console.log('ERROR: Resource not found!');
-    throw errors.notFound;
-  }
+//   if(!res.data || res.status!==200){
+//     console.log('ERROR: Resource not found!');
+//     throw errors.notFound;
+//   }
 
-  console.log('OK: Mock data found for \'Event Series\'.\n');
+//   console.log('OK: Mock data found for \'Event Series\'.\n');
 
-  try {
-    console.log('> Transforming data to the AlpineBits format...');
-    const data = odh2ab.transformEventSeriesArray(res.data, request);
-    console.log('OK: Sucessfully transformed data.\n');
+//   try {
+//     console.log('> Transforming data to the AlpineBits format...');
+//     const data = odh2ab.transformEventSeriesArray(res.data, request);
+//     console.log('OK: Sucessfully transformed data.\n');
     
-    //TODO: support fecthing subresource
-    //TODO: generalize this function
-    return data;
-  }
-  catch(error) {
-    handleTransformationError(error);
-  }
-}
+//     return data;
+//   }
+//   catch(error) {
+//     handleTransformationError(error);
+//   }
+// }
 
-function fetchEventSeriesById (request) {
-  console.log(`\n> Fetching data from 'Event Series - Mock Data' ...`);
-  res = getEventSeriesData({ id: request.params.id });
+function fechMockData (request, filePath, transformFn) {
+  res = loadMockDataFromFile(request, filePath);
 
   if(!res.data || res.status!==200){
     console.log('ERROR: Resource not found!');
     throw errors.notFound;
   }
 
-  console.log('OK: Data found on \'Event Series - Mock Data\'.\n');
-
   try {
     console.log('> Transforming data to the AlpineBits format...');
-    const data = odh2ab.transformEventSeries(res.data, request);
+    const data = transformFn(res.data, request);
     console.log('OK: Sucessfully transformed data.\n');
 
-    // TODO: Support fetchSubResource()
     return data;
   }
   catch(error) {
@@ -103,13 +99,24 @@ function fetchEventSeriesById (request) {
   }
 }
 
-function getEventSeriesData(params) {
-  let id = params.id;
-  let eventSeriesData = require('../../data/event-series.data');
-  let res = {}
+function loadMockDataFromFile(request, filePath) {
+  let mockData;
+  
+  try {
+    console.log(`\n> Loading mock data from '${filePath}'...`);
+    mockData = require(filePath);
+    console.log('OK: Data loaded.\n');
+  }
+  catch {
+    console.log(`ERROR: Could not read file '${filePath}'!`);
+    res.status = 404;
+    return res;
+  }
 
-  if(id) {
-    data = eventSeriesData.find(eventSeries => eventSeries.id === id);
+  let res = {};
+  
+  if(request.params.id) {
+    data = mockData.find(resource => resource.id === request.params.id);
     if(data) {
       res.data = data;
       res.status = 200;
@@ -120,25 +127,27 @@ function getEventSeriesData(params) {
 
     return res;
   }
+  else {
+    const { page } = request.query;
+    let pageSize = page && page.size ? page.size : 10;
+    let pageNumber = page && page.number ? page.number : 1;
 
-  let pageSize = params.pageSize;
-  let pageNumber = params.pageNumber;
+    if(pageNumber > Math.ceil(mockData.length/pageSize)) {
+      res.status = 404;
+      return res;
+    }
 
-  if(pageNumber > Math.ceil(eventSeriesData.length/pageSize)) {
-    res.status = 404;
+    res.data = {
+      TotalResults:  mockData.length,
+      TotalPages: Math.ceil(mockData.length/pageSize),
+      CurrentPage: pageNumber,
+      Seed: "null",
+      Items: mockData.slice((pageNumber-1)*pageSize,pageNumber*pageSize)
+    };
+    res.status = 200;
+
     return res;
   }
-
-  res.data = {
-    TotalResults :  eventSeriesData.length,
-    TotalPages: Math.ceil(eventSeriesData.length/pageSize),
-    CurrentPage: pageNumber,
-    Seed: "null",
-    Items: eventSeriesData.slice((pageNumber-1)*pageSize,pageNumber*pageSize)
-  };
-  res.status = 200;
-
-  return res;
 }
 
 function fetchResourceById(resource, transform) {
@@ -156,7 +165,7 @@ transform(openDataHubObject): a function to transform an OpenDataHub response in
   output: an obejct following the AlpineBits format
 */
 
-async function fetch(path, request, transformFn, field) {
+async function fetch(path, request, transformFn) {
   const instance = axios.create(axiosOpts);
   let res;
 
@@ -179,10 +188,6 @@ async function fetch(path, request, transformFn, field) {
     console.log('> Transforming data to the AlpineBits format...');
     const data = transformFn(res.data, request);
     console.log('OK: Sucessfully transformed data.\n');
-
-    // FIXME: returning subroutes
-    // if(field)
-    //   return { data: data[field], meta };
 
     return data;
   }
@@ -348,11 +353,13 @@ module.exports = {
   fetchEventVenues: fetchResourceById(EVENT_PATH, odh2ab.transformVenuesRelationship),
   fetchLifts,
   fetchLiftById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformLift),
+  fetchLiftMediaObjects: fetchResourceById(ACTIVITY_PATH, odh2ab.transformMultimediaDescriptionsRelationship),
   fetchTrails,
   fetchTrailById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformTrail),
-  fetchTrailMediaObjects: fetchResourceById(ACTIVITY_PATH, odh2ab.transformTrail),
+  fetchTrailMediaObjects: fetchResourceById(ACTIVITY_PATH, odh2ab.transformMultimediaDescriptionsRelationship),
   fetchSnowparks,
   fetchSnowparkById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformSnowpark),
+  fetchSnowparkMediaObjects: fetchResourceById(ACTIVITY_PATH, odh2ab.transformMultimediaDescriptionsRelationship),
   fetchMountainAreas: request => fetchMountainArea(request, null),
   fetchMountainAreaById: request => fetchMountainArea(request, null),
   fetchMountainAreaMedia: request => fetchMountainArea(request, 'multimediaDescriptions'),
@@ -360,6 +367,7 @@ module.exports = {
   fetchMountainAreaLifts: request => fetchMountainArea(request, 'lifts'),
   fetchMountainAreaTrails: request => fetchMountainArea(request, 'trails'),
   fetchMountainAreaSnowparks: request => fetchMountainArea(request, 'snowparks'),
-  fetchEventSeries,
-  fetchEventSeriesById,
+  fetchEventSeries: request => fechMockData(request, EVENT_SERIES_PATH, odh2ab.transformEventSeriesArray),
+  fetchEventSeriesById: request => fechMockData(request, EVENT_SERIES_PATH, odh2ab.transformEventSeries),
+  fetchEventSeriesMedia: request => fechMockData(request, EVENT_SERIES_PATH, odh2ab.transformMockMultimediaDescriptionsRelationship),
 }

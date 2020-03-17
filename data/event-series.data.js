@@ -30,6 +30,10 @@ module.exports = [
           {
             type: "mediaObjects",
             id: "0"
+          },
+          {
+            type: "mediaObjects",
+            id: "1"
           }
         ],
         links: {
@@ -40,30 +44,61 @@ module.exports = [
     },
     included: [
       {
-        "type": "mediaObjects",
-        "id": "0",
-        "meta": {
-          "dataProvider": null,
-          "lastUpdate": null
+        type: "mediaObjects",
+        id: "0",
+        meta: {
+          dataProvider: null,
+          lastUpdate: null
         },
-        "attributes": {
-          "abstract": null,
-          "categories": null,
-          "contentType": "image/png",
-          "description": null,
-          "duration": null,
-          "height": null,
-          "license": null,
-          "name": null,
-          "shortName": null,
-          "url": "http://example.com/image.png",
-          "width": null
+        attributes: {
+          abstract: null,
+          categories: null,
+          contentType: "image/png",
+          description: null,
+          duration: null,
+          height: 100,
+          license: "CC0-1.0",
+          name: {
+            eng: "My image."
+          },
+          shortName: null,
+          url: "http://example.com/image.png",
+          width: 200
         },
-        "relationships": {
-          "copyrightOwner": null
+        relationships: {
+          copyrightOwner: null
         },
-        "links": {
-          "self": null
+        links: {
+          self: null
+        } 
+      },
+      {
+        type: "mediaObjects",
+        id: "1",
+        meta: {
+          dataProvider: null,
+          lastUpdate: null
+        },
+        attributes: {
+          abstract: null,
+          categories: null,
+          contentType: "image/png",
+          description: null,
+          duration: null,
+          height: 400,
+          license: "CC0-1.0",
+          name: {
+            eng: "My second image."
+          },
+          shortName: null,
+          url: "http://example.com/another-image.png",
+          width: 400
+        },
+        relationships: {
+          copyrightOwner: null
+        },
+        links: {
+          self: null
         } 
       }
     ]

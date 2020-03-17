@@ -20,7 +20,9 @@ module.exports = function(app) {
   });
 
   app.get('/1.0/lifts/:id/multimediaDescriptions', function(req, res) {
-    errors.handleNotImplemented(req,res);
+    connector.getLiftMedia(parseResourceRequest(req))
+      .then(data => res.json(data))
+      .catch(error => errors.handleError(error, req, res));
   });
 
 }

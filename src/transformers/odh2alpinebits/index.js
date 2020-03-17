@@ -2,7 +2,7 @@ const transformEvent = require('./event.transform');
 const { transformOrganizersRelationship } = require('./organizer.transform');
 const { transformPublisherRelationship } = require('./publisher.transform');
 const { transformVenuesRelationship } = require('./venue.transform');
-const { transformMultimediaDescriptionsRelationship } = require('./media-object.transform');
+const { transformMockMultimediaDescriptionsRelationship } = require('./media-object.transform');
 const transformLift = require('./lift.transform');
 const transformTrail = require('./trail.transform');
 const transformSnowpark = require('./snowpark.transform');
@@ -40,8 +40,6 @@ function transformObject(odhData, request, transformFn) {
   let includedMap = {};
   
   let data = transformFn(odhData, includedMap, request);
-  selectFields(data, request);
-  
   let response = {
     links: {
       self: request.selfUrl
@@ -49,12 +47,14 @@ function transformObject(odhData, request, transformFn) {
     data
   }
 
-  const included = createIncludedArray(data, includedMap, request);
-  if(included){
-    selectFields(included, request);
-    response.included = included;
+  if(data){
+    selectFields(data, request);
+    const included = createIncludedArray(data, includedMap, request);
+    if(included){
+      selectFields(included, request);
+      response.included = included;
+    }
   }
-
   return response;
 }
 
@@ -210,7 +210,5 @@ module.exports = {
   transformOrganizersRelationship: (odhData, request) => transformObject(odhData, request, transformOrganizersRelationship),
   transformPublisherRelationship: (odhData, request) => transformObject(odhData, request, transformPublisherRelationship),
   transformVenuesRelationship: (odhData, request) => transformObject(odhData, request, transformVenuesRelationship),
-  transformMultimediaDescriptionsRelationship: (odhData, request) => transformObject(odhData, request, transformMultimediaDescriptionsRelationship),
+  transformMockMultimediaDescriptionsRelationship: (odhData, request) => transformObject(odhData, request, transformMockMultimediaDescriptionsRelationship),
 }
-
-//FIXME: eventSeries not working
