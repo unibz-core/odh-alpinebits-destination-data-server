@@ -7,7 +7,15 @@
           "type": "null"
         },
         {
-          "$ref": "#/definitions/venues"
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/agents"
+              }
+            ]
+          }
         }
       ]
     },
@@ -1104,11 +1112,11 @@
         }
       ]
     },
-    "venues": {
+    "agents": {
       "type": "object",
       "properties": {
         "type": {
-          "const": "venues"
+          "const": "agents"
         },
         "id": {
           "type": "string",
@@ -1147,25 +1155,6 @@
                   }
                 }
               }
-            },
-            {
-              "type": "object",
-              "properties": {
-                "address": {
-                  "$ref": "#/definitions/address"
-                },
-                "geometries": {
-                  "$ref": "#/definitions/optionalGeometries"
-                },
-                "howToArrive": {
-                  "$ref": "#/definitions/text"
-                }
-              },
-              "required": [
-                "address",
-                "geometries",
-                "howToArrive"
-              ]
             }
           ]
         },

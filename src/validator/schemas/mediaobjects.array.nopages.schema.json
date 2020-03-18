@@ -7,7 +7,15 @@
           "type": "null"
         },
         {
-          "$ref": "#/definitions/venues"
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/mediaObjects"
+              }
+            ]
+          }
         }
       ]
     },
@@ -25,14 +33,14 @@
                 "if": {
                   "properties": {
                     "type": {
-                      "const": "mediaObjects"
+                      "const": "agents"
                     }
                   }
                 },
                 "then": {
                   "allOf": [
                     {
-                      "$ref": "#/definitions/mediaObjects"
+                      "$ref": "#/definitions/agents"
                     }
                   ]
                 }
@@ -1104,173 +1112,6 @@
         }
       ]
     },
-    "venues": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "const": "venues"
-        },
-        "id": {
-          "type": "string",
-          "minLength": 1
-        },
-        "meta": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/basicMeta"
-            }
-          ]
-        },
-        "links": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/links"
-            },
-            {
-              "type": "object",
-              "required": [
-                "self"
-              ]
-            }
-          ]
-        },
-        "attributes": {
-          "allOf": [
-            {
-              "$ref": "#/definitions/basicAttributes"
-            },
-            {
-              "not": {
-                "properties": {
-                  "name": {
-                    "type": "null"
-                  }
-                }
-              }
-            },
-            {
-              "type": "object",
-              "properties": {
-                "address": {
-                  "$ref": "#/definitions/address"
-                },
-                "geometries": {
-                  "$ref": "#/definitions/optionalGeometries"
-                },
-                "howToArrive": {
-                  "$ref": "#/definitions/text"
-                }
-              },
-              "required": [
-                "address",
-                "geometries",
-                "howToArrive"
-              ]
-            }
-          ]
-        },
-        "relationships": {
-          "type": "object",
-          "properties": {
-            "multimediaDescriptions": {
-              "oneOf": [
-                {
-                  "type": "null"
-                },
-                {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "oneOf": [
-                        {
-                          "type": "null"
-                        },
-                        {
-                          "type": "array",
-                          "minItems": 1,
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "string",
-                                "minLength": 1
-                              },
-                              "type": {
-                                "type": "string",
-                                "enum": [
-                                  "mediaObjects"
-                                ]
-                              }
-                            },
-                            "required": [
-                              "id",
-                              "type"
-                            ],
-                            "additionalProperties": false
-                          }
-                        }
-                      ]
-                    },
-                    "links": {
-                      "oneOf": [
-                        {
-                          "type": "null"
-                        },
-                        {
-                          "type": "object",
-                          "additionalProperties": {
-                            "oneOf": [
-                              {
-                                "type": "null"
-                              },
-                              {
-                                "type": "string",
-                                "format": "uri"
-                              }
-                            ]
-                          },
-                          "required": [
-                            "related"
-                          ]
-                        }
-                      ]
-                    }
-                  },
-                  "required": [
-                    "data",
-                    "links"
-                  ]
-                }
-              ]
-            }
-          },
-          "additionalProperties": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/definitions/relationshipToOne"
-              },
-              {
-                "$ref": "#/definitions/relationshipToMany"
-              }
-            ]
-          },
-          "required": [
-            "multimediaDescriptions"
-          ]
-        }
-      },
-      "required": [
-        "type",
-        "id",
-        "meta",
-        "links",
-        "attributes",
-        "relationships"
-      ]
-    },
     "mediaObjects": {
       "type": "object",
       "properties": {
@@ -1470,6 +1311,154 @@
           },
           "required": [
             "copyrightOwner"
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "meta",
+        "links",
+        "attributes",
+        "relationships"
+      ]
+    },
+    "agents": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "agents"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "meta": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/basicMeta"
+            }
+          ]
+        },
+        "links": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/links"
+            },
+            {
+              "type": "object",
+              "required": [
+                "self"
+              ]
+            }
+          ]
+        },
+        "attributes": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/basicAttributes"
+            },
+            {
+              "not": {
+                "properties": {
+                  "name": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "relationships": {
+          "type": "object",
+          "properties": {
+            "multimediaDescriptions": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "oneOf": [
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "type": "array",
+                          "minItems": 1,
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "mediaObjects"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      ]
+                    },
+                    "links": {
+                      "oneOf": [
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": {
+                            "oneOf": [
+                              {
+                                "type": "null"
+                              },
+                              {
+                                "type": "string",
+                                "format": "uri"
+                              }
+                            ]
+                          },
+                          "required": [
+                            "related"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "links"
+                  ]
+                }
+              ]
+            }
+          },
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/definitions/relationshipToOne"
+              },
+              {
+                "$ref": "#/definitions/relationshipToMany"
+              }
+            ]
+          },
+          "required": [
+            "multimediaDescriptions"
           ]
         }
       },

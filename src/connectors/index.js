@@ -43,25 +43,34 @@ module.exports = {
   getEventById: req => handleRequest(req, odhCon.fetchEventById, val.validateEvent),
   getEventMedia: req => handleRequest(req, odhCon.fetchEventMediaObjects, val.validateMediaObjectArray),
   getEventPublisher: req => handleRequest(req, odhCon.fetchEventPublisher, val.validateAgent),
-  getEventOrganizers: req => handleRequest(req, odhCon.fetchEventOrganizers, val.validateAgentArray),
-  getEventVenues: req => handleRequest(req, odhCon.fetchEventVenues, val.validateVenueArray),
+  getEventOrganizers: req => handleRequest(req, odhCon.fetchEventOrganizers, val.validateAgentNoPagesArray),
+  getEventVenues: req => handleRequest(req, odhCon.fetchEventVenues, val.validateVenueNoPagesArray),
   getLifts: req => handleRequest(req, odhCon.fetchLifts, val.validateLiftArray),
   getLiftById: req => handleRequest(req, odhCon.fetchLiftById, val.validateLift),
-  getLiftMedia: req => handleRequest(req, odhCon.fetchLiftMediaObjects, val.validateMediaObjectArray),
+  getLiftMedia: req => handleRequest(req, odhCon.fetchLiftMediaObjects, val.validateMediaObjectNoPagesArray),
   getTrails: req => handleRequest(req, odhCon.fetchTrails, val.validateTrailArray),
   getTrailById: req => handleRequest(req, odhCon.fetchTrailById, val.validateTrail),
-  getTrailMedia: req => handleRequest(req, odhCon.fetchTrailMediaObjects, val.validateMediaObjectArray),
+  getTrailMedia: req => handleRequest(req, odhCon.fetchTrailMediaObjects, val.validateMediaObjectNoPagesArray),
   getSnowparks: req => handleRequest(req, odhCon.fetchSnowparks, val.validateSnowparkArray),
   getSnowparkById: req => handleRequest(req, odhCon.fetchSnowparkById, val.validateSnowpark),
-  getSnowparkMedia: req => handleRequest(req, odhCon.fetchSnowparkMediaObjects, val.validateMediaObjectArray),
+  getSnowparkMedia: req => handleRequest(req, odhCon.fetchSnowparkMediaObjects, val.validateMediaObjectNoPagesArray),
   getMountainAreas: req => handleRequest(req, odhCon.fetchMountainAreas, val.validateMountainAreaArray),
   getMountainAreaById: req => handleRequest(req, odhCon.fetchMountainAreaById, val.validateMountainArea),
-  getMountainAreaMedia: req => handleRequest(req, odhCon.fetchMountainAreaMedia, val.validateMediaObjectArray),
+  getMountainAreaMedia: req => handleRequest(req, odhCon.fetchMountainAreaMedia, val.validateMediaObjectNoPagesArray),
   getMountainAreaOwner: req => handleRequest(req, odhCon.fetchMountainAreaOwner, val.validateAgent),
-  getMountainAreaLifts: req => handleRequest(req, odhCon.fetchMountainAreaLifts, val.validateLiftArray),
-  getMountainAreaTrails: req => handleRequest(req, odhCon.fetchMountainAreaTrails, val.validateTrailArray),
-  getMountainAreaSnowparks: req => handleRequest(req, odhCon.fetchMountainAreaSnowparks, val.validateSnowparkArray),
+  getMountainAreaLifts: req => handleRequest(req, odhCon.fetchMountainAreaLifts, val.validateLiftNoPagesArray),
+  getMountainAreaTrails: req => handleRequest(req, odhCon.fetchMountainAreaTrails, val.validateTrailNoPagesArray),
+  getMountainAreaSnowparks: req => handleRequest(req, odhCon.fetchMountainAreaSnowparks, val.validateSnowparkNoPagesArray),
   getEventSeries: (req) => handleRequest(req, odhCon.fetchEventSeries, val.validateEventSeriesArray),
   getEventSeriesById: (req) => handleRequest(req, odhCon.fetchEventSeriesById, val.validateEventSeries),
-  getEventSeriesMedia: req => handleRequest(req, odhCon.fetchEventSeriesMedia, val.validateMediaObjectArray),
+  getEventSeriesMedia: req => handleRequest(req, odhCon.fetchEventSeriesMedia, val.validateMediaObjectNoPagesArray),
 }
+
+// validateAgentNoPagesArray
+// validateEventNoPagesArray
+// validateLiftNoPagesArray
+// validateMediaObjectNoPagesArray
+// validateVenueNoPagesArray
+// validateTrailNoPagesArray
+// validateSnowparkNoPagesArray
+// validateMountainAreaNoPagesArray

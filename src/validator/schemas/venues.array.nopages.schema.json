@@ -7,7 +7,15 @@
           "type": "null"
         },
         {
-          "$ref": "#/definitions/venues"
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/venues"
+              }
+            ]
+          }
         }
       ]
     },
