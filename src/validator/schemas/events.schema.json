@@ -134,15 +134,7 @@
         "url": {
           "$ref": "#/definitions/url"
         }
-      },
-      "required": [
-        "abstract",
-        "categories",
-        "description",
-        "name",
-        "shortName",
-        "url"
-      ]
+      }
     },
     "categories": {
       "oneOf": [
@@ -1188,11 +1180,9 @@
               "$ref": "#/definitions/basicAttributes"
             },
             {
-              "not": {
-                "properties": {
-                  "name": {
-                    "type": "null"
-                  }
+              "patternProperties": {
+                "name": {
+                  "type": "object"
                 }
               }
             },
@@ -1223,12 +1213,6 @@
                   ]
                 }
               },
-              "required": [
-                "capacity",
-                "endDate",
-                "startDate",
-                "status"
-              ],
               "if": {
                 "anyOf": [
                   {
@@ -1843,26 +1827,9 @@
               }
             ]
           },
-          "required": [
-            "contributors",
-            "multimediaDescriptions",
-            "organizers",
-            "publisher",
-            "series",
-            "sponsors",
-            "subEvents",
-            "venues"
-          ]
+          "required": []
         }
-      },
-      "required": [
-        "type",
-        "id",
-        "meta",
-        "links",
-        "attributes",
-        "relationships"
-      ]
+      }
     },
     "agents": {
       "type": "object",
@@ -1900,11 +1867,9 @@
               "$ref": "#/definitions/basicAttributes"
             },
             {
-              "not": {
-                "properties": {
-                  "name": {
-                    "type": "null"
-                  }
+              "patternProperties": {
+                "name": {
+                  "type": "object"
                 }
               }
             }
@@ -1998,19 +1963,9 @@
               }
             ]
           },
-          "required": [
-            "multimediaDescriptions"
-          ]
+          "required": []
         }
-      },
-      "required": [
-        "type",
-        "id",
-        "meta",
-        "links",
-        "attributes",
-        "relationships"
-      ]
+      }
     },
     "eventSeries": {
       "type": "object",
@@ -2048,11 +2003,9 @@
               "$ref": "#/definitions/basicAttributes"
             },
             {
-              "not": {
-                "properties": {
-                  "name": {
-                    "type": "null"
-                  }
+              "patternProperties": {
+                "name": {
+                  "type": "object"
                 }
               }
             },
@@ -2079,10 +2032,7 @@
                     }
                   ]
                 }
-              },
-              "required": [
-                "frequency"
-              ]
+              }
             }
           ]
         },
@@ -2245,20 +2195,9 @@
               }
             ]
           },
-          "required": [
-            "editions",
-            "multimediaDescriptions"
-          ]
+          "required": []
         }
-      },
-      "required": [
-        "type",
-        "id",
-        "meta",
-        "links",
-        "attributes",
-        "relationships"
-      ]
+      }
     },
     "mediaObjects": {
       "type": "object",
@@ -2296,11 +2235,16 @@
               "$ref": "#/definitions/basicAttributes"
             },
             {
-              "not": {
-                "properties": {
-                  "url": {
-                    "type": "null"
-                  }
+              "patternProperties": {
+                "url": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "object"
+                    }
+                  ]
                 }
               }
             },
@@ -2324,13 +2268,6 @@
                   "$ref": "#/definitions/optionalNonZeroPositiveInteger"
                 }
               },
-              "required": [
-                "contentType",
-                "duration",
-                "height",
-                "license",
-                "width"
-              ],
               "allOf": [
                 {
                   "if": {
@@ -2457,19 +2394,9 @@
               }
             ]
           },
-          "required": [
-            "copyrightOwner"
-          ]
+          "required": []
         }
-      },
-      "required": [
-        "type",
-        "id",
-        "meta",
-        "links",
-        "attributes",
-        "relationships"
-      ]
+      }
     },
     "venues": {
       "type": "object",
@@ -2507,11 +2434,9 @@
               "$ref": "#/definitions/basicAttributes"
             },
             {
-              "not": {
-                "properties": {
-                  "name": {
-                    "type": "null"
-                  }
+              "patternProperties": {
+                "name": {
+                  "type": "object"
                 }
               }
             },
@@ -2527,12 +2452,7 @@
                 "howToArrive": {
                   "$ref": "#/definitions/text"
                 }
-              },
-              "required": [
-                "address",
-                "geometries",
-                "howToArrive"
-              ]
+              }
             }
           ]
         },
@@ -2624,19 +2544,9 @@
               }
             ]
           },
-          "required": [
-            "multimediaDescriptions"
-          ]
+          "required": []
         }
-      },
-      "required": [
-        "type",
-        "id",
-        "meta",
-        "links",
-        "attributes",
-        "relationships"
-      ]
+      }
     }
   },
   "required": [

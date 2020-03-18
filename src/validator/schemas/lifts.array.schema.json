@@ -179,15 +179,7 @@
         "url": {
           "$ref": "#/definitions/url"
         }
-      },
-      "required": [
-        "abstract",
-        "categories",
-        "description",
-        "name",
-        "shortName",
-        "url"
-      ]
+      }
     },
     "categories": {
       "oneOf": [
@@ -1233,11 +1225,9 @@
               "$ref": "#/definitions/basicAttributes"
             },
             {
-              "not": {
-                "properties": {
-                  "name": {
-                    "type": "null"
-                  }
+              "patternProperties": {
+                "name": {
+                  "type": "object"
                 }
               }
             },
@@ -1271,18 +1261,7 @@
                 "personsPerChair": {
                   "$ref": "#/definitions/optionalNonZeroPositiveInteger"
                 }
-              },
-              "required": [
-                "address",
-                "capacity",
-                "geometries",
-                "howToArrive",
-                "length",
-                "maxAltitude",
-                "minAltitude",
-                "openingHours",
-                "personsPerChair"
-              ]
+              }
             }
           ]
         },
@@ -1448,20 +1427,9 @@
               }
             ]
           },
-          "required": [
-            "connections",
-            "multimediaDescriptions"
-          ]
+          "required": []
         }
-      },
-      "required": [
-        "type",
-        "id",
-        "meta",
-        "links",
-        "attributes",
-        "relationships"
-      ]
+      }
     },
     "mediaObjects": {
       "type": "object",
@@ -1499,11 +1467,16 @@
               "$ref": "#/definitions/basicAttributes"
             },
             {
-              "not": {
-                "properties": {
-                  "url": {
-                    "type": "null"
-                  }
+              "patternProperties": {
+                "url": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "object"
+                    }
+                  ]
                 }
               }
             },
@@ -1527,13 +1500,6 @@
                   "$ref": "#/definitions/optionalNonZeroPositiveInteger"
                 }
               },
-              "required": [
-                "contentType",
-                "duration",
-                "height",
-                "license",
-                "width"
-              ],
               "allOf": [
                 {
                   "if": {
@@ -1660,19 +1626,9 @@
               }
             ]
           },
-          "required": [
-            "copyrightOwner"
-          ]
+          "required": []
         }
-      },
-      "required": [
-        "type",
-        "id",
-        "meta",
-        "links",
-        "attributes",
-        "relationships"
-      ]
+      }
     },
     "mountainAreas": {
       "type": "object",
@@ -1710,11 +1666,9 @@
               "$ref": "#/definitions/basicAttributes"
             },
             {
-              "not": {
-                "properties": {
-                  "name": {
-                    "type": "null"
-                  }
+              "patternProperties": {
+                "name": {
+                  "type": "object"
                 }
               }
             },
@@ -1751,19 +1705,7 @@
                 "totalTrailLength": {
                   "$ref": "#/definitions/optionalNonZeroPositiveInteger"
                 }
-              },
-              "required": [
-                "address",
-                "area",
-                "geometries",
-                "howToArrive",
-                "maxAltitude",
-                "minAltitude",
-                "openingHours",
-                "snowCondition",
-                "totalParkLength",
-                "totalTrailLength"
-              ]
+              }
             }
           ]
         },
@@ -2280,25 +2222,9 @@
               }
             ]
           },
-          "required": [
-            "areaOwner",
-            "connections",
-            "lifts",
-            "multimediaDescriptions",
-            "snowparks",
-            "subAreas",
-            "trails"
-          ]
+          "required": []
         }
-      },
-      "required": [
-        "type",
-        "id",
-        "meta",
-        "links",
-        "attributes",
-        "relationships"
-      ]
+      }
     },
     "snowparks": {
       "type": "object",
@@ -2336,11 +2262,9 @@
               "$ref": "#/definitions/basicAttributes"
             },
             {
-              "not": {
-                "properties": {
-                  "name": {
-                    "type": "null"
-                  }
+              "patternProperties": {
+                "name": {
+                  "type": "object"
                 }
               }
             },
@@ -2377,19 +2301,7 @@
                 "snowCondition": {
                   "$ref": "#/definitions/snowCondition"
                 }
-              },
-              "required": [
-                "address",
-                "difficulty",
-                "features",
-                "geometries",
-                "howToArrive",
-                "length",
-                "maxAltitude",
-                "minAltitude",
-                "openingHours",
-                "snowCondition"
-              ]
+              }
             }
           ]
         },
@@ -2555,20 +2467,9 @@
               }
             ]
           },
-          "required": [
-            "connections",
-            "multimediaDescriptions"
-          ]
+          "required": []
         }
-      },
-      "required": [
-        "type",
-        "id",
-        "meta",
-        "links",
-        "attributes",
-        "relationships"
-      ]
+      }
     },
     "trails": {
       "type": "object",
@@ -2606,11 +2507,9 @@
               "$ref": "#/definitions/basicAttributes"
             },
             {
-              "not": {
-                "properties": {
-                  "name": {
-                    "type": "null"
-                  }
+              "patternProperties": {
+                "name": {
+                  "type": "object"
                 }
               }
             },
@@ -2644,18 +2543,7 @@
                 "snowCondition": {
                   "$ref": "#/definitions/snowCondition"
                 }
-              },
-              "required": [
-                "address",
-                "difficulty",
-                "geometries",
-                "howToArrive",
-                "length",
-                "maxAltitude",
-                "minAltitude",
-                "openingHours",
-                "snowCondition"
-              ]
+              }
             }
           ]
         },
@@ -2821,20 +2709,9 @@
               }
             ]
           },
-          "required": [
-            "connections",
-            "multimediaDescriptions"
-          ]
+          "required": []
         }
-      },
-      "required": [
-        "type",
-        "id",
-        "meta",
-        "links",
-        "attributes",
-        "relationships"
-      ]
+      }
     }
   },
   "required": [
