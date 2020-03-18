@@ -22,15 +22,14 @@ function transformArray(odhData, request, transformFn) {
   selectFields(data, request);
 
   const { meta, links } = createPaginationObjects(odhData, request);
-
+  
   let response = {
     jsonapi: {
       version: "1.0"
     },
-    meta,
-    links,
+    meta: meta && meta!=={} ? meta : undefined,
+    links: links && links!=={} ? links : undefined,
     data: data.length>0 ? data : null,
-    included: null
   }
 
   const included = createIncludedArray(data, includedMap, request);
@@ -50,12 +49,10 @@ function transformObject(odhData, request, transformFn) {
     jsonapi: {
       version: "1.0"
     },
-    meta: null,
     links: {
       self: request.selfUrl
     },
-    data,
-    included: null
+    data
   }
 
   if(data){
@@ -66,14 +63,7 @@ function transformObject(odhData, request, transformFn) {
       selectFields(included, request);
       response.included = included;
     }
-
-    if(data.length > 0)
-      response.meta = {
-        count: data.length,
-        pages: 1
-      };
   }
-
   
   return response;
 }
@@ -142,11 +132,14 @@ function createPaginationObjects (odhData, request) {
     else
       prev = last;
   }
-
-  let meta = {
-    count,
-    pages
-  };
+  
+  let meta;
+  
+  if(!request.params.id)
+    meta = {
+      count,
+      pages
+    };
 
   let links;
   let regex = /page\[number\]=[0-9]+/
