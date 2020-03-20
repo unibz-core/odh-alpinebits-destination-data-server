@@ -1,9 +1,9 @@
 const { basicResourceRouteTests } = require('./route_id.test');
 const { basicRouteTests } = require('./route.test');
-const validator = require('../src/validator');
 const { basicSchemaTests } = require('./route.schema.test');
 
-const validate = validator.validateMountainAreaArray;
+const arraySchema = require('../src/validator/schemas/mountainareas.array.schema.json');
+const resourceSchema = require('../src/validator/schemas/mountainareas.schema.json');
 
 let opts = {
   pageSize: 2,
@@ -37,7 +37,8 @@ let opts = {
     }
   ],
   schema: {
-    validate,
+    resourceSchema,
+    arraySchema,
     pageStart: 1,
     pageEnd: 2,
     pageSize: 10

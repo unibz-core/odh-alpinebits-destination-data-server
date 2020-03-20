@@ -192,17 +192,11 @@ function selectFieldsOnResource(resource, fields){
       delete attributes[attrName];   
   })
 
-  if(Object.keys(attributes).length===0)
-    resource.attributes = null;
-
   let relationships = resource.relationships;
   Object.keys(relationships).forEach(attrName => {
     if(!selectedFields.includes(attrName))
       delete relationships[attrName];   
   })
-
-  if(Object.keys(relationships).length===0)
-    resource.relationships = null
 
 }
 

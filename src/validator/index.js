@@ -160,7 +160,7 @@ function validate(validation, message) {
     console.log('OK: Generated message is VALID.');
   }
   else {
-    console.log('ERROR: Generated message is INVALID against message schema!');
+    console.log('ERROR: Generated message is INVALID against resource schema!');
     // console.log('ERROR: '+message+' is INVALID! ' + JSON.stringify(validation.errors,null,1));
     console.log(JSON.stringify(validation.errors,null,2));
     // console.log(JSON.stringify(message,null,2));

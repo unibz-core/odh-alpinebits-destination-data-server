@@ -2,8 +2,8 @@ const { basicResourceRouteTests } = require('./route_id.test');
 const { basicRouteTests } = require('./route.test');
 const { basicSchemaTests } = require('./route.schema.test');
 
-const validator = require('../src/validator');
-const validate = validator.validateSnowparkArray;
+const arraySchema = require('../src/validator/schemas/snowparks.array.schema.json');
+const resourceSchema = require('../src/validator/schemas/snowparks.schema.json');
 
 let opts = {
   route: 'snowparks',
@@ -11,7 +11,8 @@ let opts = {
   sampleAttributes: ['name','address','geometries','openingHours','difficulty'],
   sampleRelationships: ['connections','multimediaDescriptions'],
   schema: {
-    validate,
+    resourceSchema,
+    arraySchema,
     pageStart: 1,
     pageEnd: 2,
     pageSize: 20

@@ -1,8 +1,8 @@
 const { basicRouteTests } = require('./route.test');
 const { basicResourceRouteTests } = require('./route_id.test');
 const { basicSchemaTests } = require('./route.schema.test');
-const validator = require('../src/validator');
-const validate = validator.validateEventArray;
+const arraySchema = require('../src/validator/schemas/events.array.schema.json');
+const resourceSchema = require('../src/validator/schemas/events.schema.json');
 
 let opts = {
   route: 'events',
@@ -35,7 +35,8 @@ let opts = {
     }
   ],
   schema: {
-    validate,
+    resourceSchema,
+    arraySchema,
     pageStart: 1,
     pageEnd: 10,
     pageSize: 50
