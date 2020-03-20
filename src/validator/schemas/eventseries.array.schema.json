@@ -1443,25 +1443,35 @@
                 }
               },
               "if": {
-                "anyOf": [
+                "allOf": [
                   {
                     "properties": {
                       "startDate": {
-                        "type": "null"
-                      }
-                    }
-                  },
-                  {
-                    "properties": {
+                        "anyOf": [
+                          {
+                            "type": "null"
+                          },
+                          {
+                            "type": "string"
+                          }
+                        ]
+                      },
                       "endDate": {
-                        "type": "null"
+                        "anyOf": [
+                          {
+                            "type": "null"
+                          },
+                          {
+                            "type": "string"
+                          }
+                        ]
                       }
                     }
                   }
                 ]
               },
               "then": {
-                "oneOf": [
+                "anyOf": [
                   {
                     "properties": {
                       "startDate": {
