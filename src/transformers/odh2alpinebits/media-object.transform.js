@@ -14,6 +14,7 @@ function transformMockMultimediaDescriptionsRelationship(sourceResource, include
     let mediaObject = sourceResource.included.find( element => 
       element.type===reference.type && element.id===reference.id
     );
+    Object.assign(mediaObject.links, utils.createSelfLink(mediaObject, request));
     data.push(mediaObject);
   }
 
