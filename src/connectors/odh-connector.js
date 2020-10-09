@@ -385,21 +385,17 @@ function getEventFilterArray(request) {
           break;
         case 'beginsBefore': {
           // enddate
-          const date = new Date(filter.beginsBefore);
-          const day = date.getUTCDate() > 9 ? date.getUTCDate() : `0${date.getUTCDate()}`;
-          const month = date.getUTCMonth() + 1 > 9 ? date.getUTCMonth() + 1 : `0${date.getUTCMonth()+1}`;
-          const dateString = `${date.getUTCFullYear()}-${month}-${day}`;
-          filtersArray.push('enddate='+dateString);
+          filtersArray.push('enddate='+parseDateString(filter.beginsBefore));
           break;
         }
         case 'endsAfter': {
           // begindate
-          const date = new Date(filter.endsAfter);
-          const day = date.getUTCDate() > 9 ? date.getUTCDate() : `0${date.getUTCDate()}`;
-          const month = date.getUTCMonth() + 1 > 9 ? date.getUTCMonth() + 1 : `0${date.getUTCMonth()+1}`;
-          const dateString = `${date.getUTCFullYear()}-${month}-${day}`;
-          filtersArray.push('begindate='+dateString);
+          filtersArray.push('begindate='+parseDateString(filter.endsAfter));
           break;
+        }
+        case 'updatedAfter': {
+          // updatefrom
+          filtersArray.push('updatefrom='+parseDateString(filter.updatedAfter));
         }
       }
     }
@@ -407,6 +403,18 @@ function getEventFilterArray(request) {
 
   console.log("Returning from getEventFiltersArray", filtersArray);
   return filtersArray;
+}
+
+function parseDateString(malformedDateString) {
+  const date = new Date(malformedDateString);
+
+  if(isNaN(date.getDate())) {
+    return '';
+  }
+
+  const day = date.getUTCDate() > 9 ? date.getUTCDate() : `0${date.getUTCDate()}`;
+  const month = date.getUTCMonth() + 1 > 9 ? date.getUTCMonth() + 1 : `0${date.getUTCMonth()+1}`;
+  return `${date.getUTCFullYear()}-${month}-${day}`;
 }
 
 function getLangInIso6391(lang) {
