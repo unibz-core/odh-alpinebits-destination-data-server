@@ -1,4 +1,5 @@
 const axios = require('axios');
+const iso6393map = require('./iso639-3-to-1.json')
 const odh2ab = require ('../transformers/odh2alpinebits');
 const errors = require ('../errors');
 require('custom-env').env();
@@ -24,7 +25,9 @@ const axiosOpts = {
 
 function fetchEvents (request) {
   let path = EVENT_PATH;
-  let queryArray = getPaginationQuery(request);
+  let paginationArray = getPaginationQuery(request);
+  let filtersArray = getEventFilterArray(request);
+  let queryArray = [ ...paginationArray, ...filtersArray];
 
   if(queryArray.length)
     path+='?'+queryArray.join('&');
@@ -351,23 +354,120 @@ function getPaginationQuery(request) {
   return pageArray;
 }
 
+function getEventFilterArray(request) {
+  console.log("Running getEventFiltersArray", request.query ? request.query.filter : null);
+
+  const { filter } = request.query;
+  let filtersArray = [];
+
+  if(filter) {
+    for(let filterName of Object.getOwnPropertyNames(filter)) {
+      switch(filterName) {
+        case 'lang': 
+          // langfilter
+          filtersArray.push('langfilter='+getLangInIso6391(filter.lang))
+          break;
+        case 'nearPoint': {
+          // locfilter
+          const lat = filter.nearPoint[0];
+          const lng = filter.nearPoint[1];
+          const rad = filter.nearPoint[2];
+          if(lat && lng && rad) {
+            filtersArray.push('latitude='+lat);
+            filtersArray.push('longitude='+lng);
+            filtersArray.push('radius='+rad);
+          }
+          break;
+        }
+        case 'categories':
+          // topicfilter
+          filtersArray.push('topicfilter='+getCategoriesAsBitmask(filter.categories));
+          break;
+        case 'beginsBefore': {
+          // enddate
+          const date = new Date(filter.beginsBefore);
+          const day = date.getUTCDate() > 9 ? date.getUTCDate() : `0${date.getUTCDate()}`;
+          const month = date.getUTCMonth() + 1 > 9 ? date.getUTCMonth() + 1 : `0${date.getUTCMonth()+1}`;
+          const dateString = `${date.getUTCFullYear()}-${month}-${day}`;
+          filtersArray.push('enddate='+dateString);
+          break;
+        }
+        case 'endsAfter': {
+          // begindate
+          const date = new Date(filter.endsAfter);
+          const day = date.getUTCDate() > 9 ? date.getUTCDate() : `0${date.getUTCDate()}`;
+          const month = date.getUTCMonth() + 1 > 9 ? date.getUTCMonth() + 1 : `0${date.getUTCMonth()+1}`;
+          const dateString = `${date.getUTCFullYear()}-${month}-${day}`;
+          filtersArray.push('begindate='+dateString);
+          break;
+        }
+      }
+    }
+  }
+
+  console.log("Returning from getEventFiltersArray", filtersArray);
+  return filtersArray;
+}
+
+function getLangInIso6391(lang) {
+  if(Array.isArray(lang)) {
+    return lang.map(_3letterCode => iso6393map[_3letterCode]).join(',');
+  } else if(typeof lang === 'string') {
+    return iso6393map[lang];
+  } else {
+    return '';
+  }
+}
+
+const eventCategoryMask = {
+  'schema/BusinessEvent': 1,  // 'Tagungen Vorträge'
+  'schema/SportsEvent': 2,  // 'Sport'
+  'schema/FoodEvent': 4,  // 'Gastronomie/Typische Produkte'
+  'schema/TheaterEvent': 32,  // 'Theater/Vorführungen'
+  'schema/EducationEvent': 64,  // 'Kurse/Bildung'
+  'schema/MusicEvent': 128, // 'Musik/Tanz'
+  'schema/Festival': 256, // 'Volksfeste/Festivals'
+  'schema/VisualArts': 2048,  // 'Ausstellungen/Kunst'
+  'schema/ChildrensEvent': 4096,  // 'Familie'
+  'odh/tagungen-vortrage': 1, // 'schema/BusinessEvent',
+  'odh/sport': 2, // 'schema/SportsEvent',
+  'odh/gastronomie-typische-produkte': 4, // 'schema/FoodEvent',
+  'odh/handwerk-brauchtum': 8,
+  'odh/messen-markte': 16,
+  'odh/theater-vorführungen': 32, // 'schema/TheatherEvent',
+  'odh/kurse-bildung': 64, // 'schema/EducationEvent',
+  'odh/musik-tanz': 128, // 'schema/MusicEvent',
+  'odh/volksfeste-festivals': 256, // 'schema/Festival',
+  'odh/wanderungen-ausflüge': 512,
+  'odh/führungen-besichtigungen': 1024,
+  'odh/ausstellungen-kunst': 2048, // 'schema/VisualArts',
+  'odh/familie': 4096, // 'schema/ChildrensEvent',
+}
+
+function getCategoriesAsBitmask(categories) {
+  if(Array.isArray(categories)) {
+    let categoriesMasks = categories.map(category => eventCategoryMask[category]);
+    return categoriesMasks.reduce((totalMask,currentMask) => !totalMask ? currentMask : totalMask | currentMask);
+  }
+}
+
 module.exports = {
-  fetchEvents,
+  fetchEvents, // TODO: support events filters
   fetchEventById: fetchResourceById(EVENT_PATH, odh2ab.transformEvent),
   fetchEventPublisher: fetchResourceById(EVENT_PATH, odh2ab.transformPublisherRelationship),
   fetchEventMediaObjects: fetchResourceById(EVENT_PATH, odh2ab.transformMultimediaDescriptionsRelationship),
   fetchEventOrganizers: fetchResourceById(EVENT_PATH, odh2ab.transformOrganizersRelationship),
   fetchEventVenues: fetchResourceById(EVENT_PATH, odh2ab.transformVenuesRelationship),
-  fetchLifts,
+  fetchLifts, // TODO: support lifts filters
   fetchLiftById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformLift),
   fetchLiftMediaObjects: fetchResourceById(ACTIVITY_PATH, odh2ab.transformMultimediaDescriptionsRelationship),
-  fetchTrails,
+  fetchTrails, // TODO: support trails filters
   fetchTrailById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformTrail),
   fetchTrailMediaObjects: fetchResourceById(ACTIVITY_PATH, odh2ab.transformMultimediaDescriptionsRelationship),
-  fetchSnowparks,
+  fetchSnowparks, // TODO: support snowparks filters
   fetchSnowparkById: fetchResourceById(ACTIVITY_PATH, odh2ab.transformSnowpark),
   fetchSnowparkMediaObjects: fetchResourceById(ACTIVITY_PATH, odh2ab.transformMultimediaDescriptionsRelationship),
-  fetchMountainAreas: request => fetchMountainArea(request, null),
+  fetchMountainAreas: request => fetchMountainArea(request, null), // TODO: support mountain areas filters
   fetchMountainAreaById: request => fetchMountainArea(request, null),
   fetchMountainAreaMedia: request => fetchMountainAreaDependentRelationship(request, odh2ab.transformAreaMultimedDescriptionsRelationship),
   fetchMountainAreaOwner: request => fetchMountainAreaDependentRelationship(request, odh2ab.transformAreaOwnerRelationship),

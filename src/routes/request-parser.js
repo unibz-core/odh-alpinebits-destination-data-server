@@ -81,6 +81,23 @@ function parseFields(req) {
   return result;
 }
 
+function parseFilter(req) {
+  console.log("Running parseFilters", req.query ? req.query.filter : null);
+  let { filter } = req.query;
+
+  if(!filter) {
+    return {};
+  }
+
+  let result = {}
+  Object.keys(filter).forEach( filterName => {
+    result[filterName] = filter[filterName].split(",")
+  });
+
+  console.log("Returning from parseFilters", result);
+  return result;
+}
+
 function parseResourceRequest(req) {
   let parsedRequest = createRequest(req);
 
@@ -96,7 +113,7 @@ function parseCollectionRequest(req) {
   parsedRequest.query.page = parsePage(req);
   parsedRequest.query.fields = parseFields(req);
   parsedRequest.query.include = parseInclude(req);
-  // parsedRequest.query.filter = parseFilter(req);
+  parsedRequest.query.filter = parseFilter(req);
   return parsedRequest;
 }
 
