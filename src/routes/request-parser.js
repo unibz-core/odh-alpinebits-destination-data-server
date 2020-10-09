@@ -96,6 +96,7 @@ function parseCollectionRequest(req) {
   parsedRequest.query.page = parsePage(req);
   parsedRequest.query.fields = parseFields(req);
   parsedRequest.query.include = parseInclude(req);
+  // parsedRequest.query.filter = parseFilter(req);
   return parsedRequest;
 }
 
