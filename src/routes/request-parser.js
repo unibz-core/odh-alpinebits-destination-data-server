@@ -1,21 +1,21 @@
 function getBaseUrl(req) {
-  return process.env.REF_SERVER_URL + '/1.0';
+  return process.env.REF_SERVER_URL + "/1.0";
 }
 
 function getSelfUrl(req) {
-  return  process.env.REF_SERVER_URL + req.originalUrl;
+  return process.env.REF_SERVER_URL + req.originalUrl;
 }
 
-function createRequest(req){
-  return ({
+function createRequest(req) {
+  return {
     baseUrl: getBaseUrl(req),
     selfUrl: getSelfUrl(req),
     params: req.params,
     query: {
       include: {},
-      fields: {}
-    }
-  });
+      fields: {},
+    },
+  };
 }
 
 //TODO: VALIDATE QUERY PARAMETERS (only exisitng parameters, parameter values)
@@ -24,17 +24,14 @@ function parsePage(req) {
 
   let result = {
     size: 10,
-    number: 1
-  }
+    number: 1,
+  };
 
-  if(!page)
-    return result;
+  if (!page) return result;
 
-  if(page.size>0)
-    result.size = page.size;
+  if (page.size > 0) result.size = page.size;
 
-  if(page.number>0)
-    result.number = page.number;
+  if (page.number > 0) result.number = page.number;
 
   return result;
 }
@@ -43,22 +40,19 @@ function parsePage(req) {
 function parseInclude(req) {
   const { include } = req.query;
 
-  let result = {}
+  let result = {};
 
-  if(!include)
-    return result;
+  if (!include) return result;
 
-  let entries = include.split(',');
-  for(i=0; i<entries.length; i++) {
-
-    const fields = entries[i].split('.');
+  let entries = include.split(",");
+  for (i = 0; i < entries.length; i++) {
+    const fields = entries[i].split(".");
     let container = result;
 
-    for(j=0; j<fields.length; j++) {
+    for (j = 0; j < fields.length; j++) {
       const field = fields[j];
 
-      if(!container[field])
-        container[field] = {}
+      if (!container[field]) container[field] = {};
 
       container = container[field];
     }
@@ -70,31 +64,37 @@ function parseInclude(req) {
 function parseFields(req) {
   let { fields } = req.query;
 
-  if(!fields)
-    return {};
+  if (!fields) return {};
 
-  let result = {}
-  Object.keys(fields).forEach( fieldName => {
-    result[fieldName] = fields[fieldName].split(",")
+  let result = {};
+  Object.keys(fields).forEach((fieldName) => {
+    result[fieldName] = fields[fieldName].split(",");
   });
 
   return result;
 }
 
 function parseFilter(req) {
-  console.log("Running parseFilters", req.query ? req.query.filter : null);
   let { filter } = req.query;
 
-  if(!filter) {
+  if (!filter) {
     return {};
   }
 
-  let result = {}
-  Object.keys(filter).forEach( filterName => {
-    result[filterName] = filter[filterName].split(",")
+  let result = {};
+  Object.keys(filter).forEach((filterName) => {
+    console.log(filter, filterName, result);
+    if (Array.isArray(filter[filterName])) {
+      let filterValues = [];
+      filter[filterName].forEach(
+        (value) => (filterValues = [...filterValues, ...value.split(",")])
+      );
+      result[filterName] = filterValues;
+    } else {
+      result[filterName] = filter[filterName].split(",");
+    }
   });
 
-  console.log("Returning from parseFilters", result);
   return result;
 }
 

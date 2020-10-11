@@ -1,5 +1,8 @@
 const axios = require('axios');
-const iso6393map = require('./iso639-3-to-1.json')
+const { getEventFilterArray } = require('./filters/event-filters');
+const { getLiftFilterArray } = require('./filters/lift-filters');
+const { getSnowparkFilterArray } = require('./filters/snowpark-filters');
+const { getTrailFilterArray } = require('./filters/trail-filters');
 const odh2ab = require ('../transformers/odh2alpinebits');
 const errors = require ('../errors');
 require('custom-env').env();
@@ -36,7 +39,9 @@ function fetchEvents (request) {
 }
 
 function fetchLifts (request) {
-  let queryArray = getPaginationQuery(request);
+  const pageQuery = getPaginationQuery(request);
+  const filterQuery = getLiftFilterArray(request);
+  let queryArray = [ ...pageQuery, ...filterQuery ];
   queryArray.push('odhtagfilter=aufstiegsanlagen')
 
   let path = ACTIVITY_PATH+'?'+queryArray.join('&');
@@ -45,7 +50,9 @@ function fetchLifts (request) {
 }
 
 function fetchTrails (request) {
-  let queryArray = getPaginationQuery(request);
+  let pageQuery = getPaginationQuery(request);
+  let filterQuery = getTrailFilterArray(request);
+  let queryArray = [ ...pageQuery, ...filterQuery ];
   queryArray.push('odhtagfilter=ski alpin,ski alpin (rundkurs),rodelbahnen,loipen')
 
   let path = ACTIVITY_PATH+"?"+queryArray.join("&");
@@ -54,7 +61,9 @@ function fetchTrails (request) {
 }
 
 function fetchSnowparks (request) {
-  let queryArray = getPaginationQuery(request);
+  let pageQuery = getPaginationQuery(request);
+  let filterQuery = getSnowparkFilterArray(request);
+  let queryArray = [ ...pageQuery, ...filterQuery ];
   queryArray.push('odhtagfilter=snowpark')
 
   let path = ACTIVITY_PATH+'?'+queryArray.join('&');
@@ -191,7 +200,7 @@ async function fetchMountainArea(request, field) {
     console.log(`\n> Fetching mountain area(s) from ${process.env.ODH_BASE_URL}...`);
     let areaPath = areaId ? SKIAREA_PATH+'/'+areaId : SKIAREA_PATH;
     let regionPath = areaId ? SKIAREGION_PATH+'/'+areaId : SKIAREGION_PATH;
-    [ areaRes, regionRes] = await Promise.all([instance.get(areaPath), instance.get(regionPath)]);
+    [ areaRes, regionRes] = await Promise.all([instance.get(areaPath), instance.get(regionPath)]); // TODO: insert filters here
 
     if(typeof areaRes.data === 'string')
       areaRes.data = JSON.parse(areaRes.data);
@@ -352,111 +361,6 @@ function getPaginationQuery(request) {
       pageArray.push('pagenumber='+page.number);
   }
   return pageArray;
-}
-
-function getEventFilterArray(request) {
-  console.log("Running getEventFiltersArray", request.query ? request.query.filter : null);
-
-  const { filter } = request.query;
-  let filtersArray = [];
-
-  if(filter) {
-    for(let filterName of Object.getOwnPropertyNames(filter)) {
-      switch(filterName) {
-        case 'lang': 
-          // langfilter
-          filtersArray.push('langfilter='+getLangInIso6391(filter.lang))
-          break;
-        case 'nearPoint': {
-          // locfilter
-          const lat = filter.nearPoint[0];
-          const lng = filter.nearPoint[1];
-          const rad = filter.nearPoint[2];
-          if(lat && lng && rad) {
-            filtersArray.push('latitude='+lat);
-            filtersArray.push('longitude='+lng);
-            filtersArray.push('radius='+rad);
-          }
-          break;
-        }
-        case 'categories':
-          // topicfilter
-          filtersArray.push('topicfilter='+getCategoriesAsBitmask(filter.categories));
-          break;
-        case 'beginsBefore': {
-          // enddate
-          filtersArray.push('enddate='+parseDateString(filter.beginsBefore));
-          break;
-        }
-        case 'endsAfter': {
-          // begindate
-          filtersArray.push('begindate='+parseDateString(filter.endsAfter));
-          break;
-        }
-        case 'updatedAfter': {
-          // updatefrom
-          filtersArray.push('updatefrom='+parseDateString(filter.updatedAfter));
-        }
-      }
-    }
-  }
-
-  console.log("Returning from getEventFiltersArray", filtersArray);
-  return filtersArray;
-}
-
-function parseDateString(malformedDateString) {
-  const date = new Date(malformedDateString);
-
-  if(isNaN(date.getDate())) {
-    return '';
-  }
-
-  const day = date.getUTCDate() > 9 ? date.getUTCDate() : `0${date.getUTCDate()}`;
-  const month = date.getUTCMonth() + 1 > 9 ? date.getUTCMonth() + 1 : `0${date.getUTCMonth()+1}`;
-  return `${date.getUTCFullYear()}-${month}-${day}`;
-}
-
-function getLangInIso6391(lang) {
-  if(Array.isArray(lang)) {
-    return lang.map(_3letterCode => iso6393map[_3letterCode]).join(',');
-  } else if(typeof lang === 'string') {
-    return iso6393map[lang];
-  } else {
-    return '';
-  }
-}
-
-const eventCategoryMask = {
-  'schema/BusinessEvent': 1,  // 'Tagungen Vorträge'
-  'schema/SportsEvent': 2,  // 'Sport'
-  'schema/FoodEvent': 4,  // 'Gastronomie/Typische Produkte'
-  'schema/TheaterEvent': 32,  // 'Theater/Vorführungen'
-  'schema/EducationEvent': 64,  // 'Kurse/Bildung'
-  'schema/MusicEvent': 128, // 'Musik/Tanz'
-  'schema/Festival': 256, // 'Volksfeste/Festivals'
-  'schema/VisualArts': 2048,  // 'Ausstellungen/Kunst'
-  'schema/ChildrensEvent': 4096,  // 'Familie'
-  'odh/tagungen-vortrage': 1, // 'schema/BusinessEvent',
-  'odh/sport': 2, // 'schema/SportsEvent',
-  'odh/gastronomie-typische-produkte': 4, // 'schema/FoodEvent',
-  'odh/handwerk-brauchtum': 8,
-  'odh/messen-markte': 16,
-  'odh/theater-vorführungen': 32, // 'schema/TheatherEvent',
-  'odh/kurse-bildung': 64, // 'schema/EducationEvent',
-  'odh/musik-tanz': 128, // 'schema/MusicEvent',
-  'odh/volksfeste-festivals': 256, // 'schema/Festival',
-  'odh/wanderungen-ausflüge': 512,
-  'odh/führungen-besichtigungen': 1024,
-  'odh/ausstellungen-kunst': 2048, // 'schema/VisualArts',
-  'odh/familie': 4096, // 'schema/ChildrensEvent',
-}
-
-function getCategoriesAsBitmask(categories) {
-  if(Array.isArray(categories)) {
-    let categoriesMasks = categories.map(category => eventCategoryMask[category]);
-    return categoriesMasks.reduce((totalMask,currentMask) => !totalMask ? currentMask : totalMask | currentMask);
-  }
 }
 
 module.exports = {
