@@ -4,7 +4,7 @@ const {
   parsePointDistance,
 } = require("./common");
 
-function getLiftFilterArray(request) {
+function getLiftFilterQuery(request) {
   const { filter } = request.query;
   let filtersArray = [];
 
@@ -14,9 +14,9 @@ function getLiftFilterArray(request) {
         case "lang": // langfilter
           filtersArray.push("langfilter=" + getLangInIso6391(filter.lang));
           break;
-        case "nearPoint": {
+        case "nearTo": {
           // latitude, longitude, and radius
-          const { lat, lng, rad } = parsePointDistance(filter.nearPoint);
+          const { lat, lng, rad } = parsePointDistance(filter.nearTo);
           if (lat && lng && rad) {
             filtersArray.push("latitude=" + lat);
             filtersArray.push("longitude=" + lng);
@@ -48,8 +48,10 @@ function getLiftFilterArray(request) {
 
 function getCategoriesAsBitmask(categories) {
   if (Array.isArray(categories)) {
-    let categoriesMasks = categories.map(
-      (category) => activitiesCategoriesMap.Aufstiegsanlagen[category]
+    let categoriesMasks = categories.map((category) =>
+      activitiesCategoriesMap.Aufstiegsanlagen[category]
+        ? activitiesCategoriesMap.Aufstiegsanlagen[category]
+        : 0
     );
     return categoriesMasks.reduce((totalMask, currentMask) =>
       !totalMask ? currentMask : totalMask | currentMask
@@ -187,5 +189,5 @@ const activitiesCategoriesMap = {
 };
 
 module.exports = {
-  getLiftFilterArray,
+  getLiftFilterQuery,
 };

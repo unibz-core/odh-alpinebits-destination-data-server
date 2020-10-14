@@ -1,8 +1,8 @@
 const axios = require('axios');
-const { getEventFilterArray } = require('./filters/event-filters');
-const { getLiftFilterArray } = require('./filters/lift-filters');
-const { getSnowparkFilterArray } = require('./filters/snowpark-filters');
-const { getTrailFilterArray } = require('./filters/trail-filters');
+const { getEventFilterQuery } = require('./filters/event-filters');
+const { getLiftFilterQuery } = require('./filters/lift-filters');
+const { getSnowparkFilterQuery } = require('./filters/snowpark-filters');
+const { getTrailFilterQuery } = require('./filters/trail-filters');
 const odh2ab = require ('../transformers/odh2alpinebits');
 const errors = require ('../errors');
 require('custom-env').env();
@@ -27,43 +27,49 @@ const axiosOpts = {
 }
 
 function fetchEvents (request) {
-  let path = EVENT_PATH;
-  let paginationArray = getPaginationQuery(request);
-  let filtersArray = getEventFilterArray(request);
-  let queryArray = [ ...paginationArray, ...filtersArray];
-
-  if(queryArray.length)
-    path+='?'+queryArray.join('&');
+  const paginationQuery = getPaginationQuery(request);
+  const filtersQuery = getEventFilterQuery(request);
+  const sortQuery = getEventSortQuery(request);
+  const searchQuery = getSearchQuery(request);
+  const queryArray = [ ...paginationQuery, ...filtersQuery, ...sortQuery, ...searchQuery];
+  
+  const path = EVENT_PATH+'?'+queryArray.join('&');
 
   return fetch(path, request, odh2ab.transformEventArray)
 }
 
 function fetchLifts (request) {
   const pageQuery = getPaginationQuery(request);
-  const filterQuery = getLiftFilterArray(request);
-  let queryArray = [ ...pageQuery, ...filterQuery ];
+  const filterQuery = getLiftFilterQuery(request);
+  const searchQuery = getSearchQuery(request);
+  const queryArray = [ ...pageQuery, ...filterQuery, ...searchQuery ];
+
   queryArray.push('odhtagfilter=aufstiegsanlagen')
 
-  let path = ACTIVITY_PATH+'?'+queryArray.join('&');
+  const path = ACTIVITY_PATH+'?'+queryArray.join('&');
 
   return fetch(path, request, odh2ab.transformLiftArray)
 }
 
 function fetchTrails (request) {
-  let pageQuery = getPaginationQuery(request);
-  let filterQuery = getTrailFilterArray(request);
-  let queryArray = [ ...pageQuery, ...filterQuery ];
+  const pageQuery = getPaginationQuery(request);
+  const filterQuery = getTrailFilterQuery(request);
+  const searchQuery = getSearchQuery(request);
+  const queryArray = [ ...pageQuery, ...filterQuery, ...searchQuery ];
+
   queryArray.push('odhtagfilter=ski alpin,ski alpin (rundkurs),rodelbahnen,loipen')
 
-  let path = ACTIVITY_PATH+"?"+queryArray.join("&");
+  const path = ACTIVITY_PATH+"?"+queryArray.join("&");
 
   return fetch(path, request, odh2ab.transformTrailArray)
 }
 
 function fetchSnowparks (request) {
-  let pageQuery = getPaginationQuery(request);
-  let filterQuery = getSnowparkFilterArray(request);
-  let queryArray = [ ...pageQuery, ...filterQuery ];
+  const pageQuery = getPaginationQuery(request);
+  const filterQuery = getSnowparkFilterQuery(request);
+  const searchQuery = getSearchQuery(request);
+  const queryArray = [ ...pageQuery, ...filterQuery, ...searchQuery ];
+
   queryArray.push('odhtagfilter=snowpark')
 
   let path = ACTIVITY_PATH+'?'+queryArray.join('&');
@@ -72,7 +78,7 @@ function fetchSnowparks (request) {
 }
 
 function fechMockData (request, filePath, transformFn) {
-  res = loadMockDataFromFile(request, filePath);
+  let res = loadMockDataFromFile(request, filePath);
 
   if(!res.data || res.status!==200){
     console.log('ERROR: Resource not found!');
@@ -361,6 +367,51 @@ function getPaginationQuery(request) {
       pageArray.push('pagenumber='+page.number);
   }
   return pageArray;
+}
+
+function getSearchQuery(request) {
+  const { _search } = request.query;
+  let result = [];
+
+  if(!_search || typeof _search === 'string') {
+    // At the moment, we only support name searches
+    return result;
+  }
+
+  Object.keys(_search).forEach(searchedField => {
+    switch(searchedField) {
+      case 'name':
+        result.push(`searchfilter=${_search.name}`);
+      default:
+        // At the moment, we only support name searches
+    }
+  })
+
+  return result;
+}
+
+function getEventSortQuery(request) {
+  const { sort } = request.query;
+  let sortArray = [];
+
+  if (typeof sort === 'string') {
+    switch (sort) {
+      case "startDate":
+        sortArray.push("sort=asc");
+        break;
+      case "-startDate":
+        sortArray.push("sort=desc");
+        break;
+      default:
+        // at the moment, other sorting options are not supported
+        sortArray.push("sort=desc");
+        break;
+    }
+  } else {
+    sortArray.push("sort=desc");
+  }
+  
+  return sortArray;
 }
 
 module.exports = {

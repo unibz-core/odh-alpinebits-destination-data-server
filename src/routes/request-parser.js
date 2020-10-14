@@ -83,7 +83,6 @@ function parseFilter(req) {
 
   let result = {};
   Object.keys(filter).forEach((filterName) => {
-    console.log(filter, filterName, result);
     if (Array.isArray(filter[filterName])) {
       let filterValues = [];
       filter[filterName].forEach(
@@ -96,6 +95,14 @@ function parseFilter(req) {
   });
 
   return result;
+}
+
+function parseSearch(req) {
+  let { _search } = req.query;
+  
+  if (_search && (typeof _search === "string" || typeof _search === "object")) {
+    return _search;
+  }
 }
 
 function parseResourceRequest(req) {
@@ -114,6 +121,9 @@ function parseCollectionRequest(req) {
   parsedRequest.query.fields = parseFields(req);
   parsedRequest.query.include = parseInclude(req);
   parsedRequest.query.filter = parseFilter(req);
+  parsedRequest.query.sort = req.query.sort;
+  parsedRequest.query._search = parseSearch(req);
+
   return parsedRequest;
 }
 

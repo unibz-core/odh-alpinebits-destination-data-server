@@ -4,7 +4,7 @@ const {
   parsePointDistance,
 } = require("./common");
 
-function getEventFilterArray(request) {
+function getEventFilterQuery(request) {
   const { filter } = request.query;
   let filtersArray = [];
 
@@ -14,9 +14,9 @@ function getEventFilterArray(request) {
         case "lang": // langfilter
           filtersArray.push("langfilter=" + getLangInIso6391(filter.lang));
           break;
-        case "nearPoint": {
+        case "nearTo": {
           // latitude, longitude, and radius
-          const { lat, lng, rad } = parsePointDistance(filter.nearPoint);
+          const { lat, lng, rad } = parsePointDistance(filter.nearTo);
           if (lat && lng && rad) {
             filtersArray.push("latitude=" + lat);
             filtersArray.push("longitude=" + lng);
@@ -29,12 +29,21 @@ function getEventFilterArray(request) {
             "topicfilter=" + getCategoriesAsBitmask(filter.categories)
           );
           break;
-        case "startsBefore": // enddate
-          filtersArray.push("enddate=" + parseDateString(filter.startsBefore));
+        case "happeningBefore": // enddate
+          filtersArray.push("enddate=" + parseDateString(filter.happeningBefore));
           break;
-        case "endsAfter": // begindate
-          filtersArray.push("begindate=" + parseDateString(filter.endsAfter));
+        case "happeningAfter": // begindate
+          filtersArray.push("begindate=" + parseDateString(filter.happeningAfter));
           break;
+        case "happeningBetween": {
+          let limits = Array.isArray(filter.happeningBetween) ? filter.happeningBetween : []
+          limits = limits.map(parseDateString)
+
+          if(limits[0] && limits[1]) {
+            filtersArray.push(`begindate=${limits[0]}&enddate=${limits[1]}`);
+          }
+          break;
+        }
         case "updatedAfter": // updatefrom
           filtersArray.push(
             "updatefrom=" + parseDateString(filter.updatedAfter)
@@ -75,8 +84,8 @@ const eventCategoryMask = {
 
 function getCategoriesAsBitmask(categories) {
   if (Array.isArray(categories)) {
-    let categoriesMasks = categories.map(
-      (category) => eventCategoryMask[category]
+    let categoriesMasks = categories.map((category) =>
+      eventCategoryMask[category] ? eventCategoryMask[category] : 0
     );
     return categoriesMasks.reduce((totalMask, currentMask) =>
       !totalMask ? currentMask : totalMask | currentMask
@@ -85,5 +94,5 @@ function getCategoriesAsBitmask(categories) {
 }
 
 module.exports = {
-  getEventFilterArray,
+  getEventFilterQuery,
 };

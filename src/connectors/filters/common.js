@@ -1,4 +1,4 @@
-const iso6393map = require('./iso639-3-to-1.json');
+const iso6393map = require('iso-639-3/to-1.json');
 
 function parseDateString(malformedDateString) {
     const date = new Date(malformedDateString);
@@ -24,8 +24,8 @@ function getLangInIso6391(lang) {
 
 function parsePointDistance(point) {
     const distanceToPoint = {
-        lat: point[0],
-        lng: point[1],
+        lng: point[0],
+        lat: point[1],
         rad: point[2],
     }
 
