@@ -172,6 +172,7 @@ const resources = {
     attributes: {
       abstract: null,
       categories: null,
+      name: null,
       description: null,
       url: null,
       length: null,
@@ -291,3 +292,15 @@ module.exports.createObject = (type) => {
   
   return {}
 }
+
+module.exports.templates = {
+  agents: resources.Agent,
+  events: resources.Event,
+  eventSeries: resources.EventSeries,
+  lifts: resources.Lift,
+  mediaObjects: resources.MediaObject,
+  mountainAreas: resources.MountainArea,
+  snowparks: resources.Snowpark,
+  trails: resources.Trail,
+  venues: resources.Venue,
+};

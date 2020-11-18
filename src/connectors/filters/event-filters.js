@@ -30,16 +30,22 @@ function getEventFilterQuery(request) {
           );
           break;
         case "happeningBefore": // enddate
-          filtersArray.push("enddate=" + parseDateString(filter.happeningBefore));
+          filtersArray.push(
+            "enddate=" + parseDateString(filter.happeningBefore)
+          );
           break;
         case "happeningAfter": // begindate
-          filtersArray.push("begindate=" + parseDateString(filter.happeningAfter));
+          filtersArray.push(
+            "begindate=" + parseDateString(filter.happeningAfter)
+          );
           break;
         case "happeningBetween": {
-          let limits = Array.isArray(filter.happeningBetween) ? filter.happeningBetween : []
-          limits = limits.map(parseDateString)
+          let limits = Array.isArray(filter.happeningBetween)
+            ? filter.happeningBetween
+            : [];
+          limits = limits.map(parseDateString);
 
-          if(limits[0] && limits[1]) {
+          if (limits[0] && limits[1]) {
             filtersArray.push(`begindate=${limits[0]}&enddate=${limits[1]}`);
           }
           break;
@@ -49,7 +55,11 @@ function getEventFilterQuery(request) {
             "updatefrom=" + parseDateString(filter.updatedAfter)
           );
           break;
-        // Possible to be supported: orgfilter, odhtagfilter, searchfilter (requires better integration)
+        case "organization": // updatefrom
+          filtersArray.push(
+            "orgfilter=" + filter.organization
+          );
+          break;
       }
     }
   }

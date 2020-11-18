@@ -12,7 +12,7 @@ module.exports.basicSearchTests = (opts) => {
 
     opts.searches.forEach((searchEntry) => {
       const { name, value } = searchEntry;
-      const path = `/1.0/${opts.route}?_search[${name}]=${value}`;
+      const path = `/1.0/${opts.route}?search[${name}]=${value}`;
 
       test(path, () => {
         return utils.axiosInstance.get(path).then((res) => {
