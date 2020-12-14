@@ -123,7 +123,7 @@ function createPaginationObjects(odhData, request) {
 
   let count = parseInt(odhData.TotalResults);
   let current = parseInt(odhData.CurrentPage);
-  let last = (pages = parseInt(odhData.TotalPages));
+  let last = (pages = parseInt(odhData.TotalPages) || 1);
   let next = current < last ? current + 1 : last;
   let first = 1;
   let prev = 1;
@@ -149,12 +149,13 @@ function createPaginationObjects(odhData, request) {
     regexParams = /page|include|fields|filter|sort|search|random/;
     hasParams = !!selfUrl.match(regexParams);
 
+    // TODO: double-check; removed appending question mark on <first: selfUrl + (hasParams ? "&" : "?") + pageQueryStr + first,>
     links = {
-      first: selfUrl + (hasParams ? "&" : "?") + pageQueryStr + first,
-      last: selfUrl + (hasParams ? "&" : "?") + pageQueryStr + last,
-      next: selfUrl + (hasParams ? "&" : "?") + pageQueryStr + next,
-      prev: selfUrl + (hasParams ? "&" : "?") + pageQueryStr + prev,
-      self: selfUrl + (hasParams ? "&" : "?") + pageQueryStr + current,
+      first: selfUrl + (hasParams ? "&" : "") + pageQueryStr + first,
+      last: selfUrl + (hasParams ? "&" : "") + pageQueryStr + last,
+      next: selfUrl + (hasParams ? "&" : "") + pageQueryStr + next,
+      prev: selfUrl + (hasParams ? "&" : "") + pageQueryStr + prev,
+      self: selfUrl + (hasParams ? "&" : "") + pageQueryStr + current,
     };
   } else
     links = {
@@ -165,7 +166,7 @@ function createPaginationObjects(odhData, request) {
       self: selfUrl.replace(regex, pageQueryStr + current),
     };
 
-  if (current > last) {
+  if (current > last && count > 0) {
     throw { 
       ...errors.pageNotFound,
       links: {

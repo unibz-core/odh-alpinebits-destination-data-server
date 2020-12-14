@@ -2,25 +2,6 @@ const iso6393to6391 = require("iso-639-3/to-1.json");
 const errors = require("../errors");
 const { templates } = require("../transformers/odh2alpinebits/templates");
 
-// Simple generic filters
-// exists: ,
-// eq: ,
-// neq: ,
-// in: ,
-// notIn: ,
-// gt: ,
-// gte: ,
-// lt: ,
-// lte: ,
-// containsAny: ,
-// containsAll: ,
-// startsWith: ,
-// endWith: ,
-// regex: ,
-// nearPoint: ,
-// intersectsArea: ,
-// withinArea: ,
-
 const langValidation = (languageCodes) => {
   if (Array.isArray(languageCodes)) {
     return languageCodes.some(
@@ -32,7 +13,7 @@ const langValidation = (languageCodes) => {
 };
 
 const categoriesValidation = (categories) => {
-  const regex = /^([a-z]|[A-Z]|[0-9])+\/([a-z]|[A-Z]|[0-9])+$/;
+  const regex = /^([a-z]|[A-Z]|[0-9]|-|_)+\/([a-z]|[A-Z]|[0-9]|-|_)+(,(([a-z]|[A-Z]|[0-9]|-|_)+\/([a-z]|[A-Z]|[0-9]|-|_)+))*$/;
   if (Array.isArray(categories)) {
     return categories.some(
       (category) => !Array.isArray(category) || regex.test(categories)
@@ -46,21 +27,29 @@ const dateValidation = (date) =>
   !Array.isArray(date) && !isNaN(new Date(date).getTime());
 
 const nearToValidation = (pointsInfo) => {
-  if(!Array.isArray(pointsInfo) && typeof pointsInfo !== 'string') {
+  if (!Array.isArray(pointsInfo) && typeof pointsInfo !== "string") {
     return false;
   }
 
-  pointsInfo = normalize(pointsInfo)
-  
+  pointsInfo = normalize(pointsInfo);
+
   if (!Array.isArray(pointsInfo) || pointsInfo.length !== 3) {
     return false;
   }
-  
+
   const lng = Number(pointsInfo[0]);
   const lat = Number(pointsInfo[1]);
   const dist = Number(pointsInfo[2]);
-  
-  return !isNaN(lng) && !isNaN(lat) && Number.isInteger(dist) && dist > 0;
+
+  return (
+    pointsInfo[0] &&
+    pointsInfo[1] &&
+    pointsInfo[2] &&
+    !isNaN(lng) &&
+    !isNaN(lat) &&
+    Number.isInteger(dist) &&
+    dist > 0
+  );
 };
 
 const organizationValidation = (organizationId) => {
@@ -71,32 +60,44 @@ const queryValidation = {
   agents: {},
   events: {
     lang: langValidation,
-    categories: categoriesValidation,
-    happeningBefore: dateValidation,
-    happeningAfter: dateValidation,
-    happeningBetween: dateValidation,
-    updatedAfter: dateValidation,
-    nearTo: nearToValidation,
-    organization: organizationValidation,
+    categories: (filterQuery) =>
+      filterQuery.any && categoriesValidation(filterQuery.any),
+    lastUpdate: (filterQuery) =>
+      filterQuery.gt && dateValidation(filterQuery.gt),
+    venues: (filterQuery) =>
+      filterQuery.near && nearToValidation(filterQuery.near),
+    endDate: (filterQuery) =>
+      filterQuery.gte && dateValidation(filterQuery.gte),
+    startDate: (filterQuery) =>
+      filterQuery.lte && dateValidation(filterQuery.lte),
+    organizers: (filterQuery) =>
+      filterQuery.eq && organizationValidation(filterQuery.eq),
   },
   eventSeries: {},
   lifts: {
     lang: langValidation,
-    categories: categoriesValidation,
-    updatedAfter: dateValidation,
-    nearTo: nearToValidation,
+    categories: (filterQuery) =>
+      filterQuery.any && categoriesValidation(filterQuery.any),
+    lastUpdate: (filterQuery) =>
+      filterQuery.gt && dateValidation(filterQuery.gt),
+    geometries: (filterQuery) =>
+      filterQuery.near && nearToValidation(filterQuery.near),
   },
   mediaObjects: {},
   mountainAreas: {},
   snowparks: {
     lang: langValidation,
-    updatedAfter: dateValidation,
-    nearTo: nearToValidation,
+    lastUpdate: (filterQuery) =>
+      filterQuery.gt && dateValidation(filterQuery.gt),
+    geometries: (filterQuery) =>
+      filterQuery.near && nearToValidation(filterQuery.near),
   },
   trails: {
     lang: langValidation,
-    updatedAfter: dateValidation,
-    nearTo: nearToValidation,
+    lastUpdate: (filterQuery) =>
+      filterQuery.gt && dateValidation(filterQuery.gt),
+    geometries: (filterQuery) =>
+      filterQuery.near && nearToValidation(filterQuery.near),
   },
   venues: {},
 };
@@ -139,7 +140,9 @@ function validateResourceRequestQueries(request) {
         validateFieldsQuery(request);
         break;
       default:
-        throw errors.unknownQuery;
+        errors.throwUnknownQuery(
+          `The query parameter "${queryName}" was not recognized for the requested endpoint`
+        );
     }
   }
 }
@@ -176,7 +179,9 @@ function validateCollectionRequestQueries(request) {
         validateFieldsQuery(request);
         break;
       default:
-        throw errors.unknownQuery;
+        errors.throwUnknownQuery(
+          `The query parameter "${queryName}" was not recognized for the requested endpoint`
+        );
     }
   }
 }
@@ -185,7 +190,7 @@ function validatePageQuery(request) {
   const pageQuery = request.query.page;
 
   if (typeof pageQuery !== "object") {
-    throw errors.badQuery;
+    errors.throwBadQuery(`Invalid page query parameter "page=${pageQuery}"`);
   }
 
   const pageKeys = Object.keys(pageQuery);
@@ -193,9 +198,10 @@ function validatePageQuery(request) {
     Number.isInteger(Number(numberInput)) && Number(numberInput) > 0;
 
   for (const key of pageKeys) {
-    console.log(key, pageQuery, isValid(pageQuery[key]));
     if ((key !== "size" && key !== "number") || !isValid(pageQuery[key])) {
-      throw errors.badQuery;
+      errors.throwBadQuery(
+        `Invalid page query parameter "page[${key}]${pageQuery[key]}"`
+      );
     }
   }
 }
@@ -212,17 +218,19 @@ function validateIncludeQuery(request) {
   let includeQuery = request.query.include;
 
   if (isRepeated(includeQuery)) {
-    throw errors.badQuery;
+    errors.throwBadQuery(`Repeated include query`);
   }
 
   includeQuery = normalize(includeQuery);
 
   if (containsRepeatedValues(includeQuery)) {
-    throw errors.badQuery;
+    errors.throwBadQuery(`Include query contains repeated values`);
   }
 
   if (includeQuery.some((include) => relationships[include] !== null)) {
-    throw errors.unknownQuery;
+    errors.throwUnknownQuery(
+      `Unknown or unsupported value on "include=${includeQuery}"`
+    );
   }
 }
 
@@ -237,13 +245,13 @@ function validateSortQuery(request) {
   let sortQuery = request.query.sort;
 
   if (isRepeated(sortQuery)) {
-    throw errors.badQuery;
+    errors.throwBadQuery(`Repeated sort query`);
   }
 
   sortQuery = normalize(sortQuery).map((value) => value.replace("-", ""));
 
   if (containsRepeatedValues(sortQuery)) {
-    throw errors.badQuery;
+    errors.throwBadQuery(`Sort query contains repeated values`);
   }
 
   if (
@@ -253,32 +261,40 @@ function validateSortQuery(request) {
         !supportedFields[resourceType][fieldToSort]
     )
   ) {
-    throw errors.unknownQuery;
+    errors.throwUnknownQuery(
+      `Unknown or unsupported value on "sort=${sortQuery}"`
+    );
   }
 }
 
 function validateRandomQuery(request) {
   if (request.query.sort) {
-    throw errors.queryConflict;
+    errors.throwQueryConflict(
+      `Unable to process "random" and "sort" on a single request`
+    );
   }
 
   const resourceType = request.path.replace("/1.0/", "");
   const supportedResourceTypes = ["events", "lifts", "snowparks", "trails"];
 
   if (!supportedResourceTypes.includes(resourceType)) {
-    errors.unknownQuery;
+    errors.throwUnknownQuery(
+      `Random query parameter not supported on the requested endpoint`
+    );
   }
 
   let randomQuery = request.query.random;
 
   if (isRepeated(randomQuery)) {
-    throw errors.badQuery;
+    errors.throwBadQuery(`Repeated random query`);
   }
 
   randomQuery = Number(randomQuery);
 
   if (!Number.isInteger(randomQuery) || randomQuery < 1 || randomQuery > 50) {
-    throw errors.badQuery;
+    errors.throwBadQuery(
+      `Invalid query parameter value "random=${randomQuery}"`
+    );
   }
 }
 
@@ -300,41 +316,57 @@ function validateSearchQuery(request) {
   };
 
   if (!supportedFields[resourceType]) {
-    throw errors.unknownQuery;
+    errors.throwUnknownQuery(
+      `Search query parameter not supported on the requested endpoint`
+    );
   }
 
   const searchQuery = request.query.search;
 
   if (
-    typeof searchQuery !== "object" ||
-    Object.values(searchQuery).some((searchString) =>
-      isRepeated(searchString)
-    ) ||
+    Object.values(searchQuery).some((searchString) => isRepeated(searchString))
+  ) {
+    errors.throwBadQuery(`Repeated search query`);
+  }
+
+  if (typeof searchQuery !== "object") {
+    errors.throwBadQuery(
+      `Invalid or unsupported query parameter value on "search"`
+    );
+  }
+
+  if (
     Object.keys(searchQuery).some(
       (fieldToSearch) => !supportedFields[resourceType][fieldToSearch]
     )
   ) {
-    throw errors.badQuery;
+    errors.throwBadQuery(
+      `Invalid or unsupported query parameter value on "search"`
+    );
   }
 }
 
 function validateFilterQuery(request) {
   const filterQuery = request.query.filter;
   let resourceType = request.path.replace("/1.0/", "");
-  
+
   if (resourceType.indexOf("/") >= 0) {
     resourceType = resourceType.substring(0, resourceType.indexOf("/"));
   }
-  
-  if(!queryValidation[resourceType] || typeof filterQuery !== 'object') {
-    errors.badQuery;
+
+  if (!queryValidation[resourceType] || typeof filterQuery !== "object") {
+    errors.throwBadQuery(
+      `Invalid or unsupported query parameter value on "filter"`
+    );
   }
-  
+
   for (const filterName in filterQuery) {
     const filterValidation = queryValidation[resourceType][filterName];
 
-    if(!filterValidation || !filterValidation(filterQuery[filterName])) {
-      throw errors.badQuery;
+    if (!filterValidation || !filterValidation(filterQuery[filterName])) {
+      errors.throwBadQuery(
+        `Invalid or unsupported query parameter value on "filter"`
+      );
     }
   }
 }
@@ -343,7 +375,9 @@ function validateFieldsQuery(request) {
   const fieldsQuery = request.query.fields;
 
   if (typeof fieldsQuery !== "object" || Array.isArray(fieldsQuery)) {
-    throw errors.badQuery;
+    errors.throwBadQuery(
+      `Invalid or unsupported query parameter value on "fields"`
+    );
   }
 
   for (const resourceType in fieldsQuery) {
@@ -354,17 +388,21 @@ function validateFieldsQuery(request) {
       !Array.isArray(fieldNames) ||
       containsRepeatedValues(fieldNames)
     ) {
-      throw errors.badQuery;
+      errors.throwBadQuery(
+        `Invalid or unsupported query parameter value on "fields"`
+      );
     }
-    
+
     const attributes = templates[resourceType].attributes;
     const relationships = templates[resourceType].relationships;
-    
+
     for (const fieldName of fieldNames) {
       if (
         !(relationships[fieldName] === null || attributes[fieldName] === null)
       ) {
-        throw errors.badQuery;
+        errors.throwBadQuery(
+          `Invalid or unsupported query parameter value on "fields"`
+        );
       }
     }
   }
@@ -390,7 +428,6 @@ function createRequest(req) {
   };
 }
 
-//TODO: VALIDATE QUERY PARAMETERS (only existing parameters, parameter values)
 function parsePage(req) {
   const { page } = req.query;
 
@@ -446,29 +483,6 @@ function parseFields(req) {
   return result;
 }
 
-function parseFilter(req) {
-  let { filter } = req.query;
-
-  if (!filter) {
-    return {};
-  }
-
-  let result = {};
-  Object.keys(filter).forEach((filterName) => {
-    if (Array.isArray(filter[filterName])) {
-      let filterValues = [];
-      filter[filterName].forEach(
-        (value) => (filterValues = [...filterValues, ...value.split(",")])
-      );
-      result[filterName] = filterValues;
-    } else {
-      result[filterName] = filter[filterName].split(",");
-    }
-  });
-
-  return result;
-}
-
 function parseSearch(req) {
   let { search } = req.query;
 
@@ -496,9 +510,9 @@ function parseCollectionRequest(req) {
   parsedRequest.query.page = parsePage(req);
   parsedRequest.query.fields = parseFields(req);
   parsedRequest.query.include = parseInclude(req);
-  parsedRequest.query.filter = parseFilter(req);
-  parsedRequest.query.sort = req.query.sort;
-  parsedRequest.query.random = req.query.random;
+  parsedRequest.query.filter = req.query.filter || {};
+  parsedRequest.query.sort = req.query.sort || {};
+  parsedRequest.query.random = req.query.random || {};
   parsedRequest.query.search = parseSearch(req);
 
   return parsedRequest;

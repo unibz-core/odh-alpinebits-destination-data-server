@@ -90,7 +90,7 @@ function fechMockData (request, filePath, transformFn) {
   try {
     console.log('> Transforming data to the AlpineBits format...');
     const data = transformFn(res.data, request);
-    console.log('OK: Sucessfully transformed data.\n');
+    console.log('OK: Successfully transformed data.\n');
 
     return data;
   }
@@ -162,7 +162,7 @@ function fetchResourceById(resource, transform) {
 /*
 transform(openDataHubObject): a function to transform an OpenDataHub response into the AlpineBits format
   input: an object retrieved from the OpenDataHub API
-  output: an obejct following the AlpineBits format
+  output: an object following the AlpineBits format
 */
 
 async function fetch(path, request, transformFn) {

@@ -111,6 +111,7 @@ const resources = {
     links,
     attributes: {
       abstract: null,
+      address: null,
       area: null,
       categories: null,
       description: null,

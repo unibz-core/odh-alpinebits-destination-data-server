@@ -63,6 +63,26 @@ const types = {
   }
 }
 
+function throwUnknownQuery(description) {
+  const newError = Object.assign({ description }, types.unknownQuery)
+  throw newError
+}
+
+function throwBadQuery(description) {
+  const newError = Object.assign({ description }, types.badQuery)
+  throw newError
+}
+
+function throwQueryConflict(description) {
+  const newError = Object.assign({ description }, types.queryConflict)
+  throw newError
+}
+
+function throwPageNotFound(description) {
+  const newError = Object.assign({ description }, types.pageNotFound)
+  throw newError
+}
+
 function getSelfUrl(request) {
   if (request.selfUrl) {
     return request.selfUrl;
@@ -72,8 +92,6 @@ function getSelfUrl(request) {
 }
 
 function handleError(err, req, res) {
-  console.log(err);
-
   const errorMessage = {
     errors: [err],
     links: getSelfUrl(req) ? { self: getSelfUrl(req) } : undefined,
@@ -100,5 +118,9 @@ module.exports = {
   ...types,
   handleError,
   handleNotImplemented,
-  createJSON
-}
+  createJSON,
+  throwUnknownQuery,
+  throwBadQuery,
+  throwQueryConflict,
+  throwPageNotFound,
+};;;;
