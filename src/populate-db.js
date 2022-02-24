@@ -141,7 +141,10 @@ async function main() {
   let venueStreets = mapMultilingualAttributeAddress(dataSource,'Address');
   let insertVenueStreets = (getInsertMultilingualTableAddress(venueStreets, 'streets'));
   console.log(insertVenueStreets);
-
+  let venueRegions = mapMultilingualAttributeRegion(dataSource,'Name');
+  console.log(venueRegions);
+  let insertVenueRegions = (getInsertMultilingualTableAddress(venueRegions, 'regions'));
+  console.log(insertVenueRegions);
   //console.log(insertVenueCities);
   /*let venueNames = mapMultilingualAttributeVenue(dataSource, 'Name');
   venueNames = getUniques(venueNames);
@@ -299,17 +302,17 @@ function getInsertAddress(addresses) {
   return ret;
 }  
 
-function mapMultilingualAttributeVenue(odhData, field, event_id) {
+function mapMultilingualAttributeRegion(odhData, field, event_id) {
   const attributes = []
 
   for (const ev of odhData) {
-    const keys = Object.keys(ev.LocationInfo.TvInfo[field]);
+    const keys = Object.keys(ev.LocationInfo.RegionInfo[field]);
     for (const key of keys) {
       let attribute = {};
       attribute.lang = key;
-      attribute.content = checkQuotesSQL(ev.LocationInfo.TvInfo[field][key]); 
+      attribute.content = checkQuotesSQL(ev.LocationInfo.RegionInfo[field][key]); 
       //attribute.resourceId = ev.LocationInfo.TvInfo.Id;
-      attribute.resourceId = ev.Id+"_venue";
+      attribute.addressId = ev.Id+"_address";
       //attribute.resourceId = ev.Id;
       //Filter inexistent fields
       if ((attribute.content != null) && (attribute.content !=undefined)){
