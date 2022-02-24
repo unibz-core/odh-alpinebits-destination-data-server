@@ -131,9 +131,18 @@ async function main() {
   console.log(insertVenues);
   console.log('--Events - Insert Venue Address at table address');
   let venueAddresses = dataSource.map((venueAddress) => mapAddress(venueAddress));
-  venueAddresses = getUniques(venueAddresses);
+  //venueAddresses = getUniques(venueAddresses);
   insertVenueAddress = getInsertAddress(venueAddresses);
   console.log(insertVenueAddress);
+  //let venueCities = dataSource.map((venueCity) => mapMultilingualAttributeAddress(dataSource,'City'));
+  let venueCities = mapMultilingualAttributeAddress(dataSource,'City');
+  let insertVenueCities = (getInsertMultilingualTableAddress(venueCities, 'cities'));
+  console.log(insertVenueCities);
+  let venueStreets = mapMultilingualAttributeAddress(dataSource,'Address');
+  let insertVenueStreets = (getInsertMultilingualTableAddress(venueStreets, 'streets'));
+  console.log(insertVenueStreets);
+
+  //console.log(insertVenueCities);
   /*let venueNames = mapMultilingualAttributeVenue(dataSource, 'Name');
   venueNames = getUniques(venueNames);
   //insertVenueNames = getInsertMultilingualTable(getUniqueVenues(venueNames, 'resourceId', 'lang', 'content'), 'names');
@@ -320,6 +329,55 @@ function getInsertMultilingualTable(names, table) {
     const id = name.resourceId ? `'${name.resourceId}'` : null;
     const lang = name.lang ? `'${mappings.iso6391to6393[name.lang]}'` : null;
     const content = name.content ? `'${name.content}'` : null;
+    
+    if (content != null) {
+      insert += `(${id}, ${lang}, ${content}),\n`;
+      /*insert += `(${id}, ${lang}, ${content})${
+        length - 1 > index ? "," : ";"
+      }\n`;*/
+    }
+  });
+  //TODO - Less hacky and more elegant solution than the code below
+  let ret = '';
+  if (insert.endsWith(",\n")) {
+     ret = insert.slice(0, -2) + ';\n';
+  }
+  else {
+    ret = insert;
+  }
+  return ret;
+}
+
+function mapMultilingualAttributeAddress(odhData, field) {
+  const attributes = []
+
+  for (const ev of odhData) {
+    const keys = Object.keys(ev.ContactInfos);
+    for (const key of keys) {
+      let attribute = {};
+      attribute.lang = key;
+      attribute.content = checkQuotesSQL(ev.ContactInfos[key][field]); 
+      attribute.addressId = ev.Id+"_address";
+      console.log(attribute);
+      //Filter inexistent fields
+      if ((attribute.content != null) && (attribute.content !=undefined)){
+        attributes.push(attribute);
+      }
+    }
+  }
+  
+  return attributes;
+}
+
+function getInsertMultilingualTableAddress(attributes, table) {
+  attributes = getUniques(attributes);
+  let insert = "INSERT INTO "+table+" (address_id, lang, content)\nVALUES\n";
+  const length = attributes?.length;
+  console.log(attributes[0]);
+  attributes?.forEach((attribute, index) => {
+    const id = attribute.addressId;
+    const lang = attribute.lang ? `'${mappings.iso6391to6393[attribute.lang]}'` : null;
+    const content = attribute.content ? `'${attribute.content}'` : null;
     
     if (content != null) {
       insert += `(${id}, ${lang}, ${content}),\n`;
