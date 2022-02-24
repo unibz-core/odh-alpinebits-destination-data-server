@@ -129,13 +129,17 @@ async function main() {
   let venues = dataSource.map((venue) => mapVenue(venue));
   insertVenues = getInsertVenues(venues);
   console.log(insertVenues);
-  console.log('--Events - Insert Venue name at table names');
-  let venueNames = mapMultilingualAttributeVenue(dataSource, 'Name');
+  console.log('--Events - Insert Venue Address at table address');
+  let venueAddresses = dataSource.map((venueAddress) => mapAddress(venueAddress));
+  venueAddresses = getUniques(venueAddresses);
+  insertVenueAddress = getInsertAddress(venueAddresses);
+  console.log(insertVenueAddress);
+  /*let venueNames = mapMultilingualAttributeVenue(dataSource, 'Name');
   venueNames = getUniques(venueNames);
   //insertVenueNames = getInsertMultilingualTable(getUniqueVenues(venueNames, 'resourceId', 'lang', 'content'), 'names');
   insertVenueNames = getInsertMultilingualTable(venueNames, 'names');
   console.log(insertVenueNames);
-  //await executeSQLQuery(insertVenues);
+  //await executeSQLQuery(insertVenues);*/
 }
 
 /*function getUniqueVenues (venuesArray, field, field2=null, field3=null) {
@@ -242,6 +246,49 @@ function mapMultilingualAttributeOrganizer(odhData, field) {
   
   return attributes;
 }
+
+function mapAddress(odhData) {
+  //address, zipcode, codice postale
+  const address = {};
+  address.id = odhData.Id+"_address";
+  //WARN - 
+  let keys = Object.keys(odhData.OrganizerInfos);
+  //Set default country and zipcode entry
+  address.country = odhData.OrganizerInfos[keys[0]].CountryCode ? 
+                    `'${odhData.OrganizerInfos[keys[0]].CountryCode}'` : `'it'`;
+  address.zipcode = odhData.OrganizerInfos[keys[0]].ZipCode;
+  address.type = null;
+  return address;
+
+}
+
+function getInsertAddress(addresses) {
+  addresses = getUniques(addresses);
+  let insert = "INSERT INTO addresses (id, country, zipcode, type)\nVALUES\n";
+  const length = addresses?.length;
+  addresses?.forEach((address, index) => {
+    const id = `'${address.id}'`;
+    const country = address.country ? address.country : null;
+    const zipcode = address.zipcode ? `'${address.zipcode}'` : null;
+    const type = address.type ? `'${address.type}'` : null;
+    
+    if (zipcode != null) {
+      insert += `(${id}, ${country}, ${zipcode}, ${type}),\n`;
+      /*insert += `(${id}, ${lang}, ${content})${
+        length - 1 > index ? "," : ";"
+      }\n`;*/
+    }
+  });
+  //TODO - Less hacky and more elegant solution than the code below
+  let ret = '';
+  if (insert.endsWith(",\n")) {
+     ret = insert.slice(0, -2) + ';\n';
+  }
+  else {
+    ret = insert;
+  }
+  return ret;
+}  
 
 function mapMultilingualAttributeVenue(odhData, field, event_id) {
   const attributes = []
@@ -401,13 +448,13 @@ function mapVenue (odhData) {
 
   //venue.eventId = odhData.Id;
   venue.id = odhData.Id+"_venue";
-  venue.id = odhData.LocationInfo.TvInfo.Id;
   venue.odh_id = odhData.LocationInfo.TvInfo.Id;
   venue.type = 'venues';
   venue.data_provider = "http://tourism.opendatahub.bz.it/";
   venue.last_update = formatTimestampSQL(new Date().toISOString());
   venue.created_at = formatTimestampSQL(new Date().toISOString());
-  venue.simple_url = venue.simple_url ? `'${venue.simple_url}'` : null;    
+  venue.simple_url = venue.simple_url ? `'${venue.simple_url}'` : null;
+  venue.eventId = odhData.Id;    
   return venue;
 }
 
