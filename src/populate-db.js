@@ -1,8 +1,10 @@
 const fs = require("fs");
 const _ = require("lodash");
 const utils = require("./model/odh2destinationdata/utils");
+//const transformMethods = require("./model/odh2destinationdata/event_transform");
 const mappings = require("./model/mappings");
 const odhEvents = require("/home/jcg/Event.json");//"./../events-1000.json");
+const datatypes = require("/home/jcg/workspace/odh-alpinebits-destination-data-server/src/model/destinationdata/datatypes");
 
 
 const {Pool, Client} = require('pg');
@@ -19,6 +21,8 @@ main();
 
 async function main() {
   let insert;
+
+  //Create SQL Batch file
 
   const dataSource = odhEvents.Items.slice(0, 99);
   //Creating event_series
@@ -91,6 +95,8 @@ async function main() {
   insertDescriptions = insertNames = getInsertMultilingualTable(descriptions, 'descriptions');
   console.log(insertDescriptions);
   //await executeSQLQuery(insertDescriptions);
+
+  //TODO - Confirm short_names and abstracts are present in odh data
   /*console.log('--Events - Insert at table short_names');
   const shortnames = mapMultilingualAttribute(dataSource, 'Header', 'Detail');
   insertShortNames = getInsertMultilingualTable(shortnames, 'short_names');
@@ -101,6 +107,7 @@ async function main() {
   insertAbstracts = getInsertMultilingualTable(abstracts, 'abstracts');
   console.log(insertAbstracts);*/
   //await executeSQLQuery(insertAbstracts);
+  
   console.log('--Events - Insert at table urls');
   const urls = mapMultilingualAttribute(dataSource, 'Url', 'ContactInfos');
   insertUrls = getInsertMultilingualTable(urls, 'urls');
@@ -135,23 +142,36 @@ async function main() {
   insertVenueAddress = getInsertAddress(venueAddresses);
   console.log(insertVenueAddress);
   //let venueCities = dataSource.map((venueCity) => mapMultilingualAttributeAddress(dataSource,'City'));
+  console.log('--Events - Insert Venue City at table city');
   let venueCities = mapMultilingualAttributeAddress(dataSource,'City');
   let insertVenueCities = (getInsertMultilingualTableAddress(venueCities, 'cities'));
   console.log(insertVenueCities);
+  console.log('--Events - Insert Venue Address at table streets');
   let venueStreets = mapMultilingualAttributeAddress(dataSource,'Address');
   let insertVenueStreets = (getInsertMultilingualTableAddress(venueStreets, 'streets'));
   console.log(insertVenueStreets);
+  console.log('--Events - Insert Venue Region at table regions');
   let venueRegions = mapMultilingualAttributeRegion(dataSource,'Name');
   console.log(venueRegions);
   let insertVenueRegions = (getInsertMultilingualTableAddress(venueRegions, 'regions'));
   console.log(insertVenueRegions);
-  //console.log(insertVenueCities);
-  /*let venueNames = mapMultilingualAttributeVenue(dataSource, 'Name');
-  venueNames = getUniques(venueNames);
-  //insertVenueNames = getInsertMultilingualTable(getUniqueVenues(venueNames, 'resourceId', 'lang', 'content'), 'names');
-  insertVenueNames = getInsertMultilingualTable(venueNames, 'names');
-  console.log(insertVenueNames);
-  //await executeSQLQuery(insertVenues);*/
+  //TODO - Complements
+  console.log('--Events - Insert Venue data into table places');
+  let venuePlaces = dataSource.map((venuePlace) => mapPlaces(venuePlace));
+  //console.log(venuePlaces);
+  let insertVenuePlaces = getInsertPlace(venuePlaces);
+  console.log(insertVenuePlaces);
+
+}
+
+function transformVenueGeometries(odhSource) {
+  const { Latitude, Longitude } = odhSource;
+
+  if (!Latitude || !Longitude) {
+    return null;
+  } else {
+    return [datatypes.createPoint(Longitude, Latitude)];
+  }
 }
 
 /*function getUniqueVenues (venuesArray, field, field2=null, field3=null) {
@@ -166,7 +186,7 @@ async function main() {
       }
     }
     else {
-      //if (!venueSet1.has(elem[field]) && !venueSet2.has(elem[field2])) {
+-      //if (!venueSet1.has(elem[field]) && !venueSet2.has(elem[field2])) {
         let temp = `${elem[field]}:${elem[field2]}:${elem[field3]}`;
         if (!venueSet.has(temp)) {
         venueSet.add(temp);
@@ -177,6 +197,7 @@ async function main() {
   return ret;
 }*/
 
+//A simplified Hashset-like method using JSON.stringify
 function getUniques(jsonArray) {
   const uniqueString = new Set(jsonArray.map(JSON.stringify));
   const uniqueArray = Array.from(uniqueString);
@@ -257,6 +278,54 @@ function mapMultilingualAttributeOrganizer(odhData, field) {
   }
   
   return attributes;
+}
+
+function mapPlaces(odhData) {
+  //gps_data, how to arrive, opening_hours
+  const place = {};
+  place.id = odhData.Id+"_place";
+  place.addressId = odhData.Id+"_address";
+  //place.geometries = transformMethods.transformVenueGeometries(odhData);
+  place.geometries = transformVenueGeometries(odhData);
+  place.length = null;
+  place.maxAltitude = null;
+  place.minAltitude = null;
+  place.openingHours = null;
+
+  return place;
+}
+
+function getInsertPlace(places) {
+  places = getUniques(places);
+  let insert = "INSERT INTO places (id, address_id, geometries, length, max_altitude,"+
+                                    "min_altitude, opening_hours)\nVALUES\n";
+  const length = places?.length;
+  places?.forEach((place, index) => {
+    const id = `'${place.id}'`;
+    const address_id = `'${place.addressId}'`;
+    const geometries = `'${place.geometries}'`;
+    const place_length = `'${place.length}'`;
+    const max_altitude = `'${place.maxAltitude}'`;
+    const min_altitude = `'${place.minAltitude}'`;
+    const opening_hours = `'${place.openingHours}'`;
+     
+    if ((id != null) && (address_id != null)) {
+      insert += `(${id}, ${address_id}, ${geometries}, ${place_length},
+                ${max_altitude}, ${min_altitude}, ${opening_hours}\n)`;
+      /*insert += `(${id}, ${lang}, ${content})${
+        length - 1 > index ? "," : ";"
+      }\n`;*/
+    }
+  });
+  //TODO - Less hacky and more elegant solution than the code below
+  let ret = '';
+  if (insert.endsWith(",\n")) {
+     ret = insert.slice(0, -2) + ';\n';
+  }
+  else {
+    ret = insert;
+  }
+  return ret;
 }
 
 function mapAddress(odhData) {
