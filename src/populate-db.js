@@ -3,6 +3,7 @@ const _ = require("lodash");
 const utils = require("./model/odh2destinationdata/utils");
 //const transformMethods = require("./model/odh2destinationdata/event_transform");
 const mappings = require("./model/mappings");
+const categoriesData = require("/home/jcg/workspace/odh-alpinebits-destination-data-server/data/categories.data.js");
 const odhEvents = require("/home/jcg/Event.json");//"./../events-1000.json");
 const datatypes = require("/home/jcg/workspace/odh-alpinebits-destination-data-server/src/model/destinationdata/datatypes");
 
@@ -77,7 +78,21 @@ async function main() {
   eventSeries.push(defEventSeries);
   let insertdefEventSeries = getInsertEventSeries(eventSeries);
   console.log(insertdefEventSeries);
+  
+  console.log('--Extracting category data from ./data/category.js');
+  console.log('--Extracting categories classes alpinebits: and schema:');  
+  const categoriesSubset = filterCategories(categoriesData.categories);
+  console.log('--Mapping categories');    
+  const categories = categoriesSubset.map((category) => mapCategory(category));
+  const insertCategoriesResources = getInsertResources(categories);
+  const insertCategories = getInsertCategories(categories);
 
+  console.log('--Inserting categories in table resources');
+  console.log(insertCategoriesResources);
+  console.log('--Inserting categories in table categories');  
+  console.log(insertCategories);
+  console.log('--Inserting category names in table names');
+  //TODO - Multilingualattribute methods for categories
   console.log('--Extracting Events...');
   const resources = dataSource.map((odhEvent) => mapResource(odhEvent, "events"));
   console.log('--Events - Insert at table resource');
@@ -156,11 +171,11 @@ async function main() {
   let insertVenueRegions = (getInsertMultilingualTableAddress(venueRegions, 'regions'));
   console.log(insertVenueRegions);
   //TODO - Complements
-  console.log('--Events - Insert Venue data into table places');
+  /*console.log('--Events - Insert Venue data into table places');
   let venuePlaces = dataSource.map((venuePlace) => mapPlaces(venuePlace));
   //console.log(venuePlaces);
   let insertVenuePlaces = getInsertPlace(venuePlaces);
-  console.log(insertVenuePlaces);
+  console.log(insertVenuePlaces);*/
 
 }
 
@@ -238,6 +253,67 @@ function checkQuotesSQL(input) {
     return null;
 }
 
+function filterCategories (categories) {
+  let temp = categories;
+  let ret = [];
+
+  for (const cat of temp) {
+    //Filter condition: ids starting with 'alpinebits:' or 'schema:'
+    if ( (cat.id.search('alpinebits:') == 0) || (cat.id.search('schema:') == 0) ){
+      ret.push(cat);
+    }
+  }
+
+  return ret;
+}
+
+function mapCategory (cat) {
+  const category = {};
+
+  category.resourceId = cat.id;
+  category.id = cat.id;
+  category.odh_id = cat.id;
+  category.type = 'categories';
+  category.data_provider = cat.meta.dataProvider;
+  //resource.last_update = _.isString(odhResource.LastChange)
+  category.last_update = cat.meta.LastUpdate
+  //  ? odhResource.LastChange.replace(/Z/g, "") + "+01:00"
+  ? formatTimestampSQL(cat.meta.LastUpdate)
+    : formatTimestampSQL(new Date().toISOString());
+  category.created_at = formatTimestampSQL(new Date().toISOString());
+  category.simple_url = hasSimpleUrl(category) ? getSimpleUrl(category) : null;
+  category.namespace = cat.attributes.namespace;
+  category.names = cat.attributes.name;
+  category.urls = cat.attributes.url;
+  category.description = cat.attributes.description;
+
+  return category;
+}
+
+function getInsertCategories (categories) {
+  categories = getUniques(categories);
+  let insert = "INSERT INTO categories (id, namespace)\nVALUES\n";
+  const length = categories?.length;
+  categories?.forEach((category, index) => {
+    const id = `'${category.id}'`;
+    const namespace = `'${category.namespace}'`;
+
+      
+    if ((id != null) && (namespace != null)) {
+      insert += `(${id}, ${namespace}),\n`;
+    }
+  });
+  //TODO - Less hacky and more elegant solution than the code below
+  let ret = '';
+  if (insert.endsWith(",\n")) {
+      ret = insert.slice(0, -2) + ';\n';
+  }
+  else {
+    ret = insert;
+  }
+  return ret;
+}
+
 function mapMultilingualAttribute(odhResource, field, extra) {
   const attributes = []
 
@@ -303,7 +379,7 @@ function getInsertPlace(places) {
   places?.forEach((place, index) => {
     const id = `'${place.id}'`;
     const address_id = `'${place.addressId}'`;
-    const geometries = `'${place.geometries}'`;
+    const geometries = `'${place.geometries.stringify()}'`;
     const place_length = `'${place.length}'`;
     const max_altitude = `'${place.maxAltitude}'`;
     const min_altitude = `'${place.minAltitude}'`;
